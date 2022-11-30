@@ -15,12 +15,13 @@ func _ready():
 	# Create 31x15 grid, 15x15 for each player and a 1x15 no-man's-land
 	grid = []
 	for x in range(31):
-		grid.append([])
-		for y in range(15):
+		var new_column = []
+		for _y in range(30):
 			if x == 15:
-				grid[x].append('land')
+				new_column.append('land')
 			else:
-				grid[x].append('sea')
+				new_column.append('sea')
+		grid.append(new_column)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -44,13 +45,31 @@ func _draw():
 			for i in range(1, 6):
 				draw_line(hex_points[i - 1], hex_points[i], Color(0.0, 0.0, 0.0))
 			draw_line(hex_points[5], hex_points[0], Color(0.0, 0.0, 0.0))
+			draw_string(font, get_hex_center(x, y), str(x) + ',' + str(y))
 
 func _input(event):
 	if event is InputEventMouseButton:
 		print('Click! Mouse position:', event.position)
 		print('On hex:', get_hex_from_coords(event.position))
+		print('Hex neighbors:', callv("get_hex_neighbors", get_hex_from_coords(event.position)))
 	elif event is InputEventMouseMotion:
 		update()
+
+# Returns a list of hexes that border a given hex
+func get_hex_neighbors(x, y):
+	var oddq_direction_differences = [ \
+		[[+1,  0], [+1, -1], [ 0, -1], [-1, -1], [-1,  0], [ 0, +1]], \
+		[[+1, +1], [+1,  0], [ 0, -1], [-1,  0], [-1, +1], [ 0, +1]], \
+	]
+	var parity = x & 1
+	var hex_neighbors = []
+	for direction in range(6):
+		var diff = oddq_direction_differences[parity][direction]
+		var neighbor_x = x + diff[0]
+		var neighbor_y = y + diff[1]
+		if neighbor_y in range(15) and (neighbor_x in range(14) or neighbor_x in range(16, 31)):
+			hex_neighbors.append([x + diff[0], y + diff[1]])
+	return hex_neighbors
 
 # Returns which hex is at the mouse_pos coordinates
 func get_hex_from_coords(mouse_pos):
@@ -62,14 +81,15 @@ func get_hex_from_coords(mouse_pos):
 
 # Get the center point of the hexagon at x, y
 func get_hex_center(x, y):
-	return Vector2(hex_size + hex_size * 0.75 * x, hex_size + hex_size * y / sqrt(3) * 1.5)
+	var hex_center = Vector2(hex_size + hex_size * 0.75 * x, hex_size + hex_size * y / sqrt(3) * 1.5)
+	if x % 2 != 0:
+		hex_center += Vector2(0, hex_size / sqrt(3) * 0.75)
+	return hex_center
 
 # Get the six points defining the hexagon at x, y
 func get_hex_points(x, y):
 	var hex_center = get_hex_center(x, y)
 	# Offset odd columns
-	if x % 2 != 0:
-		hex_center += Vector2(0, (hex_size / sqrt(3) * 1.5) / 2)
 	var points = []
 	for i in range(6):
 		var angle_deg = 60 * i
