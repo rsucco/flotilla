@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Object",
+"class": "Tile",
+"language": "GDScript",
+"path": "res://Tile.gd"
+} ]
+_global_script_class_icons={
+"Tile": ""
+}
+
 [application]
 
 config/name="flotilla"
