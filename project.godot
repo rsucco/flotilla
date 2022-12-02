@@ -10,11 +10,17 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Object",
+"class": "Grid",
+"language": "GDScript",
+"path": "res://Grid.gd"
+}, {
+"base": "Object",
 "class": "Tile",
 "language": "GDScript",
 "path": "res://Tile.gd"
 } ]
 _global_script_class_icons={
+"Grid": "",
 "Tile": ""
 }
 

@@ -1,19 +1,17 @@
-extends Node2D
+extends Object
+
+class_name Grid
 
 
 # Declare member variables here
 var grid
-var font
 var hex_size
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
-	font = DynamicFont.new()
-	font.font_data = load("res://opensans.ttf")
-	font.size = 10
-	hex_size = 50
+func _init(hex_size = 50):
+	self.hex_size = hex_size
 	# Create 31x15 grid, 15x15 for each player and a 1x15 no-man's-land
-	grid = []
+	self.grid = []
 	for x in range(31):
 		var new_column = []
 		for _y in range(30):
@@ -21,39 +19,7 @@ func _ready():
 				new_column.append(Tile.new(true))
 			else:
 				new_column.append(Tile.new())
-		grid.append(new_column)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-
-func _draw():
-	var mouse_hex = get_hex_from_coords(get_viewport().get_mouse_position())
-	for x in range(31):
-		for y in range(15):
-			var color
-			if mouse_hex == [x, y]:
-				color = PoolColorArray([Color(1.0, 0.0, 0.0)])
-			elif grid[x][y].land:
-				color = PoolColorArray([Color(0.0, 0.7, 0.0)])
-			else:
-				color = PoolColorArray([Color(0.0, 0.0, 0.7)])
-			var hex_points = get_hex_points(x, y)
-			draw_polygon(hex_points, color)
-			# Draw the border
-			for i in range(1, 6):
-				draw_line(hex_points[i - 1], hex_points[i], Color(0.0, 0.0, 0.0))
-			draw_line(hex_points[5], hex_points[0], Color(0.0, 0.0, 0.0))
-			draw_string(font, get_hex_center(x, y), str(x) + ',' + str(y))
-
-func _input(event):
-	if event is InputEventMouseButton:
-		print('Click! Mouse position:', event.position)
-		print('On hex:', get_hex_from_coords(event.position))
-		print('Hex neighbors:', callv("get_all_hex_neighbors", get_hex_from_coords(event.position)))
-	elif event is InputEventMouseMotion:
-		update()
+		self.grid.append(new_column)
 
 # Returns a list of hexes that border a given hex
 func get_all_hex_neighbors(x, y):
@@ -75,7 +41,7 @@ func get_hex_neighbor(x, y, direction):
 	var diff = oddq_direction_differences[parity][direction / 60]
 	var neighbor_x = x + diff[0]
 	var neighbor_y = y + diff[1]
-	if neighbor_y in range(15) and (neighbor_x in range(14) or neighbor_x in range(16, 31)):
+	if neighbor_y in range(15) and (neighbor_x in range(15) or neighbor_x in range(16, 31)):
 		return [neighbor_x, neighbor_y]
 	return [-1, -1]
 
