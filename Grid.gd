@@ -32,15 +32,15 @@ func get_all_hex_neighbors(x, y):
 
 # Returns the hex that borders a given hex in a given direction in degrees
 # Returns [-1, -1] for out of bounds
-func get_hex_neighbor(x, y, direction):
+func get_hex_neighbor(x, y, direction, length = 1):
 	var oddq_direction_differences = [ \
 		[[ 0, -1], [+1, -1], [+1,  0], [ 0, +1], [-1,  0], [-1, -1]], \
 		[[ 0, -1], [+1,  0], [+1, +1], [ 0, +1], [-1, +1], [-1,  0]], \
 	]
 	var parity = x & 1
 	var diff = oddq_direction_differences[parity][direction / 60]
-	var neighbor_x = x + diff[0]
-	var neighbor_y = y + diff[1]
+	var neighbor_x = x + diff[0] * length
+	var neighbor_y = y + diff[1] * length
 	if neighbor_y in range(15) and (neighbor_x in range(15) or neighbor_x in range(16, 31)):
 		return [neighbor_x, neighbor_y]
 	return [-1, -1]

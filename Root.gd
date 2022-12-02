@@ -2,6 +2,7 @@ extends Node2D
 
 var font
 var grid
+var corvette
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -9,6 +10,9 @@ func _ready():
 	font.font_data = load("res://opensans.ttf")
 	font.size = 10
 	grid = Grid.new()
+	corvette = preload('res://Corvette.tscn').instance()
+	corvette.init(320, 3, 4)
+	add_child(corvette)
 
 func _draw():
 	var mouse_hex = grid.get_hex_from_coords(get_viewport().get_mouse_position())
@@ -20,7 +24,7 @@ func _draw():
 			elif grid.grid[x][y].is_land:
 				color = PoolColorArray([Color(0.0, 0.7, 0.0)])
 			else:
-				color = PoolColorArray([Color(0.0, 0.0, 0.7)])
+				color = PoolColorArray([Color(0.0, 0.5, 1.0)])
 			var hex_points = grid.get_hex_points(x, y)
 			draw_polygon(hex_points, color)
 			# Draw the border
