@@ -20,8 +20,8 @@ func set_grid_position(x, y, direction):
 	self.x = x
 	self.y = y
 
-func get_occupied_hexes():
-	var occupied_hexes = [[x, y]]
+func get_occupied_hexes(on_x = self.x, on_y = self.y):
+	var occupied_hexes = [[on_x, on_y]]
 	for i in range(len_fore):
 		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], direction))
 	occupied_hexes.invert()
@@ -36,7 +36,7 @@ func rotate(rotation_offset):
 func move(num_tiles):
 	for i in range(num_tiles):
 		var new_hex = get_parent().grid.get_hex_neighbor(x, y, direction)
-		if new_hex == [-1, -1]:
+		if [-1, -1] in get_occupied_hexes(new_hex[0], new_hex[1]):
 			break
 		self.x = new_hex[0]
 		self.y = new_hex[1]

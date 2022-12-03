@@ -3,6 +3,7 @@ extends Node2D
 var font
 var grid
 var ships
+var selected_ship = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,8 +23,12 @@ func _ready():
 	add_ship('SupplyTender', 27, 2, 0)
 
 func _draw():
+	# Draw grid
 	var y_grid_display = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
 	var mouse_hex = grid.get_hex_from_coords(get_viewport().get_mouse_position())
+	var selected_hexes = []
+	if selected_ship != null:
+		selected_hexes = selected_ship.get_occupied_hexes()
 	for x in range(31):
 		# Draw column markers
 		var string_color
@@ -44,11 +49,14 @@ func _draw():
 				else:
 					string_color = Color(1.0, 1.0, 1.0)
 				draw_string(font, string_location, y_grid_display[y], string_color)
+			# Draw the hexagon
 			var color
 			if mouse_hex == [x, y]:
-				color = PoolColorArray([Color(1.0, 0.0, 0.0)])
+				color = PoolColorArray([Color(0.0, 0.3, 0.9)])
+			elif [x, y] in selected_hexes:
+				color = PoolColorArray([Color(0.0, 0.4, 0.9)])
 			elif grid.grid[x][y].no_mans_land:
-				color = PoolColorArray([Color(0.0, 0.3, 0.3)])
+				color = PoolColorArray([Color(0.0, 0.3, 0.65)])
 			else:
 				color = PoolColorArray([Color(0.0, 0.5, 1.0)])
 			var hex_points = grid.get_hex_points(x, y)
@@ -62,11 +70,13 @@ func _draw():
 
 func _input(event):
 	if event is InputEventMouseButton and event.pressed:
-		print('Click! Mouse position:', event.position)
+		print('Click! Mouse position: ', event.position)
 		var on_hex = grid.get_hex_from_coords(event.position)
-		print('On hex:', on_hex)
-		print('Hex neighbors:', grid.get_all_hex_neighbors(on_hex[0], on_hex[1]))
+		print('On hex: ', on_hex)
+		print('Hex neighbors: ', grid.get_all_hex_neighbors(on_hex[0], on_hex[1]))
 		var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
+		if event.button_index == BUTTON_LEFT:
+			select_ship(ship_at_hex)
 		if ship_at_hex != null:
 			print('Ship at hex: ', ship_at_hex.desc)
 			print('Occupied hexes: ', ship_at_hex.get_occupied_hexes())
@@ -74,12 +84,17 @@ func _input(event):
 				ship_at_hex.rotate(60)
 			elif event.button_index == BUTTON_RIGHT:
 				ship_at_hex.move(1)
+		if selected_ship != null:
+			print('Selected ship: ', selected_ship.desc, ' at ', selected_ship.x, ',', selected_ship.y)
 		print('========================')
-	elif event is InputEventMouseMotion:
-		update()
+	update()
+
+func select_ship(ship):
+	selected_ship = ship
+	update()
 
 func add_ship(ship_type, x, y, direction):
-	var	ship = load('res://ships/' + ship_type + '.tscn').instance()
+	var ship = load('res://ships/' + ship_type + '.tscn').instance()
 	ship.set_grid_position(x, y, direction)
 	add_child(ship)
 	ships.append(ship)
