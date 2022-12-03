@@ -2,16 +2,16 @@ extends Node2D
 
 var font
 var grid
-var ships
+var ships = []
 var selected_ship = null
+var current_turn = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	font = DynamicFont.new()
 	font.font_data = load("res://opensans.ttf")
-	font.size = 10
+	font.size = 11
 	grid = Grid.new()
-	ships = []
 	for i in range(3):
 		add_ship('Corvette', i * 2, i + 1, i * 60 + 180)
 		add_ship('Destroyer', i * 3 + 4, i * 2 + 1, i * 60 + 60)
@@ -80,10 +80,13 @@ func _input(event):
 		if ship_at_hex != null:
 			print('Ship at hex: ', ship_at_hex.desc)
 			print('Occupied hexes: ', ship_at_hex.get_occupied_hexes())
-			if event.button_index == BUTTON_MIDDLE:
+			if event.button_index == BUTTON_LEFT:
+				ship_at_hex.hit(on_hex)
+			elif event.button_index == BUTTON_MIDDLE:
 				ship_at_hex.rotate(60)
 			elif event.button_index == BUTTON_RIGHT:
 				ship_at_hex.move(1)
+			print('Hit hexes: ', ship_at_hex.hit_hexes)
 		if selected_ship != null:
 			print('Selected ship: ', selected_ship.desc, ' at ', selected_ship.x, ',', selected_ship.y)
 		print('========================')

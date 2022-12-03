@@ -7,3 +7,4 @@ func _ready():
 	self.len_fore = 1
 	self.len_aft = 2
 	self.desc = 'Battleship'
+	self.hit_hexes = [false, false, false, false]

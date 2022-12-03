@@ -9,6 +9,7 @@ var len_aft
 var x
 var y
 var desc = ''
+var hit_hexes = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -20,18 +21,34 @@ func set_grid_position(x, y, direction):
 	self.x = x
 	self.y = y
 
-func get_occupied_hexes(on_x = self.x, on_y = self.y):
+func get_occupied_hexes(on_x = self.x, on_y = self.y, in_dir = self.direction):
 	var occupied_hexes = [[on_x, on_y]]
 	for i in range(len_fore):
-		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], direction))
+		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], in_dir))
+	occupied_hexes.remove(0)
 	occupied_hexes.invert()
+	occupied_hexes.append([on_x, on_y])
 	for i in range(len_aft):
-		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], direction + 180))
+		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], in_dir + 180))
 	return occupied_hexes
 
+func hit(hit_hex):
+	var i = self.get_occupied_hexes().find(hit_hex)
+	hit_hexes[i] = true
+	if not false in hit_hexes:
+		self.sink()
+
+func sink():
+	hide()
+	if get_parent().selected_ship == self:
+		get_parent().selected_ship = null
+	get_parent().ships.remove(get_parent().ships.find(self))
+	get_parent().remove_child(self)
+
 func rotate(rotation_offset):
-	self.direction += rotation_offset
-	self.set_rotation_degrees(self.direction)
+	if not [-1, -1] in get_occupied_hexes(self.x, self.y, self.direction + rotation_offset):
+		self.direction += rotation_offset
+		self.set_rotation_degrees(self.direction)
 
 func move(num_tiles):
 	for i in range(num_tiles):
