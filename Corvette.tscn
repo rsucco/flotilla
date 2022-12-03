@@ -1,9 +1,0 @@
-[gd_scene load_steps=3 format=2]
-
-[ext_resource path="res://Corvette.gd" type="Script" id=1]
-[ext_resource path="res://corvette.png" type="Texture" id=2]
-
-[node name="Corvette" type="Sprite"]
-texture = ExtResource( 2 )
-offset = Vector2( 0, 20 )
-script = ExtResource( 1 )
