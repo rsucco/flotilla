@@ -32,3 +32,12 @@ func get_occupied_hexes():
 func rotate(rotation_offset):
 	self.direction += rotation_offset
 	self.set_rotation_degrees(self.direction)
+
+func move(num_tiles):
+	for i in range(num_tiles):
+		var new_hex = get_parent().grid.get_hex_neighbor(x, y, direction)
+		if new_hex == [-1, -1]:
+			break
+		self.x = new_hex[0]
+		self.y = new_hex[1]
+	self.position = get_parent().grid.get_hex_center(self.x, self.y)

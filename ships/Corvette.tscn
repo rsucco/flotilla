@@ -6,5 +6,5 @@
 [node name="Corvette" type="Sprite"]
 scale = Vector2( 1, 1.1 )
 texture = ExtResource( 2 )
-offset = Vector2( 0, -25 )
+offset = Vector2( 0, 15 )
 script = ExtResource( 1 )

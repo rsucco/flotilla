@@ -12,35 +12,14 @@ func _ready():
 	grid = Grid.new()
 	ships = []
 	for i in range(3):
-		var	corvette = preload('res://ships/Corvette.tscn').instance()
-		corvette.set_grid_position(i * 2, i + 1, i * 60 + 180)
-		add_child(corvette)
-		ships.append(corvette)
-		var destroyer = preload('res://ships/Destroyer.tscn').instance()
-		destroyer.set_grid_position(i * 3 + 4, i * 2 + 1, i * 60 + 60)
-		add_child(destroyer)
-		ships.append(destroyer)
-		var cruiser = preload('res://ships/Cruiser.tscn').instance()
-		cruiser.set_grid_position(i * 2 + 1, i * 3 + 4, i * 60 + 120)
-		add_child(cruiser)
-		ships.append(cruiser)
-		var submarine = preload('res://ships/Submarine.tscn').instance()
-		submarine.set_grid_position(i * 2 + 8, i * 3 + 7, i * 60 + 240)
-		add_child(submarine)
-		ships.append(submarine)
+		add_ship('Corvette', i * 2, i + 1, i * 60 + 180)
+		add_ship('Destroyer', i * 3 + 4, i * 2 + 1, i * 60 + 60)
+		add_ship('Cruiser', i * 2 + 1, i * 3 + 4, i * 60 + 120)
+		add_ship('Submarine', i * 2 + 8, i * 3 + 7, i * 60 + 240)
 		if i > 0:
-			var battleship = preload('res://ships/Battleship.tscn').instance()
-			battleship.set_grid_position(i * 4 + 18, i * 4, i * 60 + 300)
-			add_child(battleship)
-			ships.append(battleship)
-	var carrier = preload('res://ships/Carrier.tscn').instance()
-	carrier.set_grid_position(19, 11, 300)
-	add_child(carrier)
-	ships.append(carrier)
-	var tender = preload('res://ships/SupplyTender.tscn').instance()
-	tender.set_grid_position(27, 2, 0)
-	add_child(tender)
-	ships.append(tender)
+			add_ship('Battleship', i * 4 + 18, i * 4, i * 60 + 300)
+	add_ship('Carrier', 19, 11, 300)
+	add_ship('SupplyTender', 27, 2, 0)
 
 func _draw():
 	var y_grid_display = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
@@ -68,8 +47,8 @@ func _draw():
 			var color
 			if mouse_hex == [x, y]:
 				color = PoolColorArray([Color(1.0, 0.0, 0.0)])
-			elif grid.grid[x][y].is_land:
-				color = PoolColorArray([Color(0.0, 0.7, 0.0)])
+			elif grid.grid[x][y].no_mans_land:
+				color = PoolColorArray([Color(0.0, 0.3, 0.3)])
 			else:
 				color = PoolColorArray([Color(0.0, 0.5, 1.0)])
 			var hex_points = grid.get_hex_points(x, y)
@@ -91,11 +70,19 @@ func _input(event):
 		if ship_at_hex != null:
 			print('Ship at hex: ', ship_at_hex.desc)
 			print('Occupied hexes: ', ship_at_hex.get_occupied_hexes())
-			if event.button_index == BUTTON_RIGHT:
+			if event.button_index == BUTTON_MIDDLE:
 				ship_at_hex.rotate(60)
+			elif event.button_index == BUTTON_RIGHT:
+				ship_at_hex.move(1)
 		print('========================')
 	elif event is InputEventMouseMotion:
 		update()
+
+func add_ship(ship_type, x, y, direction):
+	var	ship = load('res://ships/' + ship_type + '.tscn').instance()
+	ship.set_grid_position(x, y, direction)
+	add_child(ship)
+	ships.append(ship)
 
 func get_ship_at_hex(x, y):
 	for ship in ships:
