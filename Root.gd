@@ -2,9 +2,11 @@ extends Node2D
 
 var font
 var grid
-var ships = []
+var gui
+var ships = [[], []]
 var selected_ship = null
 var current_turn = 0
+var player_up = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -13,14 +15,16 @@ func _ready():
 	font.size = 11
 	grid = Grid.new()
 	for i in range(3):
-		add_ship('Corvette', i * 2, i + 1, i * 60 + 180)
-		add_ship('Destroyer', i * 3 + 4, i * 2 + 1, i * 60 + 60)
-		add_ship('Cruiser', i * 2 + 1, i * 3 + 4, i * 60 + 120)
-		add_ship('Submarine', i * 2 + 8, i * 3 + 7, i * 60 + 240)
+		add_ship('Corvette', i * 2, i + 1, i * 60 + 180, 0)
+		add_ship('Destroyer', i * 3 + 4, i * 2 + 1, i * 60 + 60, 0)
+		add_ship('Cruiser', i * 2 + 1, i * 3 + 4, i * 60 + 120, 0)
+		add_ship('Submarine', i * 2 + 8, i * 3 + 7, i * 60 + 240, 0)
 		if i > 0:
-			add_ship('Battleship', i * 4 + 18, i * 4, i * 60 + 300)
-	add_ship('Carrier', 19, 11, 300)
-	add_ship('SupplyTender', 27, 2, 0)
+			add_ship('Battleship', i * 4 + 18, i * 4, i * 60 + 300, 1)
+	add_ship('Carrier', 19, 11, 300, 1)
+	add_ship('SupplyTender', 27, 2, 0, 1)
+	add_ship('Corvette', 18, 3, 0, 1)
+	add_ship('Destroyer', 27, 11, 120, 1)
 
 func _draw():
 	# Draw grid
@@ -32,7 +36,7 @@ func _draw():
 	for x in range(31):
 		# Draw column markers
 		var string_color
-		var string_location = grid.get_hex_center(x, 0) - Vector2(0, grid.hex_size / sqrt(3))
+		var string_location = grid.get_hex_center(x, 0) - Vector2(4, grid.hex_size / sqrt(3))
 		if x % 2 != 0:
 			string_location -= Vector2(0, grid.hex_size / sqrt(3) * 0.75)
 		if mouse_hex[0] == x:
@@ -69,8 +73,8 @@ func _draw():
 			for i in range(1, 6):
 				draw_line(hex_points[i - 1], hex_points[i], Color(0.0, 0.0, 0.0))
 			draw_line(hex_points[5], hex_points[0], Color(0.0, 0.0, 0.0))
-			draw_string(font, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 10, -grid.hex_size / 12), y_grid_display[y] + str(x))
-#			draw_string(font, grid.get_hex_center(x, y), str(x) + ',' + str(y))
+			
+			draw_string(font, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 10, -grid.hex_size / 12), y_grid_display[y] + str(x), Color(0.0, 0.0, 0.0))
 
 func _input(event):
 	if event is InputEventMouseButton and event.pressed:
@@ -82,7 +86,7 @@ func _input(event):
 		if event.button_index == BUTTON_LEFT:
 			select_ship(ship_at_hex)
 		if ship_at_hex != null:
-			print('Ship at hex: ', ship_at_hex.desc)
+			print('Ship at hex: ', ship_at_hex.ship_name)
 			print('Occupied hexes: ', ship_at_hex.get_occupied_hexes())
 			if event.button_index == BUTTON_LEFT:
 				ship_at_hex.hit(on_hex)
@@ -92,7 +96,7 @@ func _input(event):
 				ship_at_hex.move(1)
 			print('Hit hexes: ', ship_at_hex.hit_hexes)
 		if selected_ship != null:
-			print('Selected ship: ', selected_ship.desc, ' at ', selected_ship.x, ',', selected_ship.y)
+			print('Selected ship: ', selected_ship.ship_name, ' at ', selected_ship.x, ',', selected_ship.y)
 		print('========================')
 	update()
 
@@ -124,21 +128,22 @@ func game_loop():
 	#						ship.rotate(rotation)
 	#				elif end turn:
 	#					break
-	# 
 	pass
 
 func select_ship(ship):
 	selected_ship = ship
+	gui.update_ship_info()
 	update()
 
-func add_ship(ship_type, x, y, direction):
+func add_ship(ship_type, x, y, direction, player):
 	var ship = load('res://ships/' + ship_type + '.tscn').instance()
 	ship.set_grid_position(x, y, direction)
 	add_child(ship)
-	ships.append(ship)
+	ships[player].append(ship)
+	gui.update_fleets()
 
 func get_ship_at_hex(x, y):
-	for ship in ships:
+	for ship in ships[0] + ships[1]:
 		var occupied_hexes = ship.get_occupied_hexes()
 		if occupied_hexes != null and [x, y] in occupied_hexes:
 			return ship

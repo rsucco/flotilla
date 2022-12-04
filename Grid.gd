@@ -64,7 +64,7 @@ func get_hex_from_coords(mouse_pos):
 
 # Get the center point of the hexagon at x, y
 func get_hex_center(x, y):
-	var hex_center = Vector2(75 + hex_size * 0.75 * x, hex_size + hex_size * y / sqrt(3) * 1.5)
+	var hex_center = Vector2(73 + hex_size * 0.75 * x, hex_size + hex_size * y / sqrt(3) * 1.5)
 	# Offset odd columns
 	if x % 2 != 0:
 		hex_center += Vector2(0, hex_size / sqrt(3) * 0.75)

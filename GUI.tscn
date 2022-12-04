@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://font.tres" type="DynamicFont" id=1]
+[ext_resource path="res://GUI.gd" type="Script" id=2]
 
 [node name="GUI" type="PanelContainer"]
 margin_right = 1260.0
@@ -8,8 +9,9 @@ margin_bottom = 100.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 0
+script = ExtResource( 2 )
 
-[node name="GridContainer" type="HBoxContainer" parent="."]
+[node name="GUIGrid" type="HBoxContainer" parent="."]
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 1253.0
@@ -17,108 +19,130 @@ margin_bottom = 93.0
 custom_constants/separation = 5
 alignment = 1
 
-[node name="ShipInfo" type="VBoxContainer" parent="GridContainer"]
-margin_right = 295.0
+[node name="ShipInfo" type="VBoxContainer" parent="GUIGrid"]
+margin_right = 298.0
 margin_bottom = 86.0
 size_flags_horizontal = 3
 
-[node name="Selected" type="Label" parent="GridContainer/ShipInfo"]
-margin_right = 295.0
+[node name="Selected" type="Label" parent="GUIGrid/ShipInfo"]
+margin_right = 298.0
 margin_bottom = 14.0
 custom_fonts/font = ExtResource( 1 )
 text = "Selected:"
 
-[node name="Weapon" type="Label" parent="GridContainer/ShipInfo"]
+[node name="Weapon" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 18.0
-margin_right = 295.0
+margin_right = 298.0
 margin_bottom = 32.0
 custom_fonts/font = ExtResource( 1 )
 text = "Weapon: "
 
-[node name="SpecialAbility" type="Label" parent="GridContainer/ShipInfo"]
+[node name="SpecialAbility" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 36.0
-margin_right = 295.0
+margin_right = 298.0
 margin_bottom = 50.0
 custom_fonts/font = ExtResource( 1 )
 text = "Special Ability:"
+clip_text = true
 
-[node name="PassiveAbility" type="Label" parent="GridContainer/ShipInfo"]
+[node name="PassiveAbility" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 54.0
-margin_right = 295.0
+margin_right = 298.0
 margin_bottom = 68.0
 custom_fonts/font = ExtResource( 1 )
 text = "Passive Ability:"
+clip_text = true
 
-[node name="Drawbacks" type="Label" parent="GridContainer/ShipInfo"]
+[node name="Drawbacks" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 72.0
-margin_right = 295.0
+margin_right = 298.0
 margin_bottom = 86.0
 custom_fonts/font = ExtResource( 1 )
 text = "Drawbacks:"
+clip_text = true
 
-[node name="Actions" type="HBoxContainer" parent="GridContainer"]
-margin_left = 300.0
-margin_top = 33.0
-margin_right = 606.0
-margin_bottom = 53.0
+[node name="Actions" type="VBoxContainer" parent="GUIGrid"]
+margin_left = 303.0
+margin_top = 21.0
+margin_right = 601.0
+margin_bottom = 65.0
+size_flags_horizontal = 3
 size_flags_vertical = 6
 alignment = 1
 
-[node name="Fire" type="Button" parent="GridContainer/Actions"]
-margin_right = 36.0
+[node name="Actions" type="HBoxContainer" parent="GUIGrid/Actions"]
+margin_right = 298.0
+margin_bottom = 20.0
+alignment = 1
+
+[node name="Fire" type="Button" parent="GUIGrid/Actions/Actions"]
+margin_left = 62.0
+margin_right = 98.0
 margin_bottom = 20.0
 text = "Fire"
 
-[node name="SpecialAbility" type="Button" parent="GridContainer/Actions"]
-margin_left = 40.0
-margin_right = 82.0
+[node name="SpecialAbility" type="Button" parent="GUIGrid/Actions/Actions"]
+margin_left = 102.0
+margin_right = 144.0
 margin_bottom = 20.0
 text = "Spec"
 
-[node name="SecondaryAbility" type="Button" parent="GridContainer/Actions"]
-margin_left = 86.0
-margin_right = 128.0
+[node name="SecondaryAbility" type="Button" parent="GUIGrid/Actions/Actions"]
+margin_left = 148.0
+margin_right = 190.0
 margin_bottom = 20.0
 text = "Scnd"
 
-[node name="Forward" type="Button" parent="GridContainer/Actions"]
-margin_left = 132.0
-margin_right = 174.0
-margin_bottom = 20.0
-text = "Frwd"
-
-[node name="Port" type="Button" parent="GridContainer/Actions"]
-margin_left = 178.0
-margin_right = 216.0
-margin_bottom = 20.0
-text = "Port"
-
-[node name="Starboard" type="Button" parent="GridContainer/Actions"]
-margin_left = 220.0
-margin_right = 260.0
-margin_bottom = 20.0
-text = "Stbd"
-
-[node name="EndTurn" type="Button" parent="GridContainer/Actions"]
-margin_left = 264.0
-margin_right = 306.0
+[node name="EndTurn" type="Button" parent="GUIGrid/Actions/Actions"]
+margin_left = 194.0
+margin_right = 236.0
 margin_bottom = 20.0
 text = "EndT"
 
-[node name="TurnNumber" type="VBoxContainer" parent="GridContainer"]
-margin_left = 611.0
-margin_right = 639.0
+[node name="Movement" type="HBoxContainer" parent="GUIGrid/Actions"]
+margin_top = 24.0
+margin_right = 298.0
+margin_bottom = 44.0
+alignment = 1
+
+[node name="Forward" type="Button" parent="GUIGrid/Actions/Movement"]
+margin_left = 63.0
+margin_right = 105.0
+margin_bottom = 20.0
+text = "Frwd"
+
+[node name="Port" type="Button" parent="GUIGrid/Actions/Movement"]
+margin_left = 109.0
+margin_right = 147.0
+margin_bottom = 20.0
+text = "Port"
+
+[node name="Starboard" type="Button" parent="GUIGrid/Actions/Movement"]
+margin_left = 151.0
+margin_right = 191.0
+margin_bottom = 20.0
+text = "Stbd"
+
+[node name="Reverse" type="Button" parent="GUIGrid/Actions/Movement"]
+margin_left = 195.0
+margin_right = 234.0
+margin_bottom = 20.0
+text = "Rvrs"
+
+[node name="TurnNumber" type="VBoxContainer" parent="GUIGrid"]
+margin_left = 606.0
+margin_right = 634.0
 margin_bottom = 86.0
 size_flags_horizontal = 0
 
-[node name="Turn" type="Label" parent="GridContainer/TurnNumber"]
+[node name="Turn" type="Label" parent="GUIGrid/TurnNumber"]
 margin_right = 28.0
 margin_bottom = 31.0
 text = "Turn
 "
 align = 1
 
-[node name="TurnNumber" type="Label" parent="GridContainer/TurnNumber"]
+[node name="TurnNumber" type="Label" parent="GUIGrid/TurnNumber"]
 margin_top = 35.0
 margin_right = 28.0
 margin_bottom = 49.0
@@ -126,32 +150,51 @@ text = "0"
 align = 1
 valign = 1
 
-[node name="Spacer" type="VBoxContainer" parent="GridContainer"]
-margin_left = 644.0
-margin_right = 644.0
+[node name="Spacer" type="VBoxContainer" parent="GUIGrid"]
+margin_left = 639.0
+margin_right = 639.0
 margin_bottom = 86.0
 size_flags_horizontal = 4
 
-[node name="YourFleet" type="VBoxContainer" parent="GridContainer"]
-margin_left = 649.0
-margin_right = 945.0
+[node name="YourFleet" type="VBoxContainer" parent="GUIGrid"]
+margin_left = 644.0
+margin_right = 942.0
 margin_bottom = 86.0
 size_flags_horizontal = 3
+alignment = 1
 
-[node name="YourFleet" type="Label" parent="GridContainer/YourFleet"]
-margin_right = 296.0
+[node name="YourFleetText" type="Label" parent="GUIGrid/YourFleet"]
+margin_right = 298.0
 margin_bottom = 14.0
 text = "Your Fleet:"
 align = 1
 
-[node name="OpponentFleet" type="VBoxContainer" parent="GridContainer"]
-margin_left = 950.0
+[node name="YourFleetIcons" type="GridContainer" parent="GUIGrid/YourFleet"]
+margin_left = 149.0
+margin_top = 52.0
+margin_right = 149.0
+margin_bottom = 52.0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+columns = 3
+
+[node name="OpponentFleet" type="VBoxContainer" parent="GUIGrid"]
+margin_left = 947.0
 margin_right = 1246.0
 margin_bottom = 86.0
 size_flags_horizontal = 3
 
-[node name="OpponentFleet" type="Label" parent="GridContainer/OpponentFleet"]
-margin_right = 296.0
+[node name="OpponentFleetText" type="Label" parent="GUIGrid/OpponentFleet"]
+margin_right = 299.0
 margin_bottom = 14.0
 text = "Opponent's Fleet:"
 align = 1
+
+[node name="OpponentFleetIcons" type="GridContainer" parent="GUIGrid/OpponentFleet"]
+margin_left = 149.0
+margin_top = 52.0
+margin_right = 149.0
+margin_bottom = 52.0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+columns = 3
