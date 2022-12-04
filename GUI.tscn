@@ -1,45 +1,60 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://GUI.gd" type="Script" id=2]
 
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0.137255, 0.423529, 1 )
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0, 0, 0, 1 )
+border_blend = true
+
+[sub_resource type="StyleBoxLine" id=2]
+vertical = true
+
 [node name="GUI" type="PanelContainer"]
+margin_top = 2.0
 margin_right = 1260.0
-margin_bottom = 100.0
+margin_bottom = 90.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 0
+custom_styles/panel = SubResource( 1 )
 script = ExtResource( 2 )
 
 [node name="GUIGrid" type="HBoxContainer" parent="."]
-margin_left = 7.0
-margin_top = 7.0
-margin_right = 1253.0
-margin_bottom = 93.0
+margin_left = 2.0
+margin_top = 2.0
+margin_right = 1258.0
+margin_bottom = 88.0
 custom_constants/separation = 5
 alignment = 1
 
 [node name="ShipInfo" type="VBoxContainer" parent="GUIGrid"]
-margin_right = 298.0
+margin_right = 291.0
 margin_bottom = 86.0
-size_flags_horizontal = 3
+size_flags_horizontal = 11
 
 [node name="Selected" type="Label" parent="GUIGrid/ShipInfo"]
-margin_right = 298.0
+margin_right = 291.0
 margin_bottom = 14.0
 custom_fonts/font = ExtResource( 1 )
 text = "Selected:"
 
 [node name="Weapon" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 18.0
-margin_right = 298.0
+margin_right = 291.0
 margin_bottom = 32.0
 custom_fonts/font = ExtResource( 1 )
 text = "Weapon: "
 
 [node name="SpecialAbility" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 36.0
-margin_right = 298.0
+margin_right = 291.0
 margin_bottom = 50.0
 custom_fonts/font = ExtResource( 1 )
 text = "Special Ability:"
@@ -47,7 +62,7 @@ clip_text = true
 
 [node name="PassiveAbility" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 54.0
-margin_right = 298.0
+margin_right = 291.0
 margin_bottom = 68.0
 custom_fonts/font = ExtResource( 1 )
 text = "Passive Ability:"
@@ -55,83 +70,95 @@ clip_text = true
 
 [node name="Drawbacks" type="Label" parent="GUIGrid/ShipInfo"]
 margin_top = 72.0
-margin_right = 298.0
+margin_right = 291.0
 margin_bottom = 86.0
 custom_fonts/font = ExtResource( 1 )
 text = "Drawbacks:"
 clip_text = true
 
+[node name="VSeparator0" type="VSeparator" parent="GUIGrid"]
+margin_left = 296.0
+margin_right = 300.0
+margin_bottom = 86.0
+custom_styles/separator = SubResource( 2 )
+
 [node name="Actions" type="VBoxContainer" parent="GUIGrid"]
-margin_left = 303.0
-margin_top = 21.0
-margin_right = 601.0
-margin_bottom = 65.0
+margin_left = 305.0
+margin_right = 597.0
+margin_bottom = 86.0
 size_flags_horizontal = 3
-size_flags_vertical = 6
+size_flags_vertical = 7
 alignment = 1
 
 [node name="Actions" type="HBoxContainer" parent="GUIGrid/Actions"]
-margin_right = 298.0
-margin_bottom = 20.0
+margin_top = 21.0
+margin_right = 292.0
+margin_bottom = 41.0
 alignment = 1
 
 [node name="Fire" type="Button" parent="GUIGrid/Actions/Actions"]
-margin_left = 62.0
-margin_right = 98.0
+margin_left = 59.0
+margin_right = 95.0
 margin_bottom = 20.0
 text = "Fire"
 
 [node name="SpecialAbility" type="Button" parent="GUIGrid/Actions/Actions"]
-margin_left = 102.0
-margin_right = 144.0
+margin_left = 99.0
+margin_right = 141.0
 margin_bottom = 20.0
 text = "Spec"
 
 [node name="SecondaryAbility" type="Button" parent="GUIGrid/Actions/Actions"]
-margin_left = 148.0
-margin_right = 190.0
+margin_left = 145.0
+margin_right = 187.0
 margin_bottom = 20.0
 text = "Scnd"
 
 [node name="EndTurn" type="Button" parent="GUIGrid/Actions/Actions"]
-margin_left = 194.0
-margin_right = 236.0
+margin_left = 191.0
+margin_right = 233.0
 margin_bottom = 20.0
 text = "EndT"
 
 [node name="Movement" type="HBoxContainer" parent="GUIGrid/Actions"]
-margin_top = 24.0
-margin_right = 298.0
-margin_bottom = 44.0
+margin_top = 45.0
+margin_right = 292.0
+margin_bottom = 65.0
 alignment = 1
 
 [node name="Forward" type="Button" parent="GUIGrid/Actions/Movement"]
-margin_left = 63.0
-margin_right = 105.0
+margin_left = 60.0
+margin_right = 102.0
 margin_bottom = 20.0
 text = "Frwd"
 
 [node name="Port" type="Button" parent="GUIGrid/Actions/Movement"]
-margin_left = 109.0
-margin_right = 147.0
+margin_left = 106.0
+margin_right = 144.0
 margin_bottom = 20.0
 text = "Port"
 
 [node name="Starboard" type="Button" parent="GUIGrid/Actions/Movement"]
-margin_left = 151.0
-margin_right = 191.0
+margin_left = 148.0
+margin_right = 188.0
 margin_bottom = 20.0
 text = "Stbd"
 
 [node name="Reverse" type="Button" parent="GUIGrid/Actions/Movement"]
-margin_left = 195.0
-margin_right = 234.0
+margin_left = 192.0
+margin_right = 231.0
 margin_bottom = 20.0
 text = "Rvrs"
 
+[node name="VSeparator1" type="VSeparator" parent="GUIGrid"]
+margin_left = 602.0
+margin_right = 606.0
+margin_bottom = 86.0
+custom_styles/separator = SubResource( 2 )
+
 [node name="TurnNumber" type="VBoxContainer" parent="GUIGrid"]
-margin_left = 606.0
-margin_right = 634.0
+margin_left = 611.0
+margin_right = 639.0
 margin_bottom = 86.0
 size_flags_horizontal = 0
 
@@ -150,50 +177,62 @@ text = "0"
 align = 1
 valign = 1
 
+[node name="VSeparator2" type="VSeparator" parent="GUIGrid"]
+margin_left = 644.0
+margin_right = 648.0
+margin_bottom = 86.0
+custom_styles/separator = SubResource( 2 )
+
 [node name="Spacer" type="VBoxContainer" parent="GUIGrid"]
-margin_left = 639.0
-margin_right = 639.0
+margin_left = 653.0
+margin_right = 653.0
 margin_bottom = 86.0
 size_flags_horizontal = 4
 
 [node name="YourFleet" type="VBoxContainer" parent="GUIGrid"]
-margin_left = 644.0
-margin_right = 942.0
+margin_left = 658.0
+margin_right = 950.0
 margin_bottom = 86.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="YourFleetText" type="Label" parent="GUIGrid/YourFleet"]
-margin_right = 298.0
+margin_right = 292.0
 margin_bottom = 14.0
 text = "Your Fleet:"
 align = 1
 
 [node name="YourFleetIcons" type="GridContainer" parent="GUIGrid/YourFleet"]
-margin_left = 149.0
+margin_left = 146.0
 margin_top = 52.0
-margin_right = 149.0
+margin_right = 146.0
 margin_bottom = 52.0
 size_flags_horizontal = 4
 size_flags_vertical = 6
 columns = 3
 
+[node name="VSeparator3" type="VSeparator" parent="GUIGrid"]
+margin_left = 955.0
+margin_right = 959.0
+margin_bottom = 86.0
+custom_styles/separator = SubResource( 2 )
+
 [node name="OpponentFleet" type="VBoxContainer" parent="GUIGrid"]
-margin_left = 947.0
-margin_right = 1246.0
+margin_left = 964.0
+margin_right = 1256.0
 margin_bottom = 86.0
 size_flags_horizontal = 3
 
 [node name="OpponentFleetText" type="Label" parent="GUIGrid/OpponentFleet"]
-margin_right = 299.0
+margin_right = 292.0
 margin_bottom = 14.0
 text = "Opponent's Fleet:"
 align = 1
 
 [node name="OpponentFleetIcons" type="GridContainer" parent="GUIGrid/OpponentFleet"]
-margin_left = 149.0
+margin_left = 146.0
 margin_top = 52.0
-margin_right = 149.0
+margin_right = 146.0
 margin_bottom = 52.0
 size_flags_horizontal = 4
 size_flags_vertical = 6

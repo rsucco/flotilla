@@ -10,6 +10,9 @@ func _ready():
 		ship_icons[ship_type] = load('res://ships/sprites/' + ship_type + '_icon.png')
 	get_parent().gui = self
 
+func _input(event):
+	pass
+
 # Update ShipInfo
 func update_ship_info():
 	var ship = get_parent().selected_ship

@@ -13,4 +13,4 @@ func _ready():
 	self.special = 'Nuclear Strike (10 turns)'
 	self.secondary = 'Sonar Pulse (1 turn)'
 	self.passive = 'Can only be hit by surface units on center hex'
-	self.drawback = 'Sink instantly when hit in center hex or when hit by ASW Strike, mine, or another sub'
+	self.drawback = 'Sinks instantly when hit in center hex or by ASW Strike, mine, or another sub'

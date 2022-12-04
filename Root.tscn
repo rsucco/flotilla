@@ -8,6 +8,6 @@ script = ExtResource( 4 )
 
 [node name="GUI" parent="." instance=ExtResource( 1 )]
 margin_left = 10.0
-margin_top = 700.0
+margin_top = 705.0
 margin_right = 1270.0
-margin_bottom = 800.0
+margin_bottom = 793.0

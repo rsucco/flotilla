@@ -14,14 +14,16 @@ func _ready():
 	font.font_data = load("res://opensans.ttf")
 	font.size = 11
 	grid = Grid.new()
-	for i in range(3):
+	for i in range(2):
 		add_ship('Corvette', i * 2, i + 1, i * 60 + 180, 0)
-		add_ship('Destroyer', i * 3 + 4, i * 2 + 1, i * 60 + 60, 0)
+		add_ship('Destroyer', i * 3 + 4, i * 2 + 2, i * 60 + 60, 0)
 		add_ship('Cruiser', i * 2 + 1, i * 3 + 4, i * 60 + 120, 0)
 		add_ship('Submarine', i * 2 + 8, i * 3 + 7, i * 60 + 240, 0)
 		if i > 0:
 			add_ship('Battleship', i * 4 + 18, i * 4, i * 60 + 300, 1)
-	add_ship('Carrier', 19, 11, 300, 1)
+	add_ship('Battleship', 6, 13, 60, 0)
+	add_ship('SupplyTender', 5, 10, 60, 0)
+	add_ship('Carrier', 10, 2, 300, 0)
 	add_ship('SupplyTender', 27, 2, 0, 1)
 	add_ship('Corvette', 18, 3, 0, 1)
 	add_ship('Destroyer', 27, 11, 120, 1)
