@@ -30,15 +30,15 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Weapon: Anti-Ship Missiles
 - Size: 3
 - Special Ability: (ASW Strike - 4 turns) Select a hex on opponent's board; if the hex or any of its direct neighbors contacts an enemy submarine, sink it instantly (does not affect ships)
-- Special Ability: (Lay Mine - 5 turns) Select a hex on opponent's board to place a mine; if any ships move over that tile, they will take a hit in a random hex
+- Secondary Ability: (Lay Mine - 5 turns) Select a hex on opponent's board to place a mine; if any ships move over that tile, they will take a hit in a random hex
 - Passive Ability: None
 - Drawbacks: None
 
 ##### Submarine
 - Weapon: Torpedo
 - Size: 3
-- Special Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines on that hex and its direct neighbors and also reveals the location of the submarine
 - Special Ability: (Nuclear Strike - 10 turns) Select a hex on opponent's board; instantly sinks any unit it hits directly and damages all hexes within two hexes of central hex
+- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines on that hex and its direct neighbors and also reveals the location of the submarine
 - Passive Ability: Can only be hit by surface units on center hex
 - Drawbacks: Sinks when any hex is hit by a mine, ASW strike, or another sub, sinks instantly when hit in center hex by surface unit, cannot shoot at island tiles except with Nuclear Strike
 

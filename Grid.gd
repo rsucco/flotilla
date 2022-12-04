@@ -12,13 +12,20 @@ func _init(hex_size = 50):
 	self.hex_size = hex_size
 	# Create 31x15 grid, 15x15 for each player and a 1x15 no-man's-land
 	self.grid = []
+	randomize()
 	for x in range(31):
 		var new_column = []
 		for _y in range(30):
 			if x == 15:
+				# No-man's-land
 				new_column.append(Tile.new(true))
 			else:
-				new_column.append(Tile.new())
+				if rand_range(0, 1) > 0.02:
+					# Ocean tile
+					new_column.append(Tile.new())
+				else:
+					# Island tile
+					new_column.append(Tile.new(false, true))
 		self.grid.append(new_column)
 
 # Returns a list of hexes that border a given hex
@@ -57,7 +64,7 @@ func get_hex_from_coords(mouse_pos):
 
 # Get the center point of the hexagon at x, y
 func get_hex_center(x, y):
-	var hex_center = Vector2(hex_size + hex_size * 0.75 * x, hex_size + hex_size * y / sqrt(3) * 1.5)
+	var hex_center = Vector2(75 + hex_size * 0.75 * x, hex_size + hex_size * y / sqrt(3) * 1.5)
 	# Offset odd columns
 	if x % 2 != 0:
 		hex_center += Vector2(0, hex_size / sqrt(3) * 0.75)

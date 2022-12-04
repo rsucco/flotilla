@@ -1,0 +1,157 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://font.tres" type="DynamicFont" id=1]
+
+[node name="GUI" type="PanelContainer"]
+margin_right = 1260.0
+margin_bottom = 100.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="GridContainer" type="HBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1253.0
+margin_bottom = 93.0
+custom_constants/separation = 5
+alignment = 1
+
+[node name="ShipInfo" type="VBoxContainer" parent="GridContainer"]
+margin_right = 295.0
+margin_bottom = 86.0
+size_flags_horizontal = 3
+
+[node name="Selected" type="Label" parent="GridContainer/ShipInfo"]
+margin_right = 295.0
+margin_bottom = 14.0
+custom_fonts/font = ExtResource( 1 )
+text = "Selected:"
+
+[node name="Weapon" type="Label" parent="GridContainer/ShipInfo"]
+margin_top = 18.0
+margin_right = 295.0
+margin_bottom = 32.0
+custom_fonts/font = ExtResource( 1 )
+text = "Weapon: "
+
+[node name="SpecialAbility" type="Label" parent="GridContainer/ShipInfo"]
+margin_top = 36.0
+margin_right = 295.0
+margin_bottom = 50.0
+custom_fonts/font = ExtResource( 1 )
+text = "Special Ability:"
+
+[node name="PassiveAbility" type="Label" parent="GridContainer/ShipInfo"]
+margin_top = 54.0
+margin_right = 295.0
+margin_bottom = 68.0
+custom_fonts/font = ExtResource( 1 )
+text = "Passive Ability:"
+
+[node name="Drawbacks" type="Label" parent="GridContainer/ShipInfo"]
+margin_top = 72.0
+margin_right = 295.0
+margin_bottom = 86.0
+custom_fonts/font = ExtResource( 1 )
+text = "Drawbacks:"
+
+[node name="Actions" type="HBoxContainer" parent="GridContainer"]
+margin_left = 300.0
+margin_top = 33.0
+margin_right = 606.0
+margin_bottom = 53.0
+size_flags_vertical = 6
+alignment = 1
+
+[node name="Fire" type="Button" parent="GridContainer/Actions"]
+margin_right = 36.0
+margin_bottom = 20.0
+text = "Fire"
+
+[node name="SpecialAbility" type="Button" parent="GridContainer/Actions"]
+margin_left = 40.0
+margin_right = 82.0
+margin_bottom = 20.0
+text = "Spec"
+
+[node name="SecondaryAbility" type="Button" parent="GridContainer/Actions"]
+margin_left = 86.0
+margin_right = 128.0
+margin_bottom = 20.0
+text = "Scnd"
+
+[node name="Forward" type="Button" parent="GridContainer/Actions"]
+margin_left = 132.0
+margin_right = 174.0
+margin_bottom = 20.0
+text = "Frwd"
+
+[node name="Port" type="Button" parent="GridContainer/Actions"]
+margin_left = 178.0
+margin_right = 216.0
+margin_bottom = 20.0
+text = "Port"
+
+[node name="Starboard" type="Button" parent="GridContainer/Actions"]
+margin_left = 220.0
+margin_right = 260.0
+margin_bottom = 20.0
+text = "Stbd"
+
+[node name="EndTurn" type="Button" parent="GridContainer/Actions"]
+margin_left = 264.0
+margin_right = 306.0
+margin_bottom = 20.0
+text = "EndT"
+
+[node name="TurnNumber" type="VBoxContainer" parent="GridContainer"]
+margin_left = 611.0
+margin_right = 639.0
+margin_bottom = 86.0
+size_flags_horizontal = 0
+
+[node name="Turn" type="Label" parent="GridContainer/TurnNumber"]
+margin_right = 28.0
+margin_bottom = 31.0
+text = "Turn
+"
+align = 1
+
+[node name="TurnNumber" type="Label" parent="GridContainer/TurnNumber"]
+margin_top = 35.0
+margin_right = 28.0
+margin_bottom = 49.0
+text = "0"
+align = 1
+valign = 1
+
+[node name="Spacer" type="VBoxContainer" parent="GridContainer"]
+margin_left = 644.0
+margin_right = 644.0
+margin_bottom = 86.0
+size_flags_horizontal = 4
+
+[node name="YourFleet" type="VBoxContainer" parent="GridContainer"]
+margin_left = 649.0
+margin_right = 945.0
+margin_bottom = 86.0
+size_flags_horizontal = 3
+
+[node name="YourFleet" type="Label" parent="GridContainer/YourFleet"]
+margin_right = 296.0
+margin_bottom = 14.0
+text = "Your Fleet:"
+align = 1
+
+[node name="OpponentFleet" type="VBoxContainer" parent="GridContainer"]
+margin_left = 950.0
+margin_right = 1246.0
+margin_bottom = 86.0
+size_flags_horizontal = 3
+
+[node name="OpponentFleet" type="Label" parent="GridContainer/OpponentFleet"]
+margin_right = 296.0
+margin_bottom = 14.0
+text = "Opponent's Fleet:"
+align = 1
