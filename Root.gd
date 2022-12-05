@@ -18,27 +18,16 @@ func _ready():
 	font.font_data = load("res://opensans.ttf")
 	font.size = 11
 	play_game()
-	for i in range(2):
-		add_ship('Corvette', i * 2, i + 1, i * 60 + 180, 0)
-		add_ship('Destroyer', i * 3 + 4, i * 2 + 2, i * 60 + 60, 0)
-		add_ship('Cruiser', i * 2 + 1, i * 3 + 4, i * 60 + 120, 0)
-		add_ship('Submarine', i * 2 + 8, i * 3 + 7, i * 60 + 240, 0)
-		if i > 0:
-			add_ship('Battleship', i * 4 + 18, i * 4, i * 60 + 300, 1)
-	add_ship('Battleship', 6, 13, 60, 0)
-	add_ship('SupplyTender', 5, 10, 60, 0)
-	add_ship('Carrier', 10, 2, 300, 0)
-	add_ship('SupplyTender', 27, 2, 0, 1)
-	add_ship('Corvette', 18, 3, 0, 1)
-	add_ship('Destroyer', 27, 11, 120, 1)
 
 func _draw():
 	# Draw grid
 	var y_grid_display = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
 	var mouse_hex = grid.get_hex_from_coords(get_viewport().get_mouse_position())
 	var selected_hexes = []
+	var selected_center_hex = []
 	if selected_ship != null:
 		selected_hexes = selected_ship.get_occupied_hexes()
+		selected_center_hex = selected_hexes[selected_ship.len_aft]
 	for x in range(31):
 		# Draw column markers
 		var string_color
@@ -65,6 +54,8 @@ func _draw():
 			var color
 			if mouse_hex == [x, y]:
 				color = PoolColorArray([Color(0.0, 0.3, 0.9)])
+			elif selected_center_hex == [x, y]:
+				color = PoolColorArray([Color(0.0, 0.3, 0.8)])
 			elif [x, y] in selected_hexes:
 				color = PoolColorArray([Color(0.0, 0.4, 0.9)])
 			elif grid.grid[x][y].island:
@@ -83,36 +74,47 @@ func _draw():
 			draw_string(font, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 10, -grid.hex_size / 12), y_grid_display[y] + str(x), Color(0.0, 0.0, 0.0))
 
 func _input(event):
-	if event is InputEventMouseButton and event.pressed:
-		print('Click! Mouse position: ', event.position)
-		var on_hex = grid.get_hex_from_coords(event.position)
-		print('On hex: ', on_hex)
-		print('Hex neighbors: ', grid.get_all_hex_neighbors(on_hex[0], on_hex[1]))
-		var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
-		if event.button_index == BUTTON_LEFT:
-			select_ship(ship_at_hex)
-		if ship_at_hex != null:
-			print('Ship at hex: ', ship_at_hex.ship_name)
-			print('Occupied hexes: ', ship_at_hex.get_occupied_hexes())
-			if event.button_index == BUTTON_LEFT:
-				ship_at_hex.hit(on_hex)
-			elif event.button_index == BUTTON_MIDDLE:
-				ship_at_hex.rotate(60)
-			elif event.button_index == BUTTON_RIGHT:
-				ship_at_hex.move(1)
-			print('Hit hexes: ', ship_at_hex.hit_hexes)
-		if selected_ship != null:
-			print('Selected ship: ', selected_ship.ship_name, ' at ', selected_ship.x, ',', selected_ship.y)
-		print('========================')
+#	if event is InputEventMouseButton and event.pressed:
+##		print('Click! Mouse position: ', event.position)
+#		var on_hex = grid.get_hex_from_coords(event.position)
+##		print('On hex: ', on_hex)
+##		print('Hex neighbors: ', grid.get_all_hex_neighbors(on_hex[0], on_hex[1]))
+#		var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
+#		if event.button_index == BUTTON_LEFT:
+#			select_ship(ship_at_hex)
+#		if ship_at_hex != null:
+#			print('Ship at hex: ', ship_at_hex.ship_name)
+#			print('Occupied hexes: ', ship_at_hex.get_occupied_hexes())
+#			if event.button_index == BUTTON_LEFT:
+#				ship_at_hex.hit(on_hex)
+#			elif event.button_index == BUTTON_MIDDLE:
+#				ship_at_hex.rotate(60)
+#			elif event.button_index == BUTTON_RIGHT:
+#				ship_at_hex.move(1)
+#			print('Hit hexes: ', ship_at_hex.hit_hexes)
+#		if selected_ship != null:
+#			print('Selected ship: ', selected_ship.ship_name, ' at ', selected_ship.x, ',', selected_ship.y)
+#		print('========================')
 	update()
 
 func play_game():
+	# Initial game setup
+	# Create new grid
 	grid = Grid.new()
-	players[0].get_ship_selection()
-	# Player 1 select and place ships
-	# Player 2 select and place ships
+	player_up = 0
+	# Get player ship selection and positions
+	for player in players:
+		# Get ship selections
+		player.get_ship_selection()
+		yield(player, 'ships_selected')
+		var selection = player.selected_count
+		# Place ships
+		player.place_ships(selection)
+		yield(player, 'ships_placed')
 	# Reveal both players' fleet composition
-	# while both players have ships:
+	gui.update_fleets()
+	while len(players[0].ships > 0) and len(players[1].ships > 0):
+		break
 	# 	for player in players:
 	#		for ship in player.ships:
 	#			while ship.has_moves:
@@ -141,13 +143,6 @@ func select_ship(ship):
 	selected_ship = ship
 	gui.update_ship_info()
 	update()
-
-func add_ship(ship_type, x, y, direction, player):
-	var ship = load('res://ships/' + ship_type + '.tscn').instance()
-	ship.set_grid_position(x, y, direction)
-	add_child(ship)
-	ships[player].append(ship)
-	gui.update_fleets()
 
 func get_ship_at_hex(x, y):
 	for ship in ships[0] + ships[1]:

@@ -9,7 +9,7 @@ var selected_count = {
 	'Submarine': 0,
 	'SupplyTender': 0,
 	'Battleship': 0,
-	'AircraftCarrier': 0
+	'Carrier': 0
 	}
 
 

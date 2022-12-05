@@ -46,7 +46,7 @@ func update_fleets():
 	# Count the number of each type of ship in the player's fleet
 	for ship_type in Ship.SHIP_TYPES:
 		ship_count[ship_type] = 0
-	for ship in get_parent().ships[get_parent().player_up]:
+	for ship in get_parent().players[get_parent().player_up].ships:
 		ship_count[ship.ship_type] += 1
 	# Add ship icons to YourFleet
 	for ship_type in Ship.SHIP_TYPES:
@@ -67,9 +67,9 @@ func update_fleets():
 	# Count the number of each type of ship in the opponent's fleet
 	for ship_type in Ship.SHIP_TYPES:
 		ship_count[ship_type] = 0
-	for ship in get_parent().ships[abs(get_parent().player_up - 1)]:
+	for ship in get_parent().players[abs(get_parent().player_up - 1)].ships:
 		ship_count[ship.ship_type] += 1
-	# Add ship icons to YourFleet
+	# Add ship icons to OpponentFleet
 	for ship_type in Ship.SHIP_TYPES:
 		if ship_count[ship_type] > 0:
 			var icon_sprite = TextureRect.new()

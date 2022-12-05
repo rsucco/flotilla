@@ -20,6 +20,11 @@ _global_script_classes=[ {
 "path": "res://ships/Carrier.gd"
 }, {
 "base": "Ship",
+"class": "CoastalBattery",
+"language": "GDScript",
+"path": "res://ships/CoastalBattery.gd"
+}, {
+"base": "Ship",
 "class": "Corvette",
 "language": "GDScript",
 "path": "res://ships/Corvette.gd"
@@ -72,6 +77,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "Battleship": "",
 "Carrier": "",
+"CoastalBattery": "",
 "Corvette": "",
 "Cruiser": "",
 "Destroyer": "",

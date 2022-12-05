@@ -56,6 +56,8 @@ func get_hex_neighbor(x, y, direction, length = 1):
 	var parity = x & 1
 	while direction >= 360:
 		direction -= 360
+	while direction < 0:
+		direction += 360
 	var diff = oddq_direction_differences[parity][direction / 60]
 	var neighbor_x = x + diff[0] * length
 	var neighbor_y = y + diff[1] * length

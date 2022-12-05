@@ -22,7 +22,6 @@ flags = 4
 load_path = "res://.import/corvette.png-b4ec457647882e4d8e441a3477e23d4d.stex"
 
 [node name="ShipSelection" type="PopupDialog"]
-visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 320.0
@@ -342,7 +341,7 @@ margin_bottom = 113.0
 text = "0"
 align = 1
 
-[node name="AircraftCarrier" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Carrier" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
 margin_left = 213.0
 margin_top = 192.0
 margin_right = 415.0
@@ -350,7 +349,7 @@ margin_bottom = 305.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/AircraftCarrier"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_left = 6.0
 margin_right = 195.0
 margin_bottom = 57.0
@@ -360,7 +359,7 @@ size_flags_vertical = 0
 texture = ExtResource( 10 )
 stretch_mode = 4
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/AircraftCarrier"]
+[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_top = 61.0
 margin_right = 202.0
 margin_bottom = 75.0
@@ -368,7 +367,7 @@ custom_fonts/font = ExtResource( 1 )
 text = "Aircraft Carrier"
 align = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/AircraftCarrier"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_top = 79.0
 margin_right = 202.0
 margin_bottom = 95.0
@@ -377,7 +376,7 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/AircraftCarrier"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_top = 99.0
 margin_right = 202.0
 margin_bottom = 113.0
@@ -430,6 +429,6 @@ text = "OK"
 [connection signal="value_changed" from="VBoxContainer/SelectionGrid/Submarine/CountSlider" to="." method="_on_CountSlider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/SelectionGrid/SupplyTender/CountSlider" to="." method="_on_CountSlider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/SelectionGrid/Battleship/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/AircraftCarrier/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Carrier/CountSlider" to="." method="_on_CountSlider_value_changed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/Reset" to="." method="_on_Reset_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/OK" to="." method="_on_OK_pressed"]
