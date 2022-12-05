@@ -28,6 +28,15 @@ func _init(hex_size = 50):
 					new_column.append(Tile.new(false, true))
 		self.grid.append(new_column)
 
+func get_num_island_tiles(player):
+	var num_island = 0
+	# Search the first half for player 0/1 and the second half for player 1/2
+	for x in range(player * 16, player * 16 + 15):
+		for y in range(15):
+			if grid[x][y].island:
+				num_island += 1
+	return num_island
+
 # Returns a list of hexes that border a given hex
 func get_all_hex_neighbors(x, y):
 	var hex_neighbors = []

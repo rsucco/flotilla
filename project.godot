@@ -39,6 +39,16 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Grid.gd"
 }, {
+"base": "Player",
+"class": "LocalPlayer",
+"language": "GDScript",
+"path": "res://LocalPlayer.gd"
+}, {
+"base": "Control",
+"class": "Player",
+"language": "GDScript",
+"path": "res://Player.gd"
+}, {
 "base": "Sprite",
 "class": "Ship",
 "language": "GDScript",
@@ -66,6 +76,8 @@ _global_script_class_icons={
 "Cruiser": "",
 "Destroyer": "",
 "Grid": "",
+"LocalPlayer": "",
+"Player": "",
 "Ship": "",
 "Submarine": "",
 "SupplyTender": "",

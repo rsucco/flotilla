@@ -32,7 +32,11 @@ func update_ship_info():
 		get_node('GUIGrid/ShipInfo/SpecialAbility').text = 'Special Ability: '
 		get_node('GUIGrid/ShipInfo/PassiveAbility').text = 'Passive Ability: '
 		get_node('GUIGrid/ShipInfo/Drawbacks').text = 'Drawbacks: '
-	
+
+# Update TurnNumber
+func update_turn():
+	get_node('GUIGrid/TurnNumber/TurnNumber').text = str(self.get_parent().current_turn)
+
 # Update YourFleet and OpponentFleet
 func update_fleets():
 	# Clear YourFleet icons

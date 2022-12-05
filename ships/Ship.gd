@@ -29,20 +29,21 @@ func set_grid_position(x, y, direction):
 
 func get_occupied_hexes(on_x = self.x, on_y = self.y, in_dir = self.direction):
 	var occupied_hexes = [[on_x, on_y]]
-	for _i in range(len_fore):
-		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], in_dir))
+	for _i in range(len_aft):
+		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], in_dir + 180))
 	occupied_hexes.remove(0)
 	occupied_hexes.invert()
 	occupied_hexes.append([on_x, on_y])
-	for _i in range(len_aft):
-		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], in_dir + 180))
+	for _i in range(len_fore):
+		occupied_hexes.append(get_parent().grid.get_hex_neighbor(occupied_hexes[-1][0], occupied_hexes[-1][1], in_dir))
 	return occupied_hexes
 
 func get_size():
 	return self.len_aft + self.len_fore + 1
 
 func hit(hit_hex):
-	hit_hexes[self.get_occupied_hexes().find(hit_hex)] = true
+	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
+	hit_hexes[hit_hex_index] = true
 	var smoke = Particles2D.new()
 	var smoke_material = ParticlesMaterial.new()
 	smoke_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
@@ -56,6 +57,8 @@ func hit(hit_hex):
 	smoke.process_material = smoke_material
 	smoke.amount = pow(self.get_size(), 2) * 10
 	smoke.lifetime = 0.5
+	var hex_size = get_parent().grid.hex_size
+	smoke.position -= Vector2(0, hex_size * (hit_hex_index - len_aft))
 	add_child(smoke)
 	if not false in hit_hexes:
 		self.sink()

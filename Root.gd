@@ -6,14 +6,18 @@ var gui
 var ships = [[], []]
 var selected_ship = null
 var current_turn = 0
+var players = []
 var player_up = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	players = [LocalPlayer.new(0), LocalPlayer.new(1)]
+	for player in players:
+		add_child(player)
 	font = DynamicFont.new()
 	font.font_data = load("res://opensans.ttf")
 	font.size = 11
-	grid = Grid.new()
+	play_game()
 	for i in range(2):
 		add_ship('Corvette', i * 2, i + 1, i * 60 + 180, 0)
 		add_ship('Destroyer', i * 3 + 4, i * 2 + 2, i * 60 + 60, 0)
@@ -102,7 +106,9 @@ func _input(event):
 		print('========================')
 	update()
 
-func game_loop():
+func play_game():
+	grid = Grid.new()
+	players[0].get_ship_selection()
 	# Player 1 select and place ships
 	# Player 2 select and place ships
 	# Reveal both players' fleet composition
@@ -130,7 +136,6 @@ func game_loop():
 	#						ship.rotate(rotation)
 	#				elif end turn:
 	#					break
-	pass
 
 func select_ship(ship):
 	selected_ship = ship
