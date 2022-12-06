@@ -29,3 +29,5 @@ func new_turn():
 	for ship in self.ships:
 		ship.new_turn()
 
+func hide_ships():
+	pass

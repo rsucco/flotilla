@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://ShipSelection.gd" type="Script" id=2]
@@ -9,6 +9,14 @@
 [ext_resource path="res://ships/sprites/preview/supply_tender.png" type="Texture" id=8]
 [ext_resource path="res://ships/sprites/preview/cruiser.png" type="Texture" id=9]
 [ext_resource path="res://ships/sprites/preview/carrier.png" type="Texture" id=10]
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.0823529, 0.0823529, 0.0823529, 0.862745 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0, 0, 0, 1 )
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 3 )
@@ -21,25 +29,26 @@ load_path = "res://.import/coastal_battery.png-9974caa19f9b5d56836efa7eb616abdf.
 flags = 4
 load_path = "res://.import/corvette.png-b4ec457647882e4d8e441a3477e23d4d.stex"
 
-[node name="ShipSelection" type="PopupDialog"]
+[node name="ShipSelection" type="PopupPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 320.0
 margin_top = 200.0
 margin_right = -320.0
-margin_bottom = -220.0
+margin_bottom = -231.0
+custom_styles/panel = SubResource( 4 )
 popup_exclusive = true
 script = ExtResource( 2 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-margin_left = 10.0
-margin_top = 10.0
-margin_right = 630.0
-margin_bottom = 360.0
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 639.0
+margin_bottom = 368.0
 alignment = 1
 
 [node name="Label" type="Label" parent="VBoxContainer"]
-margin_right = 620.0
+margin_right = 638.0
 margin_bottom = 23.0
 custom_fonts/font = SubResource( 1 )
 text = "Select your ships:"
@@ -47,26 +56,26 @@ align = 1
 
 [node name="SelectionGrid" type="GridContainer" parent="VBoxContainer"]
 margin_top = 27.0
-margin_right = 620.0
-margin_bottom = 332.0
+margin_right = 638.0
+margin_bottom = 343.0
 size_flags_vertical = 3
 columns = 3
 
 [node name="CoastalBattery" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 93.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 37.0
 texture = SubResource( 3 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
 margin_top = 41.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 55.0
 custom_fonts/font = ExtResource( 1 )
 text = "Coastal Battery"
@@ -74,7 +83,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
 margin_top = 59.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 75.0
 size_flags_horizontal = 3
 max_value = 5.0
@@ -83,22 +92,22 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
 margin_top = 79.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 93.0
 text = "0"
 align = 1
 
 [node name="Corvette" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_left = 213.0
-margin_right = 415.0
+margin_left = 214.0
+margin_right = 424.0
 margin_bottom = 93.0
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Corvette"]
-margin_left = 73.0
+margin_left = 77.0
 margin_top = 24.0
-margin_right = 128.0
+margin_right = 132.0
 margin_bottom = 37.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
@@ -108,7 +117,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Corvette"]
 margin_top = 41.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 55.0
 custom_fonts/font = ExtResource( 1 )
 text = "Corvette"
@@ -117,7 +126,7 @@ valign = 2
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Corvette"]
 margin_top = 59.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 75.0
 size_flags_horizontal = 3
 max_value = 5.0
@@ -126,22 +135,22 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Corvette"]
 margin_top = 79.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 93.0
 text = "0"
 align = 1
 
 [node name="Destroyer" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_left = 419.0
-margin_right = 620.0
+margin_left = 428.0
+margin_right = 638.0
 margin_bottom = 93.0
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Destroyer"]
-margin_left = 50.0
+margin_left = 55.0
 margin_top = 17.0
-margin_right = 150.0
+margin_right = 155.0
 margin_bottom = 37.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
@@ -151,7 +160,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Destroyer"]
 margin_top = 41.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 55.0
 custom_fonts/font = ExtResource( 1 )
 text = "Destroyer"
@@ -159,7 +168,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Destroyer"]
 margin_top = 59.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 75.0
 size_flags_horizontal = 3
 max_value = 5.0
@@ -168,22 +177,22 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Destroyer"]
 margin_top = 79.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 93.0
 text = "0"
 align = 1
 
 [node name="Cruiser" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
 margin_top = 97.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 188.0
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Cruiser"]
-margin_left = 40.0
+margin_left = 41.0
 margin_top = 12.0
-margin_right = 168.0
+margin_right = 169.0
 margin_bottom = 35.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
@@ -193,7 +202,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Cruiser"]
 margin_top = 39.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 53.0
 custom_fonts/font = ExtResource( 1 )
 text = "Cruiser"
@@ -201,7 +210,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Cruiser"]
 margin_top = 57.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 73.0
 size_flags_horizontal = 3
 max_value = 3.0
@@ -210,22 +219,22 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Cruiser"]
 margin_top = 77.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 91.0
 text = "0"
 align = 1
 
 [node name="Submarine" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_left = 213.0
+margin_left = 214.0
 margin_top = 97.0
-margin_right = 415.0
+margin_right = 424.0
 margin_bottom = 188.0
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Submarine"]
-margin_left = 30.0
-margin_right = 172.0
+margin_left = 34.0
+margin_right = 176.0
 margin_bottom = 35.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
@@ -235,7 +244,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Submarine"]
 margin_top = 39.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 53.0
 custom_fonts/font = ExtResource( 1 )
 text = "Submarine"
@@ -243,7 +252,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Submarine"]
 margin_top = 57.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 73.0
 size_flags_horizontal = 3
 max_value = 3.0
@@ -252,23 +261,23 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Submarine"]
 margin_top = 77.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 91.0
 text = "0"
 align = 1
 
 [node name="SupplyTender" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_left = 419.0
+margin_left = 428.0
 margin_top = 97.0
-margin_right = 620.0
+margin_right = 638.0
 margin_bottom = 188.0
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/SupplyTender"]
-margin_left = 50.0
+margin_left = 55.0
 margin_top = 18.0
-margin_right = 150.0
+margin_right = 155.0
 margin_bottom = 35.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
@@ -278,7 +287,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/SupplyTender"]
 margin_top = 39.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 53.0
 custom_fonts/font = ExtResource( 1 )
 text = "Supply Tender"
@@ -286,7 +295,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/SupplyTender"]
 margin_top = 57.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 73.0
 size_flags_horizontal = 3
 max_value = 5.0
@@ -295,14 +304,14 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/SupplyTender"]
 margin_top = 77.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 91.0
 text = "0"
 align = 1
 
 [node name="Battleship" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
 margin_top = 192.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 305.0
 size_flags_horizontal = 3
 alignment = 2
@@ -319,7 +328,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Battleship"]
 margin_top = 61.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 75.0
 custom_fonts/font = ExtResource( 1 )
 text = "Battleship"
@@ -327,7 +336,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Battleship"]
 margin_top = 79.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 95.0
 size_flags_horizontal = 3
 max_value = 5.0
@@ -336,22 +345,22 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Battleship"]
 margin_top = 99.0
-margin_right = 209.0
+margin_right = 210.0
 margin_bottom = 113.0
 text = "0"
 align = 1
 
 [node name="Carrier" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_left = 213.0
+margin_left = 214.0
 margin_top = 192.0
-margin_right = 415.0
+margin_right = 424.0
 margin_bottom = 305.0
 size_flags_horizontal = 3
 alignment = 2
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Carrier"]
-margin_left = 6.0
-margin_right = 195.0
+margin_left = 10.0
+margin_right = 199.0
 margin_bottom = 57.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
@@ -361,7 +370,7 @@ stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_top = 61.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 75.0
 custom_fonts/font = ExtResource( 1 )
 text = "Aircraft Carrier"
@@ -369,7 +378,7 @@ align = 1
 
 [node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_top = 79.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 95.0
 size_flags_horizontal = 3
 max_value = 5.0
@@ -378,47 +387,47 @@ ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]
 margin_top = 99.0
-margin_right = 202.0
+margin_right = 210.0
 margin_bottom = 113.0
 text = "0"
 align = 1
 
 [node name="Points" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
-margin_left = 419.0
+margin_left = 428.0
 margin_top = 192.0
-margin_right = 620.0
+margin_right = 638.0
 margin_bottom = 305.0
 alignment = 1
 
 [node name="PointsUsedLabel" type="Label" parent="VBoxContainer/SelectionGrid/Points"]
 margin_top = 40.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 54.0
 text = "Points Used:"
 align = 1
 
 [node name="PointsUsed" type="Label" parent="VBoxContainer/SelectionGrid/Points"]
 margin_top = 58.0
-margin_right = 201.0
+margin_right = 210.0
 margin_bottom = 72.0
 text = "0/25"
 align = 1
 
 [node name="Buttons" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 336.0
-margin_right = 620.0
-margin_bottom = 356.0
+margin_top = 347.0
+margin_right = 638.0
+margin_bottom = 367.0
 alignment = 1
 
 [node name="Reset" type="Button" parent="VBoxContainer/Buttons"]
-margin_left = 268.0
-margin_right = 316.0
+margin_left = 277.0
+margin_right = 325.0
 margin_bottom = 20.0
 text = "Reset"
 
 [node name="OK" type="Button" parent="VBoxContainer/Buttons"]
-margin_left = 320.0
-margin_right = 351.0
+margin_left = 329.0
+margin_right = 360.0
 margin_bottom = 20.0
 disabled = true
 text = "OK"

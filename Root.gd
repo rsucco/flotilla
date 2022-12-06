@@ -53,7 +53,10 @@ func _draw():
 			# Draw the hexagon
 			var color
 			if mouse_hex == [x, y]:
-				color = PoolColorArray([Color(0.0, 0.3, 0.9)])
+				if grid.grid[x][y].island:
+					color = PoolColorArray([Color(0.8, 0.5, 0.25)])
+				else:
+					color = PoolColorArray([Color(0.0, 0.3, 0.9)])
 			elif selected_center_hex == [x, y]:
 				color = PoolColorArray([Color(0.0, 0.3, 0.8)])
 			elif [x, y] in selected_hexes:

@@ -1,4 +1,4 @@
-extends PopupDialog
+extends PopupPanel
 
 
 var selected_count = {
