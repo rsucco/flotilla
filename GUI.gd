@@ -14,8 +14,7 @@ func _input(event):
 	pass
 
 # Update ShipInfo
-func update_ship_info():
-	var ship = get_parent().selected_ship
+func update_ship_info(ship):
 	if ship != null:
 		get_node('GUIGrid/ShipInfo/Selected').text = 'Selected: ' + ship.ship_name
 		get_node('GUIGrid/ShipInfo/Weapon').text = 'Weapon: ' + ship.weapon

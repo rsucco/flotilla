@@ -15,3 +15,6 @@ func _ready():
 	self.passive = 'Gains an extra move if starting next to an island tile'
 	self.drawback = 'Has a 75% chance of sinking if hit in either hex'
 
+func new_turn():
+	# TODO: Override this to set ap=5 if any neighbor hex is an island tile, ap=4 otherwise
+	ap = 4

@@ -113,12 +113,20 @@ func play_game():
 		yield(player, 'ships_placed')
 	# Reveal both players' fleet composition
 	gui.update_fleets()
-	while len(players[0].ships > 0) and len(players[1].ships > 0):
+	while len(players[0].ships) > 0 and len(players[1].ships) > 0:
+		current_turn += 1
+		gui.update_turn()
+		players[player_up].new_turn()
+		while players[player_up].has_moves():
+			players[player_up].get_move()
+
+			break
+		#
+		player_up = abs(player_up - 1)
 		break
-	# 	for player in players:
 	#		for ship in player.ships:
 	#			while ship.has_moves:
-	#				fire, move, ability, rotate, or end turn?
+	#				fire, move, ability, rotate, end turn, or select another ship?
 	#				if fire:
 	#					get target hex
 	#					ship.attack(target hex)
@@ -141,11 +149,14 @@ func play_game():
 
 func select_ship(ship):
 	selected_ship = ship
+	ship.selected = true
 	gui.update_ship_info()
 	update()
 
 func get_ship_at_hex(x, y):
-	for ship in ships[0] + ships[1]:
+	var all_ships = players[0].ships + players[1].ships
+	print(all_ships)
+	for ship in all_ships:
 		var occupied_hexes = ship.get_occupied_hexes()
 		if occupied_hexes != null and [x, y] in occupied_hexes:
 			return ship

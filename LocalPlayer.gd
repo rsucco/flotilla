@@ -3,7 +3,8 @@ extends Player
 class_name LocalPlayer
 
 var selected_count
-
+var selected_ship = null
+var getting_move = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -12,15 +13,20 @@ func _ready():
 func _init(num).(num):
 	pass
 
+func _input(event):
+	if event.is_pressed() and event.button_index == BUTTON_LEFT:
+		pass
+		#print('click player')
+
 func place_ships(ship_counts):
 	for ship_type in ship_counts:
 		for i in range(ship_counts[ship_type]):
 			print('placing ', ship_type, ' #', i)
 			var ship = load('res://ships/' + ship_type + '.tscn').instance()
 			add_child(ship)
-			ships.append(ship)
 			ship.place()
 			yield(ship, 'placed')
+			ships.append(ship)
 	emit_signal('ships_placed')
 
 func get_ship_selection():
@@ -34,3 +40,8 @@ func get_ship_selection():
 	yield(select_dialog, 'popup_hide')
 	emit_signal('ships_selected')
 	return selected_count
+
+func get_move():
+	print('getting move')
+	getting_move = true
+	

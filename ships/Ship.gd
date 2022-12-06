@@ -6,6 +6,7 @@ signal placed
 const SHIP_TYPES = ['coastal_battery', 'corvette', 'destroyer', 'submarine', 'cruiser', 'supply_tender', 'battleship', 'carrier']
 var direction = 0
 var root
+var ap = 0
 var len_fore
 var len_aft
 var x = -10
@@ -18,6 +19,7 @@ var special = ''
 var secondary = ''
 var passive = ''
 var drawback = ''
+var selected = false
 var placing = false
 
 # Called when the node enters the scene tree for the first time.
@@ -32,21 +34,22 @@ func set_grid_position(x, y, direction):
 	self.y = y
 	self.position = root.grid.get_hex_center(self.x, self.y)
 
-func place():
-	placing = true
-
 func _input(event):
 	if placing:
 		if event is InputEventMouseMotion:
 			var mouse_position = root.grid.get_hex_from_coords(event.position)
 			var occupied_hexes = get_occupied_hexes(mouse_position[0], mouse_position[1])
 			var any_land = false
+			var already_occupied = false
 			for hex in occupied_hexes:
 				if root.grid.grid[hex[0]][hex[1]].island:
 					any_land = true
+				if root.get_ship_at_hex(hex[0], hex[1]) != null:
+					already_occupied = true
 			if ship_type == 'coastal_battery':
 				any_land = !any_land
-			if !occupied_hexes.has([-1, -1]) and !any_land and \
+			root.get_ship_at_hex(mouse_position[0], mouse_position[1])
+			if !occupied_hexes.has([-1, -1]) and !any_land and !already_occupied and \
 			mouse_position[0] in range(get_parent().player_num * 16, get_parent().player_num * 16 + 15):
 				set_grid_position(mouse_position[0], mouse_position[1], direction)
 		elif event.is_pressed():
@@ -73,6 +76,12 @@ func get_occupied_hexes(on_x = self.x, on_y = self.y, in_dir = self.direction):
 
 func get_size():
 	return self.len_aft + self.len_fore + 1
+
+func new_turn():
+	ap = 4
+
+func place():
+	placing = true
 
 func hit(hit_hex):
 	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
@@ -117,12 +126,15 @@ func sink():
 func rotate(rotation_offset):
 	var rotated_hexes = get_occupied_hexes(self.x, self.y, self.direction + rotation_offset)
 	var any_land = false
+	var already_occupied = false
 	for hex in rotated_hexes:
 		if root.grid.grid[hex[0]][hex[1]].island:
 			any_land = true
+		if root.get_ship_at_hex(hex[0], hex[1]) != null:
+			already_occupied = true
 	if ship_type == 'coastal_battery':
 		any_land = !any_land
-	if not [-1, -1] in rotated_hexes and not any_land:
+	if not [-1, -1] in rotated_hexes and !any_land and !already_occupied:
 		self.direction += rotation_offset
 		self.set_rotation_degrees(self.direction)
 

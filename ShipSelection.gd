@@ -21,7 +21,8 @@ func _on_CountSlider_value_changed(value):
 	for value in selected_count.values():
 		used_points += value
 	get_node('VBoxContainer/SelectionGrid/Points/PointsUsed').text = str(used_points) + '/25'
-
+	get_node('VBoxContainer/Buttons/OK').disabled = (used_points == 0)
+	
 func _on_Reset_pressed():
 	for ship_type in selected_count.keys():
 		selected_count[ship_type] = 0
