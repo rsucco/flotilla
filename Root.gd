@@ -4,7 +4,6 @@ var font
 var grid
 var gui
 var ships = [[], []]
-var selected_ship = null
 var current_turn = 0
 var players = []
 var player_up = 0
@@ -25,9 +24,9 @@ func _draw():
 	var mouse_hex = grid.get_hex_from_coords(get_viewport().get_mouse_position())
 	var selected_hexes = []
 	var selected_center_hex = []
-	if selected_ship != null:
-		selected_hexes = selected_ship.get_occupied_hexes()
-		selected_center_hex = selected_hexes[selected_ship.len_aft]
+	if players[player_up].selected_ship != null:
+		selected_hexes = players[player_up].selected_ship.get_occupied_hexes()
+		selected_center_hex = selected_hexes[players[player_up].selected_ship.len_aft]
 	for x in range(31):
 		# Draw column markers
 		var string_color
@@ -58,7 +57,10 @@ func _draw():
 				else:
 					color = PoolColorArray([Color(0.0, 0.3, 0.9)])
 			elif selected_center_hex == [x, y]:
-				color = PoolColorArray([Color(0.0, 0.3, 0.8)])
+				if grid.grid[x][y].island:
+					color = PoolColorArray([Color(0.7, 0.42, 0.2)])
+				else:
+					color = PoolColorArray([Color(0.0, 0.3, 0.9)])
 			elif [x, y] in selected_hexes:
 				color = PoolColorArray([Color(0.0, 0.4, 0.9)])
 			elif grid.grid[x][y].island:
@@ -122,7 +124,7 @@ func play_game():
 		players[player_up].new_turn()
 		while players[player_up].has_moves():
 			players[player_up].get_move()
-
+			yield(players[player_up], 'made_move')
 			break
 		#
 		player_up = abs(player_up - 1)
@@ -150,15 +152,14 @@ func play_game():
 	#				elif end turn:
 	#					break
 
-func select_ship(ship):
-	selected_ship = ship
-	ship.selected = true
-	gui.update_ship_info()
-	update()
+#func select_ship(ship):
+#	selected_ship = ship
+#	ship.selected = true
+#	gui.update_ship_info()
+#	update()
 
 func get_ship_at_hex(x, y):
 	var all_ships = players[0].ships + players[1].ships
-	print(all_ships)
 	for ship in all_ships:
 		var occupied_hexes = ship.get_occupied_hexes()
 		if occupied_hexes != null and [x, y] in occupied_hexes:
