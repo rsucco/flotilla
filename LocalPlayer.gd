@@ -3,7 +3,6 @@ extends Player
 class_name LocalPlayer
 
 var selected_count
-var selecting = false
 var getting_move = false
 var ships_with_moves = []
 
@@ -25,11 +24,23 @@ func _input(event):
 			else:
 				select_ship(null)
 
+func _button_pressed(button):
+	match button.name:
+		'Fire':
+			print('fire')
+	print(button.name)
+
+
 func select_ship(ship):
 	# Move the ship to front of the line
 	if ship != null and len(ships_with_moves) > 0:
 		ships_with_moves.remove(ships_with_moves.find(ship))
 		ships_with_moves.push_front(ship)
+		for button in get_parent().gui.get_tree().get_nodes_in_group('action_buttons'):
+			button.disabled = false
+	elif ship == null:
+		for button in get_parent().gui.get_tree().get_nodes_in_group('action_buttons'):
+			button.disabled = true
 	selected_ship = ship
 	get_parent().gui.update_ship_info(ship)
 
@@ -63,5 +74,6 @@ func new_turn():
 func get_move():
 	print('getting move')
 	getting_move = true
-	
+	for button in get_parent().gui.get_tree().get_nodes_in_group('action_buttons'):
+		button.connect('pressed', self, '_button_pressed', [button])
 	emit_signal('made_move')
