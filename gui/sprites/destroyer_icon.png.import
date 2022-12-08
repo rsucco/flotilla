@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/cruiser_icon.png-c28a436839bcf0eed9b4c9e9b00cc366.stex"
+path="res://.import/destroyer_icon.png-d327823ee3a0c043def7b333e8296626.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ships/sprites/cruiser_icon.png"
-dest_files=[ "res://.import/cruiser_icon.png-c28a436839bcf0eed9b4c9e9b00cc366.stex" ]
+source_file="res://gui/sprites/destroyer_icon.png"
+dest_files=[ "res://.import/destroyer_icon.png-d327823ee3a0c043def7b333e8296626.stex" ]
 
 [params]
 

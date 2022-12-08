@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/carrier_icon.png-ae3df889b59f3fc709c5c8bb6521bcad.stex"
+path="res://.import/corvette_icon.png-a636d5fea14e7e5cbf10eb7bb722f3d2.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ships/sprites/carrier_icon.png"
-dest_files=[ "res://.import/carrier_icon.png-ae3df889b59f3fc709c5c8bb6521bcad.stex" ]
+source_file="res://gui/sprites/corvette_icon.png"
+dest_files=[ "res://.import/corvette_icon.png-a636d5fea14e7e5cbf10eb7bb722f3d2.stex" ]
 
 [params]
 

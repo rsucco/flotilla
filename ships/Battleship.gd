@@ -10,7 +10,6 @@ func _ready():
 	self.hit_hexes = [false, false, false, false]
 	self.ship_name = 'Battleship'
 	self.weapon = 'Big Gun'
-	self.special = 'Salvo (7 turns)'
-	self.secondary = 'None'
-	self.passive = 'Armor grants 25% chance of hits not counting'
-	self.drawback = 'None'
+	self.special = SpecialAbility.new(7, 'Salvo', 
+	'Shoot one central hex and damage whatever it contains as well as all of its immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly')
+	self.passive = PassiveAbility.new('Armor', 'Armor grants 25% chance of hits not counting')

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/destroyer_icon.png-99fa0c4df69c2d73d2491f52c4a14c0e.stex"
+path="res://.import/coastal_battery_icon.png-6d43f0e16dc1351763a9ad2b92f0ed8e.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ships/sprites/destroyer_icon.png"
-dest_files=[ "res://.import/destroyer_icon.png-99fa0c4df69c2d73d2491f52c4a14c0e.stex" ]
+source_file="res://gui/sprites/coastal_battery_icon.png"
+dest_files=[ "res://.import/coastal_battery_icon.png-6d43f0e16dc1351763a9ad2b92f0ed8e.stex" ]
 
 [params]
 

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/button_template.png-a47a7f6e5b2c046086e178f8bae96111.stex"
+path="res://.import/icon_template.png-c26b623ab7d2a1bdd94b933019d5ea22.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ships/sprites/gui/button_template.png"
-dest_files=[ "res://.import/button_template.png-a47a7f6e5b2c046086e178f8bae96111.stex" ]
+source_file="res://gui/sprites/icon_template.png"
+dest_files=[ "res://.import/icon_template.png-c26b623ab7d2a1bdd94b933019d5ea22.stex" ]
 
 [params]
 

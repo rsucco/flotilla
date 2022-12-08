@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/supply_tender_icon.png-c99e29ced8a5b4fcc312e962d5c1cbda.stex"
+path="res://.import/supply_tender_icon.png-d3307d4c29663149647f89ac6b0b4d78.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ships/sprites/supply_tender_icon.png"
-dest_files=[ "res://.import/supply_tender_icon.png-c99e29ced8a5b4fcc312e962d5c1cbda.stex" ]
+source_file="res://gui/sprites/supply_tender_icon.png"
+dest_files=[ "res://.import/supply_tender_icon.png-d3307d4c29663149647f89ac6b0b4d78.stex" ]
 
 [params]
 

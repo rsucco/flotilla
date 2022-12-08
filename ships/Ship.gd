@@ -6,6 +6,7 @@ signal placed
 const SHIP_TYPES = ['coastal_battery', 'corvette', 'destroyer', 'submarine', 'cruiser', 'supply_tender', 'battleship', 'carrier']
 var direction = 0
 var root
+var default_ap = 4
 var ap = 0
 var len_fore
 var len_aft
@@ -15,10 +16,10 @@ var ship_type = ''
 var hit_hexes = []
 var ship_name = ''
 var weapon = ''
-var special = ''
-var secondary = ''
-var passive = ''
-var drawback = ''
+var special = SpecialAbility.new()
+var secondary = SpecialAbility.new()
+var passive = PassiveAbility.new()
+var drawback = Drawback.new()
 var selected = false
 var placing = false
 
@@ -48,7 +49,6 @@ func _input(event):
 					already_occupied = true
 			if ship_type == 'coastal_battery':
 				any_land = !any_land
-			root.get_ship_at_hex(mouse_position[0], mouse_position[1])
 			if !occupied_hexes.has([-1, -1]) and !any_land and !already_occupied and \
 			mouse_position[0] in range(get_parent().player_num * 16, get_parent().player_num * 16 + 15):
 				set_grid_position(mouse_position[0], mouse_position[1], direction)
@@ -78,7 +78,7 @@ func get_size():
 	return self.len_aft + self.len_fore + 1
 
 func new_turn():
-	ap = 4
+	ap = default_ap
 
 func place():
 	placing = true
@@ -124,25 +124,80 @@ func sink():
 	queue_free()
 
 func rotate(rotation_offset):
+	if ship_type == 'coastal_battery':
+		pass
 	var rotated_hexes = get_occupied_hexes(self.x, self.y, self.direction + rotation_offset)
 	var any_land = false
 	var already_occupied = false
 	for hex in rotated_hexes:
 		if root.grid.grid[hex[0]][hex[1]].island:
 			any_land = true
-		if root.get_ship_at_hex(hex[0], hex[1]) != null:
+		var ship_at_hex = root.get_ship_at_hex(hex[0], hex[1])
+		if ship_at_hex != null and ship_at_hex != self:
 			already_occupied = true
-	if ship_type == 'coastal_battery':
-		any_land = !any_land
+	print('rotated hexes:', rotated_hexes)
+	print('any land ', any_land)
+	print()
 	if not [-1, -1] in rotated_hexes and !any_land and !already_occupied:
 		self.direction += rotation_offset
 		self.set_rotation_degrees(self.direction)
 
-func move(num_tiles):
-	for _i in range(num_tiles):
-		var new_hex = root.grid.get_hex_neighbor(x, y, direction)
-		if [-1, -1] in get_occupied_hexes(new_hex[0], new_hex[1]):
-			break
-		self.x = new_hex[0]
-		self.y = new_hex[1]
+# Returns true if moving 1 hex forward in the current direction would not result
+# in the ship colliding with another ship, an island, or going out of bounds
+func can_move(reverse = false, distance = 1):
+	if ap < 1 or (reverse and ap < 4):
+		return false
+	var new_hex
+	if !reverse:
+		new_hex = root.grid.get_hex_neighbor(x, y, direction, distance)
+	else:
+		new_hex = root.grid.get_hex_neighbor(x, y, direction + 180, distance)
+	var occupied_hexes = get_occupied_hexes(new_hex[0], new_hex[1])
+	if [-1, -1] in occupied_hexes:
+		return false
+	for hex in occupied_hexes:
+		var ship_at_hex = root.get_ship_at_hex(hex[0], hex[1])
+		if root.grid.grid[hex[0]][hex[1]].island or \
+		(ship_at_hex != null and ship_at_hex != self):
+			return false
+	return true
+
+# Returns true if the ship can rotate by the specified number of degrees
+func can_rotate(rotation_offset):
+	print('rotating ', rotation_offset)
+	# 2 AP required to rotate
+	if ap < 2:
+		return false
+	var occupied_hexes = get_occupied_hexes(x, y, direction + rotation_offset)
+	if [-1, -1] in occupied_hexes:
+		return false
+	for hex in occupied_hexes:
+		var ship_at_hex = root.get_ship_at_hex(hex[0], hex[1])
+		print('is island: ', root.grid.grid[hex[0]][hex[1]].island)
+		print('ship at hex: ', ship_at_hex)
+		if root.grid.grid[hex[0]][hex[1]].island or \
+		(ship_at_hex != null and ship_at_hex != self):
+			return false
+	return true
+
+func forward():
+	var new_hex = root.grid.get_hex_neighbor(x, y, direction)
+	self.x = new_hex[0]
+	self.y = new_hex[1]
+	self.ap -= 1
 	self.position = root.grid.get_hex_center(self.x, self.y)
+
+func reverse():
+	var new_hex = root.grid.get_hex_neighbor(x, y, direction + 180)
+	self.x = new_hex[0]
+	self.y = new_hex[1]
+	self.ap -= 4
+	self.position = root.grid.get_hex_center(self.x, self.y)
+
+func port():
+	rotate(-60)
+	self.ap -= 2
+
+func starboard():
+	rotate(60)
+	self.ap -= 2

@@ -7,30 +7,48 @@ func _ready():
 	# Load ship icon textures
 	ship_icons = {}
 	for ship_type in Ship.SHIP_TYPES:
-		ship_icons[ship_type] = load('res://ships/sprites/' + ship_type + '_icon.png')
+		ship_icons[ship_type] = load('res://gui/sprites/' + ship_type + '_icon.png')
 	get_parent().gui = self
 
 func _input(event):
 	pass
 
+func disable_button(button, disabled = true):
+	get_node('GUIGrid/Actions/' + button).disabled = disabled
+
 # Update ShipInfo
 func update_ship_info(ship):
 	if ship != null:
-		get_node('GUIGrid/ShipInfo/Selected').text = 'Selected: ' + ship.ship_name
-		get_node('GUIGrid/ShipInfo/Weapon').text = 'Weapon: ' + ship.weapon
-		get_node('GUIGrid/ShipInfo/SpecialAbility').text = 'Special Ability: ' + ship.special
-		if ship.secondary != 'None':
-			get_node('GUIGrid/ShipInfo/SpecialAbility').text += ' / ' + ship.secondary
-		get_node('GUIGrid/ShipInfo/PassiveAbility').text = 'Passive Ability: ' + ship.passive
-		get_node('GUIGrid/ShipInfo/PassiveAbility').hint_tooltip = get_node('GUIGrid/ShipInfo/PassiveAbility').text
-		get_node('GUIGrid/ShipInfo/Drawbacks').text = 'Drawbacks: ' + ship.drawback
-		get_node('GUIGrid/ShipInfo/Drawbacks').hint_tooltip = get_node('GUIGrid/ShipInfo/Drawbacks').text
+		# Update AbilityInfo container
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SpecialAbility').text = 'Special Ability: ' + ship.special.name
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SpecialAbility').hint_tooltip = ship.special.desc
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').text = 'Secondary Ability: ' + ship.secondary.name
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').hint_tooltip = ship.secondary.desc
+		get_node('GUIGrid/ShipInfo/AbilityInfo/PassiveAbility').text = 'Passive Ability: ' + ship.passive.name
+		get_node('GUIGrid/ShipInfo/AbilityInfo/PassiveAbility').hint_tooltip = ship.passive.desc
+		get_node('GUIGrid/ShipInfo/AbilityInfo/Drawbacks').text = 'Drawbacks: ' + ship.drawback.name
+		get_node('GUIGrid/ShipInfo/AbilityInfo/Drawbacks').hint_tooltip = ship.drawback.desc
+		# Update ActionInfo container
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipName').text = ship.ship_name
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipName').hint_tooltip = 'Weapon: ' + ship.weapon
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipIcon').texture = ship_icons[ship.ship_type]
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipIcon').modulate = Color(1, 1, 1, 1)
+		get_node('GUIGrid/ShipInfo/ActionInfo/AP').text = 'AP: ' + str(ship.ap) + '/' + str(ship.default_ap)
 	else:
-		get_node('GUIGrid/ShipInfo/Selected').text = 'Selected: '
-		get_node('GUIGrid/ShipInfo/Weapon').text = 'Weapon: '
-		get_node('GUIGrid/ShipInfo/SpecialAbility').text = 'Special Ability: '
-		get_node('GUIGrid/ShipInfo/PassiveAbility').text = 'Passive Ability: '
-		get_node('GUIGrid/ShipInfo/Drawbacks').text = 'Drawbacks: '
+		# Update AbilityInfo container
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SpecialAbility').text = 'Special Ability: '
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SpecialAbility').hint_tooltip = ''
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').text = 'Secondary Ability: '
+		get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').hint_tooltip = ''
+		get_node('GUIGrid/ShipInfo/AbilityInfo/PassiveAbility').text = 'Passive Ability: '
+		get_node('GUIGrid/ShipInfo/AbilityInfo/PassiveAbility').hint_tooltip = ''
+		get_node('GUIGrid/ShipInfo/AbilityInfo/Drawbacks').text = 'Drawbacks: '
+		get_node('GUIGrid/ShipInfo/AbilityInfo/Drawbacks').hint_tooltip = ''
+		# Update ActionInfo container
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipName').text = ''
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipName').hint_tooltip = ''
+		get_node('GUIGrid/ShipInfo/ActionInfo/ShipIcon').modulate = Color(1, 1, 1, 0)
+		get_node('GUIGrid/ShipInfo/ActionInfo/AP').text = 'AP:     '
 
 # Update TurnNumber
 func update_turn():
@@ -58,7 +76,6 @@ func update_fleets():
 			icon_container.add_child(icon_sprite)
 			icon_container.add_child(icon_label)
 			get_node('GUIGrid/YourFleet/YourFleetIcons').add_child(icon_container)
-#			get_node('GUIGrid/YourFleet/YourFleetIcons').queue_sort()
 	# Clear OpponentFleet icons
 	for n in get_node('GUIGrid/OpponentFleet/OpponentFleetIcons').get_children():
 		n.queue_free()

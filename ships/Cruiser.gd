@@ -10,8 +10,8 @@ func _ready():
 	self.hit_hexes = [false, false, false]
 	self.ship_name = 'Cruiser'
 	self.weapon = 'Anti-Ship Missile'
-	self.special = 'EW Strike (6 turns)'
-	self.secondary = 'None'
-	self.passive = '50% chance of intercepting incoming missile attacks within two hexes'
-	self.drawback = 'None'
+	self.special = SpecialAbility.new(6, 'EW Strike', 
+	'Select a hex on opponent\'s board; prevents all units within two hexes of central hex from firing next turn and either resets or adds five to their special ability cooldowns, whichever is less')
+	self.passive = PassiveAbility.new('Missile Defense', 
+	'50% chance of intercepting incoming missile attacks within two hexes if no move action was taken last turn (chance is reduced to 25% for incoming nuclear strike)')
 

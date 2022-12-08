@@ -10,7 +10,10 @@ func _ready():
 	self.hit_hexes = [false, false, false]
 	self.ship_name = 'Submarine'
 	self.weapon = 'Torpedo'
-	self.special = 'Nuclear Strike (10 turns)'
-	self.secondary = 'Sonar Pulse (1 turn)'
-	self.passive = 'Can only be hit by surface units on center hex'
-	self.drawback = 'Sinks instantly when hit in center hex or by ASW Strike, mine, or another sub'
+	self.special = SpecialAbility.new(10, 'Nuclear Strike',
+	'Select a hex on opponent\'s board; instantly sinks any unit it hits directly and damages all hexes within two hexes of central hex')
+	self.secondary = SpecialAbility.new(1, 'Sonar Pulse',
+	'Select a hex on opponent\'s board; reveals ships and submarines on that hex and its direct neighbors and also reveals the location of the submarine')
+	self.passive = PassiveAbility.new('Silent Service', 'Can only be hit by surface units on center hex')
+	self.drawback = Drawback.new('Crushing Depths', 
+	'Sinks instantly when hit in center hex by surface unit, or when hit in any hex by ASW Strike, mine, or another sub') 
