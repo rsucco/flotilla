@@ -3,9 +3,9 @@ extends Player
 class_name LocalPlayer
 
 var selected_count
-var getting_move = false
+var aiming = {'fire': false, 'special': false, 'secondary': false}
 var ships_with_moves = []
-var targeting_hex_range = 2
+var targeting_hex_range = -1
 
 
 # Called when the node enters the scene tree for the first time.
@@ -30,14 +30,13 @@ func _unhandled_input(event):
 #					select_ship(null)
 			# Clicking on opponent's grid
 			elif on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
-				# Just deselecting for now; eventually targetting logic will go here
-#				select_ship(null)
-				pass
+				if aiming['fire']:
+					fire(on_hex[0], on_hex[1])
 
 func _button_pressed(button):
 	match button.name:
 		'Fire':
-			print('fire')
+			aim_fire()
 		'Special':
 			print('special')
 		'Secondary':
@@ -52,6 +51,24 @@ func _button_pressed(button):
 			starboard()
 		'Reverse':
 			reverse()
+
+func aim_fire():
+	if selected_ship != null and selected_ship.can_fire():
+		aiming['fire'] = true
+		targeting_hex_range = 0
+
+func fire(x, y):
+	get_parent().players[abs(player_num - 1)].receive_fire(x, y)
+	selected_ship.ap -= 2
+	selected_ship.fire_remaining -= 1
+	update_buttons(selected_ship)
+	get_parent().gui.update_ship_info(selected_ship)
+	emit_signal('made_move')
+
+func end_turn():
+	if selected_ship != null:
+		selected_ship.ap = 0
+		emit_signal('made_move')
 
 func forward():
 	if selected_ship != null and selected_ship.can_move():
@@ -79,12 +96,6 @@ func starboard():
 		selected_ship.starboard()
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
-		emit_signal('made_move')
-
-func end_turn():
-	if selected_ship != null:
-		print('ended turn for ', selected_ship)
-		selected_ship.ap = 0
 		emit_signal('made_move')
 
 func get_hover_hexes(x, y):
@@ -173,7 +184,8 @@ func new_turn():
 	select_ship(ships_with_moves[0])
 
 func get_move():
-	getting_move = true
+	aiming = {'fire': false, 'special': false, 'secondary': false}
+	targeting_hex_range = -1
 	for ship in ships_with_moves:
 		if ship.ap == 0:
 			ships_with_moves.remove(ships_with_moves.find(ship))

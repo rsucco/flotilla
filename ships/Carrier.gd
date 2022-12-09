@@ -20,7 +20,7 @@ func new_turn():
 	.new_turn()
 	var num_hit_hexes = 0
 	for hex in hit_hexes:
-		if !hex:
+		if hex:
 			num_hit_hexes += 1
 	# Drawback: loses passive ability if two or more hexes are damaged
 	if num_hit_hexes < 2:

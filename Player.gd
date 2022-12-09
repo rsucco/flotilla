@@ -46,7 +46,7 @@ func get_hover_hexes(x, y):
 func receive_fire(x, y):
 	var ship_at_hex = get_ship_at_hex(x, y)
 	if ship_at_hex != null:
-		ship_at_hex.hit()
+		ship_at_hex.hit([x, y])
 		return true
 	else:
 		return false

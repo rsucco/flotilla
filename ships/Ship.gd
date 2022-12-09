@@ -120,9 +120,6 @@ func hit(hit_hex):
 		self.sink()
 
 func sink():
-	# TODO: Hacky af, change all this
-	if root.selected_ship == self:
-		root.selected_ship = null
 	get_parent().ships.remove(get_parent().ships.find(self))
 	root.gui.update_fleets()
 	queue_free()
