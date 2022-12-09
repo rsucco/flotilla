@@ -20,10 +20,8 @@ func _init(num):
 func has_moves():
 	var remaining = false
 	for ship in ships:
-		print(ship.ap)
 		if ship.ap > 0:
 			remaining = true
-	print(remaining)
 	return remaining
 
 # Start a new turn
@@ -40,3 +38,6 @@ func get_ship_at_hex(x, y):
 		if occupied_hexes != null and [x, y] in occupied_hexes:
 			return ship
 	return null
+
+func get_hover_hexes(x, y):
+	return [[x, y]]

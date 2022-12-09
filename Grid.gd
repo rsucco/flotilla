@@ -38,12 +38,17 @@ func get_num_island_tiles(player):
 	return num_island
 
 # Returns a list of hexes that border a given hex
-func get_all_hex_neighbors(x, y):
+func get_all_hex_neighbors(x, y, distance = 1):
 	var hex_neighbors = []
-	for direction in [0, 60, 120, 180, 240, 300]:
-		var hex_neighbor = get_hex_neighbor(x, y, direction)
-		if hex_neighbor != [-1, -1]:
-			hex_neighbors.append(hex_neighbor)
+	if x < 0 or y < 0:
+		return []
+	if distance > 0:
+		for direction in [0, 60, 120, 180, 240, 300]:
+			var hex_neighbor = get_hex_neighbor(x, y, direction)
+			if hex_neighbor != [-1, -1]:
+				hex_neighbors += get_all_hex_neighbors(hex_neighbor[0], hex_neighbor[1], distance - 1)
+	else:
+		hex_neighbors.append([x, y])
 	return hex_neighbors
 
 # Returns the hex that borders a given hex in a given direction in degrees

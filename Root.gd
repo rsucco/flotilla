@@ -3,6 +3,7 @@ extends Node2D
 var font
 var grid
 var gui
+var selecting = true
 var ships = [[], []]
 var current_turn = 0
 var players = []
@@ -22,6 +23,7 @@ func _draw():
 	# Draw grid
 	var y_grid_display = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
 	var mouse_hex = grid.get_hex_from_coords(get_viewport().get_mouse_position())
+	var hover_hexes = players[player_up].get_hover_hexes(mouse_hex[0], mouse_hex[1])
 	var selected_hexes = []
 	var selected_center_hex = []
 	if players[player_up].selected_ship != null:
@@ -33,7 +35,7 @@ func _draw():
 		var string_location = grid.get_hex_center(x, 0) - Vector2(4, grid.hex_size / sqrt(3))
 		if x % 2 != 0:
 			string_location -= Vector2(0, grid.hex_size / sqrt(3) * 0.75)
-		if mouse_hex[0] == x:
+		if mouse_hex[0] == x and current_turn != 0:
 			string_color = Color(1.0, 0.0, 0.0)
 		else:
 			string_color = Color(1.0, 1.0, 1.0)
@@ -43,7 +45,7 @@ func _draw():
 			if x == 0:
 				var left_string_location = grid.get_hex_center(0, y) - Vector2(grid.hex_size * 0.75, -grid.hex_size / sqrt(3) / 2)
 				var right_string_location = grid.get_hex_center(30, y) + Vector2(grid.hex_size * 0.6, grid.hex_size / sqrt(3) / 2)
-				if mouse_hex[1] == y:
+				if mouse_hex[1] == y and current_turn != 0:
 					string_color = Color(0.7, 0.0, 0.0)
 				else:
 					string_color = Color(1.0, 1.0, 1.0)
@@ -51,11 +53,19 @@ func _draw():
 				draw_string(font, right_string_location, y_grid_display[y], string_color)
 			# Draw the hexagon
 			var color
-			if mouse_hex == [x, y]:
-				if grid.grid[x][y].island:
-					color = PoolColorArray([Color(0.8, 0.5, 0.25)])
+			# Highlight hover hexes appropriately
+			if [x, y] in hover_hexes and current_turn != 0:
+				# Darker colors on opponent's grid
+				if x in range(player_up * 16, player_up * 16 + 15):
+					if grid.grid[x][y].island:
+						color = PoolColorArray([Color(0.8, 0.5, 0.25)])
+					else:
+						color = PoolColorArray([Color(0.0, 0.3, 0.9)])
 				else:
-					color = PoolColorArray([Color(0.0, 0.3, 0.9)])
+					if grid.grid[x][y].island:
+						color = PoolColorArray([Color(0.47, 0.27, 0.14)])
+					else:
+						color = PoolColorArray([Color(0.0, 0.26, 0.5)])
 			elif selected_center_hex == [x, y]:
 				if grid.grid[x][y].island:
 					color = PoolColorArray([Color(0.7, 0.42, 0.2)])

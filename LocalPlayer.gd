@@ -5,6 +5,7 @@ class_name LocalPlayer
 var selected_count
 var getting_move = false
 var ships_with_moves = []
+var targeting_hex_range = 2
 
 
 # Called when the node enters the scene tree for the first time.
@@ -77,6 +78,24 @@ func starboard():
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
 
+func get_hover_hexes(x, y):
+	# Check if hex is on our half of the board
+	if x in range(16 * player_num, 16 * player_num + 15):
+		# On our half, don't bother with area of effect
+		return [[x, y]]
+	# Border; don't do anything
+	elif x == 15:
+		return []
+	else:
+		# On opponent's half; return nothing if targeting_hex_range is -1
+		if targeting_hex_range == -1:
+			return []
+		# Return all neighbors within targeting_hex_range hexes otherwise
+		else:
+			var hover_hexes = get_parent().grid.get_all_hex_neighbors(x, y, targeting_hex_range)
+			hover_hexes.append([x, y])
+			return hover_hexes
+
 func select_ship(ship):
 	if ship != null:
 		# Move the ship to front of the line (if there is a ship, and if there is a
@@ -107,6 +126,15 @@ func update_buttons(ship):
 	# Check if ship can rotate to starboard (+60 degrees)
 	if !ship.can_rotate(60):
 		get_parent().gui.disable_button('Starboard')
+	# Check if ship can fire
+	if !ship.can_fire():
+		get_parent().gui.disable_button('Fire')
+	# Check if ship can use special ability
+	if !ship.can_special():
+		get_parent().gui.disable_button('Special')
+	# Check if ship can use secondary ability
+	if !ship.can_secondary():
+		get_parent().gui.disable_button('Secondary')
 
 func place_ships(ship_counts):
 	for ship_type in ship_counts:

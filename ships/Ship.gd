@@ -22,6 +22,7 @@ var passive = PassiveAbility.new()
 var drawback = Drawback.new()
 var selected = false
 var placing = false
+var fire_remaining = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -79,6 +80,9 @@ func get_size():
 
 func new_turn():
 	ap = default_ap
+	fire_remaining = 1
+	special.cooldown_current -= 1
+	secondary.cooldown_current -= 1
 
 func place():
 	placing = true
@@ -124,8 +128,6 @@ func sink():
 	queue_free()
 
 func rotate(rotation_offset):
-	if ship_type == 'coastal_battery':
-		pass
 	var rotated_hexes = get_occupied_hexes(self.x, self.y, self.direction + rotation_offset)
 	var any_land = false
 	var already_occupied = false
@@ -135,9 +137,6 @@ func rotate(rotation_offset):
 		var ship_at_hex = root.get_ship_at_hex(hex[0], hex[1])
 		if ship_at_hex != null and ship_at_hex != self:
 			already_occupied = true
-	print('rotated hexes:', rotated_hexes)
-	print('any land ', any_land)
-	print()
 	if not [-1, -1] in rotated_hexes and !any_land and !already_occupied:
 		self.direction += rotation_offset
 		self.set_rotation_degrees(self.direction)
@@ -145,16 +144,21 @@ func rotate(rotation_offset):
 # Returns true if moving 1 hex forward in the current direction would not result
 # in the ship colliding with another ship, an island, or going out of bounds
 func can_move(reverse = false, distance = 1):
-	if ap < 1 or (reverse and ap < 4):
+	# Make sure we have sufficient action points for this move
+	if ap < distance or (reverse and ap < 4):
 		return false
 	var new_hex
+	# Get potential new center hex
 	if !reverse:
 		new_hex = root.grid.get_hex_neighbor(x, y, direction, distance)
 	else:
 		new_hex = root.grid.get_hex_neighbor(x, y, direction + 180, distance)
+	# Get potential new occupied hexes
 	var occupied_hexes = get_occupied_hexes(new_hex[0], new_hex[1])
+	# Don't go out of bounds
 	if [-1, -1] in occupied_hexes:
 		return false
+	# Don't allow moving into an island tile or another ship
 	for hex in occupied_hexes:
 		var ship_at_hex = root.get_ship_at_hex(hex[0], hex[1])
 		if root.grid.grid[hex[0]][hex[1]].island or \
@@ -168,17 +172,38 @@ func can_rotate(rotation_offset):
 	# 2 AP required to rotate
 	if ap < 2:
 		return false
+	# Get potential new occupied hexes
 	var occupied_hexes = get_occupied_hexes(x, y, direction + rotation_offset)
+	# Don't go out of bounds
 	if [-1, -1] in occupied_hexes:
 		return false
+	# Don't allow moving into an island tile or another ship
 	for hex in occupied_hexes:
 		var ship_at_hex = root.get_ship_at_hex(hex[0], hex[1])
-		print('is island: ', root.grid.grid[hex[0]][hex[1]].island)
-		print('ship at hex: ', ship_at_hex)
 		if root.grid.grid[hex[0]][hex[1]].island or \
 		(ship_at_hex != null and ship_at_hex != self):
 			return false
 	return true
+
+# Return true if a ship can fire
+func can_fire():
+	# 2 AP and 1 fire action required to fire
+	if ap >= 2 and fire_remaining >= 1:
+		return true
+	else:
+		return false
+
+func can_special():
+	if special.desc == '' or special.cooldown_current != 0:
+		return false
+	else:
+		return true
+
+func can_secondary():
+	if secondary.desc == '' or secondary.cooldown_current != 0:
+		return false
+	else:
+		return true
 
 func forward():
 	var new_hex = root.grid.get_hex_neighbor(x, y, direction)

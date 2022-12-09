@@ -14,3 +14,15 @@ func _ready():
 	'Select three connecting hexes on opponent\'s board; reveals hexes and all their immediate neighbors')
 	self.passive = PassiveAbility.new('Flight Ops', 'Can take two attack moves in one turn instead of moving')
 	self.drawback = Drawback.new('Degraded Runway', 'If two or more hexes are damaged, can only take one attack move')
+
+# Override to implement passive ability and drawback
+func new_turn():
+	.new_turn()
+	var num_hit_hexes = 0
+	for hex in hit_hexes:
+		if !hex:
+			num_hit_hexes += 1
+	# Drawback: loses passive ability if two or more hexes are damaged
+	if num_hit_hexes < 2:
+		# Passive ability: gets two fire moves
+		fire_remaining = 2

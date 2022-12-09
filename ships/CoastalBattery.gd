@@ -21,3 +21,7 @@ func can_move(reverse = false, distance = 1):
 # Coastal batteries have no need to rotate; always return false
 func can_rotate(dir = 0):
 	return false
+
+# Don't rotate in placement screen either
+func rotate(rotation_offset = 0):
+	pass

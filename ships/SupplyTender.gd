@@ -13,3 +13,7 @@ func _ready():
 	self.special = SpecialAbility.new(6, 'UNREP', 'Completely heals an adjacent ship')
 	self.passive = PassiveAbility.new('Damage Control', 'Heals one hex every 10 turns if damaged')
 	self.drawback = Drawback.new('Flammable Cargo', 'Lose 2 AP per turn if damaged')
+
+# Supply tenders cannot fire
+func can_fire():
+	return false
