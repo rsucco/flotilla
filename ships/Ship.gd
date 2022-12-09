@@ -191,13 +191,13 @@ func can_fire():
 		return false
 
 func can_special():
-	if special.desc == '' or special.cooldown_current != 0:
+	if special.desc == '' or special.cooldown_current != 0 and ap >= 2:
 		return false
 	else:
 		return true
 
 func can_secondary():
-	if secondary.desc == '' or secondary.cooldown_current != 0:
+	if secondary.desc == '' or secondary.cooldown_current != 0 and ap >= 2:
 		return false
 	else:
 		return true

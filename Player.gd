@@ -18,6 +18,9 @@ func _init(num):
 
 # Check whether the player has moves remaining
 func has_moves():
+	# Don't make any more moves if the opponent is defeated
+	if len(get_parent().players[abs(player_num - 1)].ships) < 1:
+		return false
 	var remaining = false
 	for ship in ships:
 		if ship.ap > 0:

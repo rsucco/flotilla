@@ -10,5 +10,6 @@ func _ready():
 	self.hit_hexes = [false, false, false]
 	self.ship_name = 'Destroyer'
 	self.weapon = 'Anti-Ship Missile'
-	self.special = SpecialAbility.new(4, 'ASW Strike', 'Select a hex on opponent\'s board; if the hex or any of its direct neighbors contacts an enemy submarine, sink it instantly (does not affect ships)')
-	self.secondary = SpecialAbility.new(5, 'Lay Mine', 'Select a hex on opponent\'s boardto place a mine; if any ships move over that tile, they will take a hit in a random hex')
+	self.special = SpecialAbility.new(4, 'ASW Strike',
+	'Select a hex on opponent\'s board; if the hex or any of its direct neighbors contacts an enemy submarine, sink it instantly (does not affect ships)', 1)
+	self.secondary = SpecialAbility.new(5, 'Lay Mine', 'Select a hex on opponent\'s board to place a mine; if any ships move over that tile, they will take a hit in a random hex', 0)

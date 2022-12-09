@@ -122,10 +122,11 @@ func play_game():
 			players[player_up].disconnect_buttons()
 		player_up = abs(player_up - 1)
 	# TODO: Make this pretty
-	if len(players[0].ship) > len(players[1].ships):
+	if len(players[0].ships) > len(players[1].ships):
 		print('Player 1 wins!')
 	else:
 		print('Player 2 wins!')
+	queue_free()
 
 func get_ship_at_hex(x, y):
 	var all_ships = players[0].ships + players[1].ships

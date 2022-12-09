@@ -38,9 +38,9 @@ func _button_pressed(button):
 		'Fire':
 			aim_fire()
 		'Special':
-			print('special')
+			aim_special()
 		'Secondary':
-			print('secondary')
+			aim_secondary()
 		'EndTurn':
 			end_turn()
 		'Forward':
@@ -54,6 +54,8 @@ func _button_pressed(button):
 
 func aim_fire():
 	if selected_ship != null and selected_ship.can_fire():
+		aiming['special'] = false
+		aiming['secondary'] = false
 		aiming['fire'] = true
 		targeting_hex_range = 0
 
@@ -64,6 +66,20 @@ func fire(x, y):
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')
+
+func aim_special():
+	if selected_ship != null and selected_ship.can_special():
+		aiming['fire'] = false
+		aiming['secondary'] = false
+		aiming['special'] = true
+		targeting_hex_range = selected_ship.special.aoe
+
+func aim_secondary():
+	if selected_ship != null and selected_ship.can_secondary():
+		aiming['fire'] = false
+		aiming['special'] = false
+		aiming['secondary'] = true
+		targeting_hex_range = selected_ship.secondary.aoe
 
 func end_turn():
 	if selected_ship != null:
