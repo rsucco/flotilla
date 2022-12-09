@@ -43,7 +43,7 @@ func _button_pressed(button):
 		'Secondary':
 			print('secondary')
 		'EndTurn':
-			print('endturn')
+			end_turn()
 		'Forward':
 			forward()
 		'Port':
@@ -52,31 +52,40 @@ func _button_pressed(button):
 			starboard()
 		'Reverse':
 			reverse()
-	print(button.name)
 
 func forward():
 	if selected_ship != null and selected_ship.can_move():
 		selected_ship.forward()
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
 
 func reverse():
 	if selected_ship != null and selected_ship.can_move(true):
 		selected_ship.reverse()
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
 
 func port():
 	if selected_ship != null and selected_ship.can_rotate(-60):
 		selected_ship.port()
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
 
 func starboard():
 	if selected_ship != null and selected_ship.can_rotate(60):
 		selected_ship.starboard()
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
+
+func end_turn():
+	if selected_ship != null:
+		print('ended turn for ', selected_ship)
+		selected_ship.ap = 0
+		emit_signal('made_move')
 
 func get_hover_hexes(x, y):
 	# Check if hex is on our half of the board
@@ -161,11 +170,17 @@ func get_ship_selection():
 func new_turn():
 	.new_turn()
 	ships_with_moves = ships.duplicate()
-
 	select_ship(ships_with_moves[0])
 
 func get_move():
 	getting_move = true
+	for ship in ships_with_moves:
+		if ship.ap == 0:
+			ships_with_moves.remove(ships_with_moves.find(ship))
+	select_ship(ships_with_moves[0])
 	for button in get_parent().gui.get_tree().get_nodes_in_group('action_buttons'):
 		button.connect('pressed', self, '_button_pressed', [button])
-	emit_signal('made_move')
+
+func disconnect_buttons():
+	for button in get_parent().gui.get_tree().get_nodes_in_group('action_buttons'):
+		button.disconnect('pressed', self, '_button_pressed')

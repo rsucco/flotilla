@@ -41,3 +41,12 @@ func get_ship_at_hex(x, y):
 
 func get_hover_hexes(x, y):
 	return [[x, y]]
+
+# Receive a shot at a given hex, return true for a hit and false for a miss
+func receive_fire(x, y):
+	var ship_at_hex = get_ship_at_hex(x, y)
+	if ship_at_hex != null:
+		ship_at_hex.hit()
+		return true
+	else:
+		return false

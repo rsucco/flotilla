@@ -129,16 +129,16 @@ func play_game():
 	# Reveal both players' fleet composition
 	gui.update_fleets()
 	while len(players[0].ships) > 0 and len(players[1].ships) > 0:
-		current_turn += 1
+		if player_up == 0:
+			current_turn += 1
 		gui.update_turn()
 		players[player_up].new_turn()
 		while players[player_up].has_moves():
 			players[player_up].get_move()
 			yield(players[player_up], 'made_move')
-			break
-		#
+			players[player_up].disconnect_buttons()
 		player_up = abs(player_up - 1)
-		break
+#		break
 	#		for ship in player.ships:
 	#			while ship.has_moves:
 	#				fire, move, ability, rotate, end turn, or select another ship?
