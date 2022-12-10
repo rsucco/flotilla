@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/end_turn.png-732d8dfdc3a283551d8961892c717e4e.stex"
+path="res://.import/port.png-66125b8c2f5407da19937da3bd927c31.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://gui/sprites/end_turn.png"
-dest_files=[ "res://.import/end_turn.png-732d8dfdc3a283551d8961892c717e4e.stex" ]
+source_file="res://gui/sprites/buttons/port.png"
+dest_files=[ "res://.import/port.png-66125b8c2f5407da19937da3bd927c31.stex" ]
 
 [params]
 

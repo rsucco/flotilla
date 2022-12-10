@@ -165,7 +165,6 @@ func can_move(reverse = false, distance = 1):
 
 # Returns true if the ship can rotate by the specified number of degrees
 func can_rotate(rotation_offset):
-	print('rotating ', rotation_offset)
 	# 2 AP required to rotate
 	if ap < 2:
 		return false
@@ -223,3 +222,12 @@ func port():
 func starboard():
 	rotate(60)
 	self.ap -= 2
+
+func fire(target_x, target_y):
+	pass
+
+func special(target_x, target_y):
+	pass
+
+func secondary(target_x, target_y):
+	pass

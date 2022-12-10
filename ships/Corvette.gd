@@ -15,4 +15,4 @@ func _ready():
 
 func new_turn():
 	# TODO: Override this to set ap=5 if any neighbor hex is an island tile, ap=4 otherwise
-	ap = 10
+	.new_turn()

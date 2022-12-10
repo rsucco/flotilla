@@ -18,20 +18,29 @@ func _init(num).(num):
 func _unhandled_input(event):
 	# Only pay attention if it's our turn
 	if get_parent().player_up == player_num:
-		# Left mouse
-		if event.is_pressed() and event is InputEventMouseButton and event.button_index == BUTTON_LEFT:
-			var on_hex = get_parent().grid.get_hex_from_coords(event.position)
-			var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
-			# Clicking on own grid
-			if on_hex[0] in range(player_num * 16, player_num * 16 + 15):
-				if ship_at_hex != null and get_parent().current_turn != 0:
-					select_ship(ship_at_hex)
-#				else:
-#					select_ship(null)
-			# Clicking on opponent's grid
-			elif on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
-				if aiming['fire']:
-					fire(on_hex[0], on_hex[1])
+		# Click
+		if event.is_pressed() and event is InputEventMouseButton:
+			# Left click
+			if event.button_index == BUTTON_LEFT:
+				var on_hex = get_parent().grid.get_hex_from_coords(event.position)
+				var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
+				# Left-clicking on own grid
+				if on_hex[0] in range(player_num * 16, player_num * 16 + 15):
+					if ship_at_hex != null and get_parent().current_turn != 0:
+						select_ship(ship_at_hex)
+				# Left-clicking on opponent's grid
+				elif on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
+					# If aiming for a shot or ability, call the relevant function
+					if aiming['fire']:
+						fire(on_hex[0], on_hex[1])
+					elif aiming['special']:
+						special(on_hex[0], on_hex[1])
+					elif aiming['secondary']:
+						secondary(on_hex[0], on_hex[1])
+			# Right click
+			elif event.button_index == BUTTON_RIGHT:
+				select_ship(null)
+
 
 func _button_pressed(button):
 	match button.name:
@@ -59,14 +68,6 @@ func aim_fire():
 		aiming['fire'] = true
 		targeting_hex_range = 0
 
-func fire(x, y):
-	get_parent().players[abs(player_num - 1)].receive_fire(x, y)
-	selected_ship.ap -= 2
-	selected_ship.fire_remaining -= 1
-	update_buttons(selected_ship)
-	get_parent().gui.update_ship_info(selected_ship)
-	emit_signal('made_move')
-
 func aim_special():
 	if selected_ship != null and selected_ship.can_special():
 		aiming['fire'] = false
@@ -80,6 +81,34 @@ func aim_secondary():
 		aiming['special'] = false
 		aiming['secondary'] = true
 		targeting_hex_range = selected_ship.secondary.aoe
+
+# Fire at an enemy hex with the selected ship
+func fire(x, y):
+	# Play fire animation
+	selected_ship.fire(x, y)
+	# Send fire event to other player for tracking
+	get_parent().players[abs(player_num - 1)].receive_fire(x, y)
+	selected_ship.ap -= 2
+	selected_ship.fire_remaining -= 1
+	update_buttons(selected_ship)
+	get_parent().gui.update_ship_info(selected_ship)
+	emit_signal('made_move')
+
+func special(x, y):
+	print('using special ability centered at ', x, ', ', y)
+	selected_ship.ap -= 2
+	selected_ship.special.cooldown_current = selected_ship.special.cooldown_interval
+	update_buttons(selected_ship)
+	get_parent().gui.update_ship_info(selected_ship)
+	emit_signal('made_move')
+
+func secondary(x, y):
+	selected_ship.ap -= 2
+	selected_ship.special.cooldown_current = selected_ship.special.cooldown_interval
+	update_buttons(selected_ship)
+	get_parent().gui.update_ship_info(selected_ship)
+	emit_signal('made_move')
+
 
 func end_turn():
 	if selected_ship != null:
@@ -196,6 +225,10 @@ func get_ship_selection():
 
 func new_turn():
 	.new_turn()
+	for ship in ships:
+		ship.visible = true
+	for other_ship in get_parent().players[abs(player_num - 1)].ships:
+		other_ship.visible = false
 	ships_with_moves = ships.duplicate()
 	select_ship(ships_with_moves[0])
 

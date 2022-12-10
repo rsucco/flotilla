@@ -1,11 +1,15 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://GUI.gd" type="Script" id=2]
-[ext_resource path="res://gui/sprites/button_template.png" type="Texture" id=3]
-[ext_resource path="res://gui/sprites/fire.png" type="Texture" id=4]
-[ext_resource path="res://gui/sprites/end_turn.png" type="Texture" id=5]
+[ext_resource path="res://gui/sprites/buttons/button_template.png" type="Texture" id=3]
+[ext_resource path="res://gui/sprites/buttons/fire.png" type="Texture" id=4]
+[ext_resource path="res://gui/sprites/buttons/end_turn.png" type="Texture" id=5]
 [ext_resource path="res://gui/sprites/carrier_icon.png" type="Texture" id=6]
+[ext_resource path="res://gui/sprites/buttons/port.png" type="Texture" id=7]
+[ext_resource path="res://gui/sprites/buttons/starboard.png" type="Texture" id=8]
+[ext_resource path="res://gui/sprites/buttons/reverse.png" type="Texture" id=9]
+[ext_resource path="res://gui/sprites/buttons/forward.png" type="Texture" id=10]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0.137255, 0.423529, 1 )
@@ -54,6 +58,7 @@ margin_right = 204.0
 margin_bottom = 16.0
 mouse_filter = 1
 size_flags_vertical = 6
+custom_fonts/font = ExtResource( 1 )
 text = "Special Ability:"
 
 [node name="SecondaryAbility" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
@@ -62,6 +67,7 @@ margin_right = 204.0
 margin_bottom = 38.0
 mouse_filter = 1
 size_flags_vertical = 6
+custom_fonts/font = ExtResource( 1 )
 text = "Special Ability:"
 
 [node name="PassiveAbility" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
@@ -70,6 +76,7 @@ margin_right = 204.0
 margin_bottom = 60.0
 mouse_filter = 1
 size_flags_vertical = 6
+custom_fonts/font = ExtResource( 1 )
 text = "Passive Ability:"
 
 [node name="Drawbacks" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
@@ -78,6 +85,7 @@ margin_right = 204.0
 margin_bottom = 82.0
 mouse_filter = 1
 size_flags_vertical = 6
+custom_fonts/font = ExtResource( 1 )
 text = "Drawbacks:"
 
 [node name="VSeparator" type="VSeparator" parent="GUIGrid/ShipInfo"]
@@ -136,87 +144,85 @@ margin_bottom = 84.0
 custom_styles/separator = SubResource( 2 )
 
 [node name="Actions" type="GridContainer" parent="GUIGrid"]
-margin_left = 305.0
+margin_left = 323.0
 margin_top = 9.0
-margin_right = 597.0
+margin_right = 579.0
 margin_bottom = 75.0
-size_flags_horizontal = 3
+size_flags_horizontal = 6
 size_flags_vertical = 4
 columns = 4
 
 [node name="Fire" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_right = 69.0
+margin_right = 82.0
 margin_bottom = 31.0
+custom_fonts/font = ExtResource( 1 )
 disabled = true
 text = "Fire"
 icon = ExtResource( 4 )
-align = 2
 
 [node name="Special" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_left = 73.0
-margin_right = 142.0
+margin_left = 86.0
+margin_right = 174.0
 margin_bottom = 31.0
+custom_fonts/font = ExtResource( 1 )
 disabled = true
-text = "Spec"
+text = "Special"
 icon = ExtResource( 3 )
-align = 2
-
-[node name="Secondary" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_left = 146.0
-margin_right = 215.0
-margin_bottom = 31.0
-disabled = true
-text = "Scnd"
-icon = ExtResource( 3 )
-align = 2
-
-[node name="EndTurn" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_left = 219.0
-margin_right = 288.0
-margin_bottom = 31.0
-disabled = true
-text = "EndT"
-icon = ExtResource( 5 )
 align = 2
 
 [node name="Forward" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_top = 35.0
-margin_right = 69.0
-margin_bottom = 66.0
+margin_left = 178.0
+margin_right = 215.0
+margin_bottom = 31.0
+size_flags_horizontal = 0
 disabled = true
-text = "Frwd"
-icon = ExtResource( 3 )
-align = 2
+icon = ExtResource( 10 )
+icon_align = 1
 
 [node name="Port" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_left = 73.0
-margin_top = 35.0
-margin_right = 142.0
-margin_bottom = 66.0
+margin_left = 219.0
+margin_right = 256.0
+margin_bottom = 31.0
+size_flags_horizontal = 0
 disabled = true
-text = "Port"
-icon = ExtResource( 3 )
-align = 2
+icon = ExtResource( 7 )
 
-[node name="Starboard" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
-margin_left = 146.0
+[node name="EndTurn" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+margin_top = 35.0
+margin_right = 82.0
+margin_bottom = 66.0
+custom_fonts/font = ExtResource( 1 )
+disabled = true
+text = "End Turn"
+icon = ExtResource( 5 )
+
+[node name="Secondary" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+margin_left = 86.0
+margin_top = 35.0
+margin_right = 174.0
+margin_bottom = 66.0
+custom_fonts/font = ExtResource( 1 )
+disabled = true
+text = "Secondary"
+icon = ExtResource( 3 )
+
+[node name="Reverse" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+margin_left = 178.0
 margin_top = 35.0
 margin_right = 215.0
 margin_bottom = 66.0
+size_flags_horizontal = 0
 disabled = true
-text = "Stbd"
-icon = ExtResource( 3 )
-align = 2
+icon = ExtResource( 9 )
 
-[node name="Reverse" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Starboard" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
 margin_left = 219.0
 margin_top = 35.0
-margin_right = 288.0
+margin_right = 256.0
 margin_bottom = 66.0
+size_flags_horizontal = 0
 disabled = true
-text = "Rvrs"
-icon = ExtResource( 3 )
-align = 2
+icon = ExtResource( 8 )
 
 [node name="VSeparator1" type="VSeparator" parent="GUIGrid"]
 margin_left = 602.0

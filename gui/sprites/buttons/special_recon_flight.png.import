@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/fire.png-97403b8755487ce42a48a44934de79e6.stex"
+path="res://.import/special_recon_flight.png-73ce99e802f662e89b75520bc5ae9e85.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://gui/sprites/fire.png"
-dest_files=[ "res://.import/fire.png-97403b8755487ce42a48a44934de79e6.stex" ]
+source_file="res://gui/sprites/buttons/special_recon_flight.png"
+dest_files=[ "res://.import/special_recon_flight.png-73ce99e802f662e89b75520bc5ae9e85.stex" ]
 
 [params]
 

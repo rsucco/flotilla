@@ -1,5 +1,5 @@
 # Flotilla
-Turn-based naval strategy game inspired by Battleship and XCOM. This is still very much a work in progress, and might end up proving overly ambitious, but I'm mostly doing this project as a way to get more familiar with Godot.
+Turn-based naval strategy game inspired by Battleship and XCOM and written in Godot
 
 Basic gameplay is similar to Battleship, with some exceptions:
 - Rather than a 10x10 rectangular grid, each player places their ships on a 15x15 hexagonal grid. Ships can be placed diagonally.
@@ -70,5 +70,13 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Passive Ability: Can use two attacks in one turn instead of moving
 - Drawbacks: If at least two hexes are damaged, can only use one attack move per turn
 
+### Release History
+##### 0.1.0 (10DEC2022):
+After a couple years of off-and-on planning, a couple months of trying to learn Godot, and a couple weeks of actual coding, the core game loop and the skeleton of the game are complete, and it's playable at the most basic level. Ship placement works and ships can move and fire, but I haven't yet implemented special abilities and most of the passive abilities/drawbacks. Graphical presentation is also pretty rough at this point, and there's no sound. I estimate that I'm at the point where I've done the 20% of the work that accounts for 80% of the completed game though, which is encouraging. Going forward, I plan to focus on graphics, polish, and information presentation to the players. Once the game is suitably polished I'll consider that an 0.2.0 release, then move forward with adding an AI player, then on to adding network multiplayer.
+
 ### Credits
-- Graphics: [Antony Christian Sumakud](https://opengameart.org/content/sea-warfare-set-ships-and-more)
+##### Graphics
+- [Antony Christian Sumakud](https://opengameart.org/content/sea-warfare-set-ships-and-more) (Public Domain)
+- [sbed](https://opengameart.org/content/95-game-icons) (CC BY 3.0)
+- [Lorc](https://lorcblog.blogspot.com/) (CC BY 3.0)
+- [Delapouite](https://delapouite.com/) (CC BY 3.0)

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/button_template.png-e68a81af47d0def034904ffc554ae518.stex"
+path="res://.import/special_asw_strike.png-d282cdf45927ac6a9a390408ded59a95.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://gui/sprites/button_template.png"
-dest_files=[ "res://.import/button_template.png-e68a81af47d0def034904ffc554ae518.stex" ]
+source_file="res://gui/sprites/buttons/special_asw_strike.png"
+dest_files=[ "res://.import/special_asw_strike.png-d282cdf45927ac6a9a390408ded59a95.stex" ]
 
 [params]
 
