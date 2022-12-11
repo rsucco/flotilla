@@ -3,6 +3,8 @@ extends Sprite
 class_name Ship
 
 signal placed
+signal fire_animation_complete
+
 const SHIP_TYPES = ['coastal_battery', 'corvette', 'destroyer', 'submarine', 'cruiser', 'supply_tender', 'battleship', 'carrier']
 var direction = 0
 var root
@@ -226,8 +228,10 @@ func starboard():
 func fire(target_x, target_y):
 	pass
 
-func special(target_x, target_y):
-	pass
+func use_special(target_x, target_y):
+	ap -= 2
+	special.cooldown_current = special.cooldown_interval
 
-func secondary(target_x, target_y):
-	pass
+func use_secondary(target_x, target_y):
+	ap -= 2
+	secondary.cooldown_current = secondary.cooldown_interval

@@ -168,7 +168,6 @@ custom_fonts/font = ExtResource( 1 )
 disabled = true
 text = "Special"
 icon = ExtResource( 3 )
-align = 2
 
 [node name="Forward" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
 margin_left = 178.0

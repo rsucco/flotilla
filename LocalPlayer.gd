@@ -6,7 +6,8 @@ var selected_count
 var aiming = {'fire': false, 'special': false, 'secondary': false}
 var ships_with_moves = []
 var targeting_hex_range = -1
-
+var current_on_hex = [-1, -1]
+var on_hex_time = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -18,12 +19,12 @@ func _init(num).(num):
 func _unhandled_input(event):
 	# Only pay attention if it's our turn
 	if get_parent().player_up == player_num:
+		var on_hex = get_parent().grid.get_hex_from_coords(event.position)
+		var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
 		# Click
 		if event.is_pressed() and event is InputEventMouseButton:
 			# Left click
 			if event.button_index == BUTTON_LEFT:
-				var on_hex = get_parent().grid.get_hex_from_coords(event.position)
-				var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
 				# Left-clicking on own grid
 				if on_hex[0] in range(player_num * 16, player_num * 16 + 15):
 					if ship_at_hex != null and get_parent().current_turn != 0:
@@ -40,7 +41,27 @@ func _unhandled_input(event):
 			# Right click
 			elif event.button_index == BUTTON_RIGHT:
 				select_ship(null)
+		# Mouse motion on opponent's grid
+		elif event is InputEventMouseMotion and get_parent().current_turn > 0 and \
+		on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
+#			print('current_on_hex: ', current_on_hex)
+#			print('on hex: ', on_hex)
+#			print('on_hex_time: ', on_hex_time)
+			# Reset history popup timer if we've moved to a different hex
+			if on_hex != current_on_hex:
+				current_on_hex = on_hex
+				on_hex_time = 0
+			
 
+#func _process(delta):
+#	on_hex_time += delta
+#	# Show history popup if we've been on the same hex for 3 seconds
+#	if on_hex_time > 3 and get_parent().current_turn > 0 and get_parent().player_up == player_num:
+#		var tile_history = preload('res://gui/TileHistory.tscn').instance()
+#		tile_history.rect_position = get_parent().grid.get_hex_center(current_on_hex[0], current_on_hex[1])
+#		add_child(tile_history)
+#		tile_history.popup()
+#		on_hex_time = 0
 
 func _button_pressed(button):
 	match button.name:
@@ -95,16 +116,13 @@ func fire(x, y):
 	emit_signal('made_move')
 
 func special(x, y):
-	print('using special ability centered at ', x, ', ', y)
-	selected_ship.ap -= 2
-	selected_ship.special.cooldown_current = selected_ship.special.cooldown_interval
+	selected_ship.use_special(x, y)
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')
 
 func secondary(x, y):
-	selected_ship.ap -= 2
-	selected_ship.special.cooldown_current = selected_ship.special.cooldown_interval
+	selected_ship.use_secondary(x, y)
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')

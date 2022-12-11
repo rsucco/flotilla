@@ -10,28 +10,28 @@ texture = ExtResource( 2 )
 offset = Vector2( 0, 30 )
 script = ExtResource( 1 )
 
-[node name="Turret0" type="Sprite" parent="."]
+[node name="Turret0" type="Sprite" parent="." groups=["turrets"]]
 position = Vector2( 0, -22 )
 rotation = 1.5708
 scale = Vector2( 0.7, 0.6 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -15 )
 
-[node name="Turret1" type="Sprite" parent="."]
+[node name="Turret1" type="Sprite" parent="." groups=["turrets"]]
 position = Vector2( 0, -5 )
 rotation = 1.5708
 scale = Vector2( 0.7, 0.6 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -15 )
 
-[node name="Turret2" type="Sprite" parent="."]
+[node name="Turret2" type="Sprite" parent="." groups=["turrets"]]
 position = Vector2( 0, 81 )
 rotation = 1.5708
 scale = Vector2( 0.7, 0.6 )
 texture = ExtResource( 3 )
 offset = Vector2( 0, -15 )
 
-[node name="Turret3" type="Sprite" parent="."]
+[node name="Turret3" type="Sprite" parent="." groups=["turrets"]]
 position = Vector2( 0, 98 )
 rotation = 1.5708
 scale = Vector2( 0.7, 0.6 )

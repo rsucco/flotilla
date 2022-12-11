@@ -10,7 +10,7 @@ func _ready():
 	self.hit_hexes = [false, false, false]
 	self.ship_name = 'Submarine'
 	self.weapon = 'Torpedo'
-	self.special = SpecialAbility.new(1, 'Nuclear Strike',
+	self.special = SpecialAbility.new(10, 'Nuclear Strike',
 	'Select a hex on opponent\'s board; instantly sinks any unit it hits directly and damages all hexes within two hexes of central hex', 2)
 	self.secondary = SpecialAbility.new(1, 'Sonar Pulse',
 	'Select a hex on opponent\'s board; reveals ships and submarines on that hex and its direct neighbors and also reveals the location of the submarine', 1)
