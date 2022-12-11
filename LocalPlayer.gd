@@ -108,7 +108,7 @@ func fire(x, y):
 	# Play fire animation
 	selected_ship.fire(x, y)
 	# Send fire event to other player for tracking
-	get_parent().players[abs(player_num - 1)].receive_fire(x, y)
+	get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
 	selected_ship.ap -= 2
 	selected_ship.fire_remaining -= 1
 	update_buttons(selected_ship)
@@ -243,8 +243,10 @@ func get_ship_selection():
 
 func new_turn():
 	.new_turn()
+	# Show our ships
 	for ship in ships:
 		ship.visible = true
+	# Hide opponent's ships
 	for other_ship in get_parent().players[abs(player_num - 1)].ships:
 		other_ship.visible = false
 	ships_with_moves = ships.duplicate()

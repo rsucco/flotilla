@@ -14,5 +14,19 @@ func _ready():
 	self.drawback = Drawback.new('Fragile', 'Has a 75% chance of sinking if hit in either hex')
 
 func new_turn():
-	# TODO: Override this to set ap=5 if any neighbor hex is an island tile, ap=4 otherwise
 	.new_turn()
+	# Passive ability - Littoral Ops
+	# Gain an extra action point if starting turn adjacent to an island tile
+	for hex in get_occupied_hexes():
+		for neighbor in get_parent().get_parent().grid.get_all_hex_neighbors(hex[0], hex[1]):
+			if get_parent().get_parent().grid.grid[neighbor[0]][neighbor[1]].island:
+				ap = 5
+				break
+
+func hit(hit_hex, from_ship):
+	.hit(hit_hex, from_ship)
+	randomize()
+	# Drawback - Fragile
+	# 75% chance of sinking if hit in either hex
+	if rand_range(0, 1) < 0.75:
+		sink()

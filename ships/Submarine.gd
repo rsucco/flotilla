@@ -17,3 +17,12 @@ func _ready():
 	self.passive = PassiveAbility.new('Silent Service', 'Can only be hit by surface units on center hex')
 	self.drawback = Drawback.new('Crushing Depths', 
 	'Sinks instantly when hit in center hex by surface unit, or when hit in any hex by ASW Strike, mine, or another sub') 
+
+func hit(hit_hex, from_ship):
+	# Drawback - Crushing Depths
+	# Sink instantly when hit in center hex or in any hex by another sub
+	# TODO: Also sink instantly when hit by ASW strike or another sub
+	if hit_hex == [x, y] or from_ship.ship_type == 'submarine':
+		sink()
+	# Passive ability - Silent Service
+	# If hit on non-center hex by a surface unit, hit doesn't count

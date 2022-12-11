@@ -89,7 +89,7 @@ func new_turn():
 func place():
 	placing = true
 
-func hit(hit_hex):
+func hit(hit_hex, from_ship):
 	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
 	hit_hexes[hit_hex_index] = true
 	var smoke = Particles2D.new()
@@ -101,10 +101,7 @@ func hit(hit_hex):
 	smoke_material.spread = 25.0
 	smoke_material.damping = -1.5
 	smoke_material.scale = 2.5
-	if ship_type == 'submarine':
-		smoke_material.color = Color(0.7, 1.0, 1.0)
-	else:
-		smoke_material.color = Color(0.0, 0.0, 0.0)
+	smoke_material.color = Color(0.0, 0.0, 0.0)
 	smoke.process_material = smoke_material
 	smoke.amount = pow(self.get_size(), 2) * 10
 	smoke.lifetime = 0.5

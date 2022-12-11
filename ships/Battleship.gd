@@ -30,10 +30,6 @@ func fire(target_x, target_y):
 			old_angle_deg += 360
 		elif old_angle_deg >= 360:
 			old_angle_deg -= 360
-		print('turret global position: ', turret.global_position)
-		print('target coordinates: ', get_parent().get_parent().grid.get_hex_center(target_x, target_y))
-		print('old angle: ', old_angle_deg)
-		print('new angle: ', new_angle_deg)
 		turret.global_rotation_degrees = new_angle_deg
 		var tween = Tween.new()
 		tween.interpolate_property(turret, 'global_rotation_degrees', old_angle_deg, new_angle_deg, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
