@@ -26,3 +26,6 @@ func new_turn():
 	if num_hit_hexes < 2:
 		# Passive ability: gets two fire moves
 		fire_remaining = 2
+		print('passive - flight ops')
+	else:
+		print('drawback - degraded runway')

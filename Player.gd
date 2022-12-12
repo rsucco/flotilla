@@ -49,7 +49,20 @@ func get_hover_hexes(x, y):
 func receive_fire(x, y, from_ship):
 	var ship_at_hex = get_ship_at_hex(x, y)
 	if ship_at_hex != null:
-		ship_at_hex.hit([x, y], from_ship)
+		# Cruiser missile defense has a 50% chance of intercepting incoming fire from
+		# missile-based weapons (cruisers, destroyers, aircraft carriers) within 2 hexes
+		var hit_countered = false
+		if from_ship.ship_type in ['destroyer', 'cruiser', 'carrier']:
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, 2):
+				var potential_cruiser = get_ship_at_hex(hex[0], hex[1])
+				if potential_cruiser != null and potential_cruiser.ship_type == 'cruiser':
+					randomize()
+					if rand_range(0, 1) > 0.5:
+						hit_countered = true
+						print('passive - missile defense')
+					break
+		if !hit_countered:
+			ship_at_hex.hit([x, y], from_ship)
 		return true
 	else:
 		return false

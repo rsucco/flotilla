@@ -35,3 +35,12 @@ func fire(target_x, target_y):
 		tween.interpolate_property(turret, 'global_rotation_degrees', old_angle_deg, new_angle_deg, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 		add_child(tween)
 		tween.start()
+
+func hit(hit_hex, from_ship):
+	randomize()
+	# Passive ability - Armor
+	# 25% chance of a hit not counting
+	if rand_range(0, 1) > 0.25:
+		.hit(hit_hex, from_ship)
+	else:
+		print('passive - armor')

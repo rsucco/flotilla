@@ -23,6 +23,9 @@ func hit(hit_hex, from_ship):
 	# Sink instantly when hit in center hex or in any hex by another sub
 	# TODO: Also sink instantly when hit by ASW strike or another sub
 	if hit_hex == [x, y] or from_ship.ship_type == 'submarine':
+		print('drawback - crushing depths')
 		sink()
-	# Passive ability - Silent Service
-	# If hit on non-center hex by a surface unit, hit doesn't count
+	else:
+		print('passive - silent service')
+		# Passive ability - Silent Service
+		# If hit on non-center hex by a surface unit, hit doesn't count
