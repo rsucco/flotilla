@@ -183,7 +183,7 @@ func select_ship(ship):
 	if ship != null:
 		# Move the ship to front of the line (if there is a ship, and if there is a
 		# line, and if the ship isn't already at the front of the line)
-		if len(ships_with_moves) > 0 and ships_with_moves[0] != ship:
+		if len(ships_with_moves) > 0 and ships_with_moves[0] != ship and ship.ap > 0:
 			ships_with_moves.remove(ships_with_moves.find(ship))
 			ships_with_moves.push_front(ship)
 		update_buttons(ship)

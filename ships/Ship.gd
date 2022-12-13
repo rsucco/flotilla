@@ -29,7 +29,6 @@ var fire_remaining = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	root = get_parent().get_parent()
-	#self.position = get_parent().grid.get_hex_center(self.x, self.y)
 
 func set_grid_position(x, y, direction):
 	self.direction = direction
@@ -83,8 +82,10 @@ func get_size():
 func new_turn():
 	ap = default_ap
 	fire_remaining = 1
-	special.cooldown_current -= 1
-	secondary.cooldown_current -= 1
+	if special.cooldown_current > 0:
+		special.cooldown_current -= 1
+	if secondary.cooldown_current > 0:
+		secondary.cooldown_current -= 1
 
 func place():
 	placing = true

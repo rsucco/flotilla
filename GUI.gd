@@ -24,11 +24,19 @@ func update_ship_info(ship):
 		if ship.special.name != 'None':
 			get_node('GUIGrid/ShipInfo/AbilityInfo/SpecialAbility').text += ' (' + str(ship.special.cooldown_current) + '/' + str(ship.special.cooldown_interval) + ')'
 			get_node('GUIGrid/Actions/Special').text = ship.special.name
+			get_node('GUIGrid/Actions/Special').icon = load('res://gui/sprites/buttons/special_' + ship.special.name.to_lower().replace(' ', '_') + '.png')
+		else:
+			get_node('GUIGrid/Actions/Special').text = 'Special'
+			get_node('GUIGrid/Actions/Special').icon = load('res://gui/sprites/buttons/button_template.png')
 		get_node('GUIGrid/ShipInfo/AbilityInfo/SpecialAbility').hint_tooltip = ship.special.desc
 		get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').text = 'Secondary Ability: ' + ship.secondary.name
 		if ship.secondary.name != 'None':
 			get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').text += ' (' + str(ship.secondary.cooldown_current) + '/' + str(ship.secondary.cooldown_interval) + ')'
 			get_node('GUIGrid/Actions/Secondary').text = ship.secondary.name
+			get_node('GUIGrid/Actions/Secondary').icon = load('res://gui/sprites/buttons/special_' + ship.secondary.name.to_lower().replace(' ', '_') + '.png')
+		else:
+			get_node('GUIGrid/Actions/Secondary').text = 'Secondary'
+			get_node('GUIGrid/Actions/Secondary').icon = load('res://gui/sprites/buttons/button_template.png')
 		get_node('GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility').hint_tooltip = ship.secondary.desc
 		get_node('GUIGrid/ShipInfo/AbilityInfo/PassiveAbility').text = 'Passive Ability: ' + ship.passive.name
 		get_node('GUIGrid/ShipInfo/AbilityInfo/PassiveAbility').hint_tooltip = ship.passive.desc
@@ -58,6 +66,8 @@ func update_ship_info(ship):
 		# Update Actions buttons
 		get_node('GUIGrid/Actions/Special').text = 'Special'
 		get_node('GUIGrid/Actions/Secondary').text = 'Secondary'
+		get_node('GUIGrid/Actions/Special').icon = load('res://gui/sprites/buttons/button_template.png')
+		get_node('GUIGrid/Actions/Secondary').icon = load('res://gui/sprites/buttons/button_template.png')
 
 # Update TurnNumber
 func update_turn():
