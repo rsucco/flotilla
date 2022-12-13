@@ -2,16 +2,18 @@ extends Player
 
 class_name LocalPlayer
 
+const TILE_HIST_HOVER_TIME = .5
 var selected_count
 var aiming = {'fire': false, 'special': false, 'secondary': false}
 var ships_with_moves = []
 var targeting_hex_range = -1
 var current_on_hex = [-1, -1]
 var on_hex_time = 0
+var tile_history
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	tile_history = get_parent().get_node('TileHistory')
 
 func _init(num).(num):
 	pass
@@ -42,26 +44,29 @@ func _unhandled_input(event):
 			elif event.button_index == BUTTON_RIGHT:
 				select_ship(null)
 		# Mouse motion on opponent's grid
-		elif event is InputEventMouseMotion and get_parent().current_turn > 0 and \
-		on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
-#			print('current_on_hex: ', current_on_hex)
-#			print('on hex: ', on_hex)
-#			print('on_hex_time: ', on_hex_time)
-			# Reset history popup timer if we've moved to a different hex
-			if on_hex != current_on_hex:
-				current_on_hex = on_hex
-				on_hex_time = 0
-			
+		elif event is InputEventMouseMotion and get_parent().current_turn > 0:
+			if on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
+				# Reset history popup timer if we've moved outside opponent's grid
+				if on_hex != current_on_hex:
+					current_on_hex = on_hex
+					if on_hex_time < TILE_HIST_HOVER_TIME:
+						on_hex_time = 0
+			else:
+				current_on_hex = [-1, -1]
+				tile_history.visible = false
 
-#func _process(delta):
-#	on_hex_time += delta
-#	# Show history popup if we've been on the same hex for 3 seconds
-#	if on_hex_time > 3 and get_parent().current_turn > 0 and get_parent().player_up == player_num:
-#		var tile_history = preload('res://gui/TileHistory.tscn').instance()
-#		tile_history.rect_position = get_parent().grid.get_hex_center(current_on_hex[0], current_on_hex[1])
-#		add_child(tile_history)
-#		tile_history.popup()
-#		on_hex_time = 0
+func _process(delta):
+	if current_on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
+		on_hex_time += delta
+	else:
+		on_hex_time = 0
+	# Show history popup if we've been on the same hex for 3 seconds
+	if on_hex_time > TILE_HIST_HOVER_TIME and get_parent().current_turn > 0 and \
+	get_parent().player_up == player_num and current_on_hex != [-1, -1]:
+		tile_history.show_history(current_on_hex)
+		tile_history.rect_position = get_parent().grid.get_hex_center(current_on_hex[0], current_on_hex[1]) + Vector2(40, -60)
+		if !tile_history.visible:
+			tile_history.show()
 
 func _button_pressed(button):
 	match button.name:
@@ -251,6 +256,7 @@ func new_turn():
 		other_ship.visible = false
 	ships_with_moves = ships.duplicate()
 	select_ship(ships_with_moves[0])
+	on_hex_time = 0
 
 func get_move():
 	aiming = {'fire': false, 'special': false, 'secondary': false}
