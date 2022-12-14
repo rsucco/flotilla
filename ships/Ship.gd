@@ -224,7 +224,8 @@ func starboard():
 	self.ap -= 2
 
 func fire(target_x, target_y):
-	pass
+	ap -= 2
+	fire_remaining -= 1
 
 func use_special(target_x, target_y):
 	ap -= 2

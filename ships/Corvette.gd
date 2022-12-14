@@ -34,6 +34,7 @@ func hit(hit_hex, from_ship):
 		sink()
 
 func fire(target_x, target_y):
+	.fire(target_x, target_y)
 	# Rotate turrets to point at target
 	var turret = get_node('Turret')
 	var new_angle_rad = turret.global_position.angle_to_point(

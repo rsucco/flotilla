@@ -138,6 +138,7 @@ func play_game():
 			yield(players[player_up], 'made_move')
 			# Make sure the player only receives signals from the buttons if it's their turn
 			players[player_up].disconnect_buttons()
+		players[player_up].finish_turn()
 		# Next player
 		player_up = abs(player_up - 1)
 	# TODO: Make this pretty

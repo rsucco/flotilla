@@ -122,20 +122,24 @@ func fire(x, y):
 		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss'])
 	else:
 		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Hit, ' + is_hit.name])
-	selected_ship.ap -= 2
-	selected_ship.fire_remaining -= 1
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')
 
 func special(x, y):
+	# Play special animation
 	selected_ship.use_special(x, y)
+	# Send special to other player to check for hits
+	var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship)
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')
 
 func secondary(x, y):
+	# Play animation
 	selected_ship.use_secondary(x, y)
+	# Send secondary to other player to check for hits
+	var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship, true)
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')

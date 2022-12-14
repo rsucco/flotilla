@@ -15,6 +15,7 @@ func _ready():
 	self.passive = PassiveAbility.new('Armor', 'Armor grants 25% chance of hits not counting')
 
 func fire(target_x, target_y):
+	.fire(target_x, target_y)
 	# Rotate turrets to point at target
 	for i in range(4):
 		var turret = get_node('Turret' + str(i))

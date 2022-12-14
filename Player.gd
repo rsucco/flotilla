@@ -7,6 +7,7 @@ signal ships_placed
 signal made_move
 var player_num
 var ships = []
+var temp_revealed_ships = []
 var selected_ship = null
 
 # Called when the node enters the scene tree for the first time.
@@ -31,6 +32,15 @@ func has_moves():
 func new_turn():
 	for ship in self.ships:
 		ship.new_turn()
+	for revealed_ship in temp_revealed_ships:
+		add_child(revealed_ship)
+		revealed_ship.visible = true
+
+# End of turn cleanup
+func finish_turn():
+	for revealed_ship in temp_revealed_ships:
+		revealed_ship.queue_free()
+	temp_revealed_ships = []
 
 func hide_ships():
 	pass
@@ -65,3 +75,27 @@ func receive_fire(x, y, from_ship):
 		if !hit_countered:
 			ship_at_hex.hit([x, y], from_ship)
 	return ship_at_hex
+
+func receive_special(x, y, from_ship, secondary = false):
+	var ability
+	var hits = []
+	if secondary:
+		ability = from_ship.secondary
+	else:
+		ability = from_ship.special
+	match ability.name:
+		'Sonar Pulse':
+			# Sonar pulse reveals all ships around it and also reveals the submarine
+			temp_revealed_ships.append(from_ship.duplicate())
+			for sub_hex in from_ship.get_occupied_hexes():
+				get_parent().grid.grid[sub_hex[0]][sub_hex[1]].history.append([get_parent().current_turn, 'Submarine used Sonar Pulse'])
+			var revealed_ships = []
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, 1):
+				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
+				if ship_at_hex != null and ship_at_hex.ship_type != 'coastal_battery' \
+				and not ship_at_hex in revealed_ships:
+					ship_at_hex.visible = true
+					revealed_ships.append(ship_at_hex)
+					for ship_hex in ship_at_hex.get_occupied_hexes():
+						get_parent().grid.grid[ship_hex[0]][ship_hex[1]].history.append([get_parent().current_turn, ship_at_hex.ship_name + ' revealed by Sonar Pulse'])
+	return hits
