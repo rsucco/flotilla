@@ -120,6 +120,8 @@ func hit(hit_hex, from_ship):
 		self.sink()
 
 func sink():
+	for hex in get_occupied_hexes():
+		get_parent().get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().get_parent().current_turn, 'Sunk, ' + ship_name])
 	get_parent().ships.remove(get_parent().ships.find(self))
 	root.gui.update_fleets()
 	queue_free()

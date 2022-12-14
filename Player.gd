@@ -73,7 +73,12 @@ func receive_fire(x, y, from_ship):
 						print('passive - missile defense')
 					break
 		if !hit_countered:
+			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Hit, ' + ship_at_hex.ship_name])
 			ship_at_hex.hit([x, y], from_ship)
+		else:
+			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Missile Defense intercepted hit'])
+	else:
+		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss'])
 	return ship_at_hex
 
 func receive_special(x, y, from_ship, secondary = false):
@@ -84,8 +89,15 @@ func receive_special(x, y, from_ship, secondary = false):
 	else:
 		ability = from_ship.special
 	match ability.name:
+		'ASW Strike':
+			# ASW Strike instantly sinks any submarines on a hex or its direct neighbors
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, 1):
+				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
+				if ship_at_hex != null and ship_at_hex.ship_type == 'submarine':
+					ship_at_hex.sink()
+
 		'Sonar Pulse':
-			# Sonar pulse reveals all ships around it and also reveals the submarine
+			# Sonar Pulse reveals all ships around a hex and its direct neighbors and also reveals the submarine
 			temp_revealed_ships.append(from_ship.duplicate())
 			for sub_hex in from_ship.get_occupied_hexes():
 				get_parent().grid.grid[sub_hex[0]][sub_hex[1]].history.append([get_parent().current_turn, 'Submarine used Sonar Pulse'])

@@ -117,11 +117,6 @@ func fire(x, y):
 	selected_ship.fire(x, y)
 	# Send fire event to other player for tracking
 	var is_hit = get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
-	# Update tile history
-	if is_hit == null:
-		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss'])
-	else:
-		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Hit, ' + is_hit.name])
 	update_buttons(selected_ship)
 	get_parent().gui.update_ship_info(selected_ship)
 	emit_signal('made_move')
