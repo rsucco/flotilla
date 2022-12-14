@@ -21,6 +21,9 @@ func _init(num).(num):
 func _unhandled_input(event):
 	# Only pay attention if it's our turn
 	if get_parent().player_up == player_num:
+		# Keyboard input
+		if event is InputEventKey:
+			return
 		var on_hex = get_parent().grid.get_hex_from_coords(event.position)
 		var ship_at_hex = get_ship_at_hex(on_hex[0], on_hex[1])
 		# Click
@@ -113,7 +116,12 @@ func fire(x, y):
 	# Play fire animation
 	selected_ship.fire(x, y)
 	# Send fire event to other player for tracking
-	get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
+	var is_hit = get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
+	# Update tile history
+	if is_hit == null:
+		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss'])
+	else:
+		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Hit, ' + is_hit.name])
 	selected_ship.ap -= 2
 	selected_ship.fire_remaining -= 1
 	update_buttons(selected_ship)

@@ -89,6 +89,16 @@ func _draw():
 				draw_line(hex_points[i - 1], hex_points[i], Color(0.0, 0.0, 0.0))
 			draw_line(hex_points[5], hex_points[0], Color(0.0, 0.0, 0.0))
 
+			# Draw hit or miss marker, if applicable, fading out as turns go by
+			if x in range(abs(player_up - 1) * 16, abs(player_up - 1) * 16 + 15):
+				var hit_miss = grid.grid[x][y].get_last_event()
+				if hit_miss != null:
+					var alpha_val = 1.0 / max(current_turn - hit_miss[0], 1.0)
+					if hit_miss[1] == 'Hit':
+						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 0.0, 0.0, alpha_val))
+					elif hit_miss[1] == 'Miss':
+						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 1.0, 1.0, alpha_val))
+
 			# Draw tile coordinates
 			draw_string(font, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 10, -grid.hex_size / 12), y_grid_display[y] + str(x), Color(0.0, 0.0, 0.0))
 
@@ -111,15 +121,24 @@ func play_game():
 		yield(player, 'ships_placed')
 	# Reveal both players' fleet composition
 	gui.update_fleets()
+	# Play until one player has no more ships
 	while len(players[0].ships) > 0 and len(players[1].ships) > 0:
+		# Increment turn counter at the start of player 1's turn
 		if player_up == 0:
 			current_turn += 1
 		gui.update_turn()
+		# Reset AP counts, decrement ability timers, etc.
 		players[player_up].new_turn()
+		# Get moves from the player as long as they can make a move
 		while players[player_up].has_moves():
+			# The player object will emit the 'made_move' signal once a move has been made
+			# This makes it easy to wait for GUI input for local players, or wait for
+			# network input for if I ever get around to adding network play
 			players[player_up].get_move()
 			yield(players[player_up], 'made_move')
+			# Make sure the player only receives signals from the buttons if it's their turn
 			players[player_up].disconnect_buttons()
+		# Next player
 		player_up = abs(player_up - 1)
 	# TODO: Make this pretty
 	if len(players[0].ships) > len(players[1].ships):

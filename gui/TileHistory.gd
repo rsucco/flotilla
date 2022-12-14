@@ -7,6 +7,9 @@ func _ready():
 
 func show_history(hex):
 	var hex_events = get_parent().grid.grid[hex[0]][hex[1]].history.duplicate()
+	if len(hex_events) == 0:
+		self.visible = false
+		return
 	hex_events.invert()
 	get_node('VBoxContainer/TileHistory').text = ''
 	for hex_event in hex_events:

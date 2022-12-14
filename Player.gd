@@ -45,7 +45,7 @@ func get_ship_at_hex(x, y):
 func get_hover_hexes(x, y):
 	return [[x, y]]
 
-# Receive a shot at a given hex, return true for a hit and false for a miss
+# Receive a shot at a given hex, return null for a miss or the ship that was hit for a hit
 func receive_fire(x, y, from_ship):
 	var ship_at_hex = get_ship_at_hex(x, y)
 	if ship_at_hex != null:
@@ -59,10 +59,9 @@ func receive_fire(x, y, from_ship):
 					randomize()
 					if rand_range(0, 1) > 0.5:
 						hit_countered = true
+						ship_at_hex = null
 						print('passive - missile defense')
 					break
 		if !hit_countered:
 			ship_at_hex.hit([x, y], from_ship)
-		return true
-	else:
-		return false
+	return ship_at_hex
