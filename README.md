@@ -66,7 +66,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 ##### Aircraft Carrier
 - Weapon: F-35
 - Size: 5
-- Special Ability: (Recon Flight - 4 turns) Select three connecting hexes on opponent's board; reveals hexes and all their immediate neighbors
+- Special Ability: (Recon Flight - 4 turns) Reveals one row of hexes on opponent's board
 - Passive Ability: Can use two attacks in one turn instead of moving
 - Drawbacks: If at least two hexes are damaged, can only use one attack move per turn
 

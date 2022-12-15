@@ -93,12 +93,13 @@ func _draw():
 			if x in range(abs(player_up - 1) * 16, abs(player_up - 1) * 16 + 15):
 				var hit_miss = grid.grid[x][y].get_last_event()
 				if hit_miss != null:
-					var alpha_val = 1.0 / max(current_turn - hit_miss[0], 1.0)
+					var alpha_val = max(1.0 - (current_turn - hit_miss[0]) / 10.0, 0.0)
 					if hit_miss[1] == 'Hit':
 						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 0.0, 0.0, alpha_val))
 					elif hit_miss[1] == 'Miss':
 						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 1.0, 1.0, alpha_val))
-
+					elif hit_miss[1] == 'Sunk':
+						draw_circle(grid.get_hex_center(x, y), 10, Color(0.0, 0.0, 0.0, alpha_val))
 			# Draw tile coordinates
 			draw_string(font, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 10, -grid.hex_size / 12), y_grid_display[y] + str(x), Color(0.0, 0.0, 0.0))
 

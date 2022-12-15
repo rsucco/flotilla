@@ -35,6 +35,7 @@ func new_turn():
 	for revealed_ship in temp_revealed_ships:
 		add_child(revealed_ship)
 		revealed_ship.visible = true
+		revealed_ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
 
 # End of turn cleanup
 func finish_turn():
@@ -73,7 +74,6 @@ func receive_fire(x, y, from_ship):
 						print('passive - missile defense')
 					break
 		if !hit_countered:
-			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Hit, ' + ship_at_hex.ship_name])
 			ship_at_hex.hit([x, y], from_ship)
 		else:
 			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Missile Defense intercepted hit'])
@@ -110,6 +110,7 @@ func receive_special(x, y, from_ship, secondary = false):
 				if ship_at_hex != null and ship_at_hex.ship_type != 'coastal_battery' \
 				and not ship_at_hex in revealed_ships:
 					ship_at_hex.visible = true
+					ship_at_hex.modulate = Color(1.0, 1.0, 1.0, 0.8)
 					revealed_ships.append(ship_at_hex)
 					for ship_hex in ship_at_hex.get_occupied_hexes():
 						get_parent().grid.grid[ship_hex[0]][ship_hex[1]].history.append([get_parent().current_turn, ship_at_hex.ship_name + ' revealed by Sonar Pulse'])
@@ -140,13 +141,26 @@ func receive_special(x, y, from_ship, secondary = false):
 		'Salvo':
 			# Salvo instantly sinks anything when it hits a damaged hex dead-on (including a damaged Coastal Battery); otherwise hits normally in AOE
 			var dead_center = get_ship_at_hex(x, y)
-			if dead_center != null and dead_center.is_hex_hit([x, y]):
-				dead_center.sink()
+			if dead_center != null:
+				if dead_center.is_hex_hit([x, y]):
+					dead_center.sink()
+				else:
+					dead_center.hit([x, y], from_ship)
 			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null:
 					ship_at_hex.hit(hex, from_ship)
 
 		'Recon Flight':
-			print('Recon flight')
+			var revealed_ships = []
+			for i in range(abs(get_parent().player_up - 1) * 16, abs(get_parent().player_up - 1) * 16 + 15):
+				var ship_at_hex = get_ship_at_hex(i, y)
+				if ship_at_hex != null and ship_at_hex.ship_type != 'submarine' \
+				and not ship_at_hex in revealed_ships:
+					ship_at_hex.visible = true
+					ship_at_hex.modulate = Color(1.0, 1.0, 1.0, 0.8)
+					revealed_ships.append(ship_at_hex)
+					for ship_hex in ship_at_hex.get_occupied_hexes():
+						get_parent().grid.grid[ship_hex[0]][ship_hex[1]].history.append([get_parent().current_turn, ship_at_hex.ship_name + ' revealed by Recon Flight'])
+
 	return hits

@@ -81,6 +81,7 @@ func get_size():
 	return self.len_aft + self.len_fore + 1
 
 func new_turn():
+	modulate = Color.white
 	ap = default_ap
 	fire_remaining = 1
 	if special.cooldown_current > 0:
@@ -92,6 +93,8 @@ func place():
 	placing = true
 
 func hit(hit_hex, from_ship):
+	get_parent().get_parent().grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+		[get_parent().get_parent().current_turn, 'Hit, ' + ship_name])
 	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
 	hit_hexes[hit_hex_index] = true
 	var smoke = Particles2D.new()

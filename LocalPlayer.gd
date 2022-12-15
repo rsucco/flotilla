@@ -4,7 +4,7 @@ class_name LocalPlayer
 
 const TILE_HIST_HOVER_TIME = .5
 var selected_count
-var aiming = {'fire': false, 'special': false, 'secondary': false}
+var aiming = {'fire': false, 'special': false, 'secondary': false, 'recon': false}
 var ships_with_moves = []
 var targeting_hex_range = -1
 var current_on_hex = [-1, -1]
@@ -94,6 +94,7 @@ func aim_fire():
 	if selected_ship != null and selected_ship.can_fire():
 		aiming['special'] = false
 		aiming['secondary'] = false
+		aiming['recon'] = false
 		aiming['fire'] = true
 		targeting_hex_range = 0
 
@@ -105,6 +106,10 @@ func aim_special():
 		else:
 			aiming['fire'] = false
 			aiming['secondary'] = false
+			if selected_ship.special.name == 'Recon Flight':
+				aiming['recon'] = true
+			else:
+				aiming['recon'] = false
 			aiming['special'] = true
 			targeting_hex_range = selected_ship.special.aoe
 
@@ -112,6 +117,7 @@ func aim_secondary():
 	if selected_ship != null and selected_ship.can_secondary():
 		aiming['fire'] = false
 		aiming['special'] = false
+		aiming['recon'] = false
 		aiming['secondary'] = true
 		targeting_hex_range = selected_ship.secondary.aoe
 
@@ -186,8 +192,15 @@ func get_hover_hexes(x, y):
 	elif x == 15:
 		return []
 	else:
-		# On opponent's half; return nothing if targeting_hex_range is -1
-		if targeting_hex_range == -1:
+		# On opponent's half
+		# Recon flight covers the entire row
+		if aiming['recon']:
+			var hover_hexes = []
+			for i in range(abs(get_parent().player_up - 1) * 16, abs(get_parent().player_up - 1) * 16 + 15):
+				hover_hexes.append([i, y])
+			return hover_hexes
+		# Return nothing if targeting_hex_range is -1
+		elif targeting_hex_range == -1:
 			return []
 		# Return all neighbors within targeting_hex_range hexes otherwise
 		else:
@@ -270,7 +283,7 @@ func new_turn():
 	on_hex_time = 0
 
 func get_move():
-	aiming = {'fire': false, 'special': false, 'secondary': false}
+	aiming = {'fire': false, 'special': false, 'secondary': false, 'recon': false}
 	targeting_hex_range = -1
 	for ship in ships_with_moves:
 		if ship.ap == 0:
