@@ -243,8 +243,10 @@ func use_secondary(target_x, target_y):
 	secondary.cooldown_current = secondary.cooldown_interval
 
 func heal():
-	for hex in hit_hexes:
-		hex = false
+	var healed_hexes = []
+	for i in range(len(hit_hexes)):
+		healed_hexes.append(false)
+	hit_hexes = healed_hexes
 	for smoke in smoke_nodes:
 		remove_child(smoke)
 		smoke.queue_free()

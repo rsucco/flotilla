@@ -17,6 +17,7 @@ func show_history(hex):
 			': ' + hex_event[1] + "\n"
 
 func show():
+	get_parent().move_child(self, len(get_parent().get_children()))
 	self.modulate = Color.transparent
 	self.visible = true
 	var tween = Tween.new()

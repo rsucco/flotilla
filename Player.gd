@@ -91,7 +91,7 @@ func receive_special(x, y, from_ship, secondary = false):
 	match ability.name:
 		'ASW Strike':
 			# ASW Strike instantly sinks any submarines on a hex or its direct neighbors
-			for hex in get_parent().grid.get_all_hex_neighbors(x, y, 1):
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null and ship_at_hex.ship_type == 'submarine':
 					ship_at_hex.sink()
@@ -105,7 +105,7 @@ func receive_special(x, y, from_ship, secondary = false):
 			for sub_hex in from_ship.get_occupied_hexes():
 				get_parent().grid.grid[sub_hex[0]][sub_hex[1]].history.append([get_parent().current_turn, 'Submarine used Sonar Pulse'])
 			var revealed_ships = []
-			for hex in get_parent().grid.get_all_hex_neighbors(x, y, 1):
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null and ship_at_hex.ship_type != 'coastal_battery' \
 				and not ship_at_hex in revealed_ships:
@@ -115,13 +115,37 @@ func receive_special(x, y, from_ship, secondary = false):
 						get_parent().grid.grid[ship_hex[0]][ship_hex[1]].history.append([get_parent().current_turn, ship_at_hex.ship_name + ' revealed by Sonar Pulse'])
 
 		'Nuclear Strike':
-			print('Nuclear strike')
+			# Nuclear Strike instantly destroys anything it hits hex dead-on (including Coastal Batteries); otherwise hits normally in AOE
+			var dead_center = get_ship_at_hex(x, y)
+			if dead_center != null:
+				dead_center.sink()
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
+				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
+				if ship_at_hex != null:
+					ship_at_hex.hit(hex, from_ship)
 
 		'EW Strike':
-			print('EW Strike')
+			# EW Strike either adds 5 turns to ability cooldown or resets it to default, whichever is less
+			var struck_ships = []
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
+				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
+				if ship_at_hex != null and not ship_at_hex in struck_ships:
+					if ship_at_hex.special.name != 'None':
+						ship_at_hex.special.cooldown_current = min(ship_at_hex.special.cooldown_current + 5, ship_at_hex.special.cooldown_interval)
+					if ship_at_hex.secondary.name != 'None':
+						ship_at_hex.secondary.cooldown_current = min(ship_at_hex.secondary.cooldown_current + 5, ship_at_hex.secondary.cooldown_interval)
+					print('EW Strike affected ', ship_at_hex.ship_name)
+					struck_ships.append(ship_at_hex)
 
 		'Salvo':
-			print('Salvo')
+			# Salvo instantly sinks anything when it hits a damaged hex dead-on (including a damaged Coastal Battery); otherwise hits normally in AOE
+			var dead_center = get_ship_at_hex(x, y)
+			if dead_center != null and dead_center.is_hex_hit([x, y]):
+				dead_center.sink()
+			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
+				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
+				if ship_at_hex != null:
+					ship_at_hex.hit(hex, from_ship)
 
 		'Recon Flight':
 			print('Recon flight')
