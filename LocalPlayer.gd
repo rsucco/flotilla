@@ -99,10 +99,14 @@ func aim_fire():
 
 func aim_special():
 	if selected_ship != null and selected_ship.can_special():
-		aiming['fire'] = false
-		aiming['secondary'] = false
-		aiming['special'] = true
-		targeting_hex_range = selected_ship.special.aoe
+		# Supply Tenders don't aim their UNREP ability
+		if selected_ship.ship_type == 'supply_tender':
+			special(selected_ship.x, selected_ship.y)
+		else:
+			aiming['fire'] = false
+			aiming['secondary'] = false
+			aiming['special'] = true
+			targeting_hex_range = selected_ship.special.aoe
 
 func aim_secondary():
 	if selected_ship != null and selected_ship.can_secondary():

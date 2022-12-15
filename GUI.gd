@@ -10,9 +10,6 @@ func _ready():
 		ship_icons[ship_type] = load('res://gui/sprites/' + ship_type + '_icon.png')
 	get_parent().gui = self
 
-func _input(event):
-	pass
-
 func disable_button(button, disabled = true):
 	get_node('GUIGrid/Actions/' + button).disabled = disabled
 

@@ -16,6 +16,7 @@ var x = -10
 var y = -10
 var ship_type = ''
 var hit_hexes = []
+var smoke_nodes = []
 var ship_name = ''
 var weapon = ''
 var special = SpecialAbility.new()
@@ -115,6 +116,7 @@ func hit(hit_hex, from_ship):
 			smoke.position -= Vector2(0, 10)
 		elif hit_hex_index == 4:
 			smoke.position += Vector2(0, 15)
+	smoke_nodes.append(smoke)
 	add_child(smoke)
 	if not false in hit_hexes:
 		self.sink()
@@ -139,6 +141,9 @@ func rotate(rotation_offset):
 	if not [-1, -1] in rotated_hexes and !any_land and !already_occupied:
 		self.direction += rotation_offset
 		self.set_rotation_degrees(self.direction)
+
+func is_hex_hit(hex):
+	return hit_hexes[self.get_occupied_hexes().find(hex)]
 
 # Returns true if moving 1 hex forward in the current direction would not result
 # in the ship colliding with another ship, an island, or going out of bounds
@@ -236,3 +241,11 @@ func use_special(target_x, target_y):
 func use_secondary(target_x, target_y):
 	ap -= 2
 	secondary.cooldown_current = secondary.cooldown_interval
+
+func heal():
+	for hex in hit_hexes:
+		hex = false
+	for smoke in smoke_nodes:
+		remove_child(smoke)
+		smoke.queue_free()
+	smoke_nodes = []

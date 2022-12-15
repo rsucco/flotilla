@@ -34,7 +34,17 @@ func new_turn():
 			dc_timer = 10
 		elif dc_timer == 0:
 			dc_timer = 10
-			hit_hexes[hit_hexes.find_last(true)] = false
-			print('passive - damage control')
+			if true in hit_hexes:
+				hit_hexes[hit_hexes.find_last(true)] = false
+				print('passive - damage control')
 		else:
 			dc_timer -= 1
+
+# Heal all adjacent ships
+func use_special(x, y):
+	.use_special(x, y)
+	for ship_hex in get_occupied_hexes():
+		for neighbor_hex in get_parent().get_parent().grid.get_all_hex_neighbors(ship_hex[0], ship_hex[1]):
+			var ship_at_hex = get_parent().get_ship_at_hex(neighbor_hex[0], neighbor_hex[1])
+			if ship_at_hex != null:
+				ship_at_hex.heal()

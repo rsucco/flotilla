@@ -96,6 +96,9 @@ func receive_special(x, y, from_ship, secondary = false):
 				if ship_at_hex != null and ship_at_hex.ship_type == 'submarine':
 					ship_at_hex.sink()
 
+		'Lay Mine':
+			print('Lay mine')
+
 		'Sonar Pulse':
 			# Sonar Pulse reveals all ships around a hex and its direct neighbors and also reveals the submarine
 			temp_revealed_ships.append(from_ship.duplicate())
@@ -110,4 +113,16 @@ func receive_special(x, y, from_ship, secondary = false):
 					revealed_ships.append(ship_at_hex)
 					for ship_hex in ship_at_hex.get_occupied_hexes():
 						get_parent().grid.grid[ship_hex[0]][ship_hex[1]].history.append([get_parent().current_turn, ship_at_hex.ship_name + ' revealed by Sonar Pulse'])
+
+		'Nuclear Strike':
+			print('Nuclear strike')
+
+		'EW Strike':
+			print('EW Strike')
+
+		'Salvo':
+			print('Salvo')
+
+		'Recon Flight':
+			print('Recon flight')
 	return hits
