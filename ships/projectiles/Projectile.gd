@@ -52,9 +52,9 @@ func boom():
 	fire_material.gravity = Vector3(0, 0, 0)
 	fire_material.spread = 360.0
 	fire_material.damping = 10
-	fire_material.color = Color.orangered
-	fire_material.hue_variation_random = 0.7
-	fire_material.scale = 0.02
+	fire_material.color = Color.coral
+#	fire_material.hue_variation_random = 0.7
+	fire_material.scale = 0.03
 	fire.process_material = fire_material
 	fire.texture = preload('res://ships/sprites/projectiles/fire.png')
 	fire.amount = 200
@@ -95,11 +95,11 @@ func splash():
 	var ripples = Particles2D.new()
 	var ripples_material = ParticlesMaterial.new()
 	ripples_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
-	ripples_material.emission_ring_radius = 2
+	ripples_material.emission_ring_radius = 1
 	ripples_material.initial_velocity = 35
 	ripples_material.gravity = Vector3(0, 0, 0)
 	ripples_material.spread = 360.0
-	ripples_material.damping = 30
+	ripples_material.damping = 35
 	ripples_material.color = Color(0.65, 1.0, 1.0, 0.5)
 	ripples_material.scale = 3
 	ripples.process_material = ripples_material
