@@ -144,7 +144,10 @@ func rotate(rotation_offset):
 			already_occupied = true
 	if not [-1, -1] in rotated_hexes and !any_land and !already_occupied:
 		self.direction += rotation_offset
-		self.set_rotation_degrees(self.direction)
+		var tween = Tween.new()
+		tween.interpolate_property(self, 'rotation_degrees', self.rotation_degrees, self.direction, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+		add_child(tween)
+		tween.start()
 
 func is_hex_hit(hex):
 	return hit_hexes[self.get_occupied_hexes().find(hex)]
@@ -217,7 +220,10 @@ func forward():
 	self.x = new_hex[0]
 	self.y = new_hex[1]
 	self.ap -= 1
-	self.position = root.grid.get_hex_center(self.x, self.y)
+	var tween = Tween.new()
+	tween.interpolate_property(self, 'position', position, root.grid.get_hex_center(self.x, self.y), 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+	add_child(tween)
+	tween.start()
 	check_for_mine()
 
 func reverse():
@@ -225,7 +231,10 @@ func reverse():
 	self.x = new_hex[0]
 	self.y = new_hex[1]
 	self.ap -= 4
-	self.position = root.grid.get_hex_center(self.x, self.y)
+	var tween = Tween.new()
+	tween.interpolate_property(self, 'position', position, root.grid.get_hex_center(self.x, self.y), 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+	add_child(tween)
+	tween.start()
 	check_for_mine()
 
 func port():

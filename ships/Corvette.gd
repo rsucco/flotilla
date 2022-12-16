@@ -2,6 +2,8 @@ extends Ship
 
 class_name Corvette
 
+var projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.len_fore = 0
@@ -35,7 +37,7 @@ func hit(hit_hex, from_ship):
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
-	# Rotate turrets to point at target
+	# Rotate turret to point at target
 	var turret = get_node('Turret')
 	var new_angle_rad = turret.global_position.angle_to_point(
 		get_parent().get_parent().grid.get_hex_center(target_x, target_y))
@@ -54,4 +56,11 @@ func fire(target_x, target_y):
 	tween.interpolate_property(turret, 'global_rotation_degrees', old_angle_deg, new_angle_deg, 0.5, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 	add_child(tween)
 	tween.start()
+	yield(tween, 'tween_completed')
+	var projectile = projectile_node.instance()
+	projectile.scale = Vector2(0.5, 0.5)
+	root.add_child(projectile)
+	projectile.init(turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), [target_x, target_y], abs(get_parent().player_num - 1))
+	yield(projectile, 'done')
+	emit_signal('fire_animation_complete')
 	emit_signal('fire_animation_complete')

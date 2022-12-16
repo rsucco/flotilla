@@ -147,14 +147,17 @@ func receive_special(x, y, from_ship, secondary = false):
 		'Salvo':
 			# Salvo instantly sinks anything when it hits a damaged hex dead-on (including a damaged Coastal Battery); otherwise hits normally in AOE
 			var dead_center = get_ship_at_hex(x, y)
+			var search_hexes = get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe)
 			if dead_center != null:
 				if dead_center.is_hex_hit([x, y]):
+					for hex in dead_center.get_occupied_hexes():
+						search_hexes.erase(hex)
 					dead_center.sink()
 				else:
 					dead_center.hit([x, y], from_ship)
 			else:
 				get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss (Salvo)'])
-			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
+			for hex in search_hexes:
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null:
 					ship_at_hex.hit(hex, from_ship)

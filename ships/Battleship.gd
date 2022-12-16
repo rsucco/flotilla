@@ -40,7 +40,8 @@ func hit(hit_hex, from_ship):
 	if rand_range(0, 1) > 0.25:
 		.hit(hit_hex, from_ship)
 	else:
-		print('passive - armor')
+		root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+			[root.current_turn, 'Miss (Blocked by Armor)'])
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)

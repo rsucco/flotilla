@@ -2,6 +2,7 @@ extends Ship
 
 class_name CoastalBattery
 
+var projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
 var hp
 
 # Called when the node enters the scene tree for the first time.
@@ -33,7 +34,7 @@ func can_rotate(dir = 0):
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
-	# Rotate turrets to point at target
+	# Rotate turret to point at target
 	var turret = get_node('Turret')
 	var new_angle_rad = turret.global_position.angle_to_point(
 		get_parent().get_parent().grid.get_hex_center(target_x, target_y))
@@ -52,19 +53,26 @@ func fire(target_x, target_y):
 	tween.interpolate_property(turret, 'global_rotation_degrees', old_angle_deg, new_angle_deg, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 	add_child(tween)
 	tween.start()
+	yield(tween, 'tween_completed')
+	var projectile = projectile_node.instance()
+	root.add_child(projectile)
+	projectile.init(turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), [target_x, target_y], abs(get_parent().player_num - 1))
+	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
 
 
 # Coastal batteries have 5 HP rather than a set number of hexes to be hit
 func hit(hit_hex, from_ship):
 	hp -= 1
+	root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+	[root.current_turn, 'Hit, Coastal Battery (' + str(hp) + 'HP)'])
 	if hp == 0:
 		sink()
 	else:
 		print('passive - fortified')
 
 # Don't rotate in placement screen either
-func rotate(rotation_offset = 0):
+func rotate(_rotation_offset = 0):
 	pass
 
 func new_turn():
