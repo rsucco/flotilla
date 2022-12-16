@@ -65,6 +65,11 @@ _global_script_classes=[ {
 "path": "res://Player.gd"
 }, {
 "base": "Sprite",
+"class": "Projectile",
+"language": "GDScript",
+"path": "res://ships/projectiles/Projectile.gd"
+}, {
+"base": "Sprite",
 "class": "Ship",
 "language": "GDScript",
 "path": "res://ships/Ship.gd"
@@ -101,6 +106,7 @@ _global_script_class_icons={
 "LocalPlayer": "",
 "PassiveAbility": "",
 "Player": "",
+"Projectile": "",
 "Ship": "",
 "SpecialAbility": "",
 "Submarine": "",

@@ -95,9 +95,13 @@ func receive_special(x, y, from_ship, secondary = false):
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null and ship_at_hex.ship_type == 'submarine':
 					ship_at_hex.sink()
+				else:
+					get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (ASW Strike)'])
 
 		'Lay Mine':
-			print('Lay mine')
+			# Lay Mine lays a mine, duh
+			get_parent().grid.grid[x][y].is_mined = true
+			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Mine laid'])
 
 		'Sonar Pulse':
 			# Sonar Pulse reveals all ships around a hex and its direct neighbors and also reveals the submarine
@@ -124,6 +128,8 @@ func receive_special(x, y, from_ship, secondary = false):
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null:
 					ship_at_hex.hit(hex, from_ship)
+				else:
+					get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (Nuclear Strike)'])
 
 		'EW Strike':
 			# EW Strike either adds 5 turns to ability cooldown or resets it to default, whichever is less
@@ -146,10 +152,14 @@ func receive_special(x, y, from_ship, secondary = false):
 					dead_center.sink()
 				else:
 					dead_center.hit([x, y], from_ship)
+			else:
+				get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss (Salvo)'])
 			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null:
 					ship_at_hex.hit(hex, from_ship)
+				else:
+					get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (Salvo)'])
 
 		'Recon Flight':
 			var revealed_ships = []

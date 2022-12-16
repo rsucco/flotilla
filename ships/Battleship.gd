@@ -2,6 +2,11 @@ extends Ship
 
 class_name Battleship
 
+signal turrets_pointed
+
+var projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
+var turret_up = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.len_fore = 1
@@ -16,6 +21,53 @@ func _ready():
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
+	point_turrets(target_x, target_y)
+	yield(self, 'turrets_pointed')
+	var projectile = projectile_node.instance()
+	var turret = get_node('Turret' + str(turret_up))
+	turret_up += 1
+	if turret_up == 4:
+		turret_up = 0
+	root.add_child(projectile)
+	projectile.init(turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), [target_x, target_y], abs(get_parent().player_num - 1))
+	yield(projectile, 'done')
+	emit_signal('fire_animation_complete')
+
+func hit(hit_hex, from_ship):
+	randomize()
+	# Passive ability - Armor
+	# 25% chance of a hit not counting
+	if rand_range(0, 1) > 0.25:
+		.hit(hit_hex, from_ship)
+	else:
+		print('passive - armor')
+
+func use_special(target_x, target_y):
+	.use_special(target_x, target_y)
+	point_turrets(target_x, target_y)
+	yield(self, 'turrets_pointed')
+	var target_hexes = root.grid.get_all_hex_neighbors(target_x, target_y, special.aoe)
+	# We want the first and last turret to both shoot at the center hex,
+	# so add it to the beginning and end of the array
+	target_hexes.append([target_x, target_y])
+	target_hexes.push_front([target_x, target_y])
+	# Divert shots to center hex if they'd otherwise go out of bounds
+	while len(target_hexes) < 8:
+		target_hexes.append([target_x, target_y])
+	for i in range(0, 8, 2):
+		print(target_hexes[i], ', ', target_hexes[i+1])
+		var turret = get_node('Turret' + str(i / 2))
+		var projectile1 = projectile_node.instance()
+		root.add_child(projectile1)
+		projectile1.init(turret.global_position + Vector2(-5, -20).rotated(turret.global_rotation), [target_hexes[i][0], target_hexes[i][1]], abs(get_parent().player_num - 1))
+		var projectile2 = projectile_node.instance()
+		root.add_child(projectile2)
+		projectile2.init(turret.global_position + Vector2(5, -20).rotated(turret.global_rotation), [target_hexes[i + 1][0], target_hexes[i + 1][1]], abs(get_parent().player_num - 1))
+		if i == 6:
+			yield(projectile2, 'done')
+	emit_signal('special_animation_complete')
+
+func point_turrets(target_x, target_y):
 	# Rotate turrets to point at target
 	for i in range(4):
 		var turret = get_node('Turret' + str(i))
@@ -36,12 +88,6 @@ func fire(target_x, target_y):
 		tween.interpolate_property(turret, 'global_rotation_degrees', old_angle_deg, new_angle_deg, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 		add_child(tween)
 		tween.start()
-
-func hit(hit_hex, from_ship):
-	randomize()
-	# Passive ability - Armor
-	# 25% chance of a hit not counting
-	if rand_range(0, 1) > 0.25:
-		.hit(hit_hex, from_ship)
-	else:
-		print('passive - armor')
+		if i == 3:
+			yield(tween, 'tween_completed')
+	emit_signal('turrets_pointed')

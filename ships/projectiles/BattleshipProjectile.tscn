@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ships/projectiles/BattleshipProjectile.gd" type="Script" id=1]
+[ext_resource path="res://ships/sprites/projectiles/battleship_projectile.png" type="Texture" id=2]
+
+[node name="BattleshipProjectile" type="Sprite"]
+texture = ExtResource( 2 )
+offset = Vector2( 2, 0 )
+script = ExtResource( 1 )

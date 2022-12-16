@@ -28,3 +28,11 @@ func new_turn():
 		print('passive - flight ops')
 	else:
 		print('drawback - degraded runway')
+
+func fire(target_x, target_y):
+	.fire(target_x, target_y)
+	emit_signal('fire_animation_complete')
+
+func use_special(target_x, target_y):
+	.use_special(target_x, target_y)
+	emit_signal('special_animation_complete')

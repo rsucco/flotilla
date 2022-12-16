@@ -48,3 +48,4 @@ func use_special(x, y):
 			var ship_at_hex = get_parent().get_ship_at_hex(neighbor_hex[0], neighbor_hex[1])
 			if ship_at_hex != null:
 				ship_at_hex.heal()
+	emit_signal('special_animation_complete')

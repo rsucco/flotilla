@@ -77,6 +77,7 @@ After a couple years of off-and-on planning, a couple months of trying to learn 
 ### Credits
 ##### Graphics
 - [Antony Christian Sumakud](https://opengameart.org/content/sea-warfare-set-ships-and-more) (Public Domain)
+- [Hugo Locurcio](https://github.com/Calinou/kenney-particle-pack) (CC0 1.0)
 - [sbed](https://opengameart.org/content/95-game-icons) (CC BY 3.0)
 - [Lorc](https://lorcblog.blogspot.com/) (CC BY 3.0)
 - [Delapouite](https://delapouite.com/) (CC BY 3.0)

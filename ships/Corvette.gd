@@ -54,3 +54,4 @@ func fire(target_x, target_y):
 	tween.interpolate_property(turret, 'global_rotation_degrees', old_angle_deg, new_angle_deg, 0.5, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 	add_child(tween)
 	tween.start()
+	emit_signal('fire_animation_complete')

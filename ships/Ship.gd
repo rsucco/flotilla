@@ -4,6 +4,7 @@ class_name Ship
 
 signal placed
 signal fire_animation_complete
+signal special_animation_complete
 
 const SHIP_TYPES = ['coastal_battery', 'corvette', 'destroyer', 'submarine', 'cruiser', 'supply_tender', 'battleship', 'carrier']
 var direction = 0
@@ -93,8 +94,8 @@ func place():
 	placing = true
 
 func hit(hit_hex, from_ship):
-	get_parent().get_parent().grid.grid[hit_hex[0]][hit_hex[1]].history.append(
-		[get_parent().get_parent().current_turn, 'Hit, ' + ship_name])
+	root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+		[root.current_turn, 'Hit, ' + ship_name])
 	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
 	hit_hexes[hit_hex_index] = true
 	var smoke = Particles2D.new()
@@ -126,7 +127,7 @@ func hit(hit_hex, from_ship):
 
 func sink():
 	for hex in get_occupied_hexes():
-		get_parent().get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().get_parent().current_turn, 'Sunk, ' + ship_name])
+		root.grid.grid[hex[0]][hex[1]].history.append([root.current_turn, 'Sunk, ' + ship_name])
 	get_parent().ships.remove(get_parent().ships.find(self))
 	root.gui.update_fleets()
 	queue_free()
@@ -200,13 +201,13 @@ func can_fire():
 		return false
 
 func can_special():
-	if special.desc == '' or special.cooldown_current != 0 and ap >= 2:
+	if special.desc == '' or special.cooldown_current != 0 or ap < 2:
 		return false
 	else:
 		return true
 
 func can_secondary():
-	if secondary.desc == '' or secondary.cooldown_current != 0 and ap >= 2:
+	if secondary.desc == '' or secondary.cooldown_current != 0 or ap < 2:
 		return false
 	else:
 		return true
@@ -217,6 +218,7 @@ func forward():
 	self.y = new_hex[1]
 	self.ap -= 1
 	self.position = root.grid.get_hex_center(self.x, self.y)
+	check_for_mine()
 
 func reverse():
 	var new_hex = root.grid.get_hex_neighbor(x, y, direction + 180)
@@ -224,14 +226,26 @@ func reverse():
 	self.y = new_hex[1]
 	self.ap -= 4
 	self.position = root.grid.get_hex_center(self.x, self.y)
+	check_for_mine()
 
 func port():
 	rotate(-60)
 	self.ap -= 2
+	check_for_mine()
 
 func starboard():
 	rotate(60)
 	self.ap -= 2
+	check_for_mine()
+
+func check_for_mine():
+	for hex in get_occupied_hexes():
+		if root.grid.grid[hex[0]][hex[1]].is_mined:
+			root.grid.grid[hex[0]][hex[1]].is_mined = false
+			for ship_hex in get_occupied_hexes():
+				if !is_hex_hit(ship_hex):
+					hit(ship_hex, self)
+					break
 
 func fire(target_x, target_y):
 	ap -= 2
