@@ -123,34 +123,37 @@ func aim_secondary():
 
 # Fire at an enemy hex with the selected ship
 func fire(x, y):
-	# Play fire animation
-	selected_ship.fire(x, y)
-	yield(selected_ship, 'fire_animation_complete')
-	# Send fire event to other player for tracking
-	var is_hit = get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
-	update_buttons(selected_ship)
-	get_parent().gui.update_ship_info(selected_ship)
-	emit_signal('made_move')
+	if selected_ship != null and selected_ship.can_fire():
+		# Play fire animation
+		selected_ship.fire(x, y)
+		yield(selected_ship, 'fire_animation_complete')
+		# Send fire event to other player for tracking
+		var is_hit = get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
+		update_buttons(selected_ship)
+		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
 
 func special(x, y):
-	# Play special animation
-	selected_ship.use_special(x, y)
-	yield(selected_ship, 'special_animation_complete')
-	# Send special to other player to check for hits
-	var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship)
-	update_buttons(selected_ship)
-	get_parent().gui.update_ship_info(selected_ship)
-	emit_signal('made_move')
+	if selected_ship != null and selected_ship.can_special():
+		# Play special animation
+		selected_ship.use_special(x, y)
+		yield(selected_ship, 'special_animation_complete')
+		# Send special to other player to check for hits
+		var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship)
+		update_buttons(selected_ship)
+		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
 
 func secondary(x, y):
-	# Play animation
-	selected_ship.use_secondary(x, y)
-	yield(selected_ship, 'special_animation_complete')
-	# Send secondary to other player to check for hits
-	var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship, true)
-	update_buttons(selected_ship)
-	get_parent().gui.update_ship_info(selected_ship)
-	emit_signal('made_move')
+	if selected_ship != null and selected_ship.can_secondary():
+		# Play animation
+		selected_ship.use_secondary(x, y)
+		yield(selected_ship, 'special_animation_complete')
+		# Send secondary to other player to check for hits
+		var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship, true)
+		update_buttons(selected_ship)
+		get_parent().gui.update_ship_info(selected_ship)
+		emit_signal('made_move')
 
 
 func end_turn():

@@ -2,6 +2,8 @@ extends Ship
 
 class_name Carrier
 
+var f35
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.len_fore = 2
@@ -13,6 +15,7 @@ func _ready():
 	self.special = SpecialAbility.new(4, 'Recon Flight', 'Reveals one row of hexes on opponent\'s board')
 	self.passive = PassiveAbility.new('Flight Ops', 'Can take two attack moves in one turn instead of moving')
 	self.drawback = Drawback.new('Degraded Runway', 'If two or more hexes are damaged, can only take one attack move')
+	self.f35 = get_node('F35')
 
 # Override to implement passive ability and drawback
 func new_turn():
@@ -31,6 +34,7 @@ func new_turn():
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
+	f35.bomb(target_x, target_y)
 	var t = Timer.new()
 	t.set_wait_time(0.1)
 	t.set_one_shot(true)
