@@ -2,6 +2,8 @@ extends Ship
 
 class_name Submarine
 
+const projectile_node = preload('res://ships/projectiles/Torpedo.tscn')
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.len_fore = 1
@@ -33,6 +35,11 @@ func hit(hit_hex, from_ship):
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
+	var projectile = projectile_node.instance()
+	projectile.scale = Vector2(2, 2)
+	root.add_child(projectile)
+	projectile.init(global_position, [target_x, target_y], abs(get_parent().player_num - 1))
+	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
 
 func use_special(target_x, target_y):
