@@ -4,7 +4,7 @@ class_name Battleship
 
 signal turrets_pointed
 
-var projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
+const projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
 var turret_up = 0
 
 # Called when the node enters the scene tree for the first time.

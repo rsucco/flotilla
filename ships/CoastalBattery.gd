@@ -2,7 +2,7 @@ extends Ship
 
 class_name CoastalBattery
 
-var projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
+const projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
 var hp
 
 # Called when the node enters the scene tree for the first time.

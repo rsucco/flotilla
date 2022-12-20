@@ -37,7 +37,7 @@ _global_script_classes=[ {
 "base": "Ship",
 "class": "Destroyer",
 "language": "GDScript",
-"path": "res://ships/Submarine.gd"
+"path": "res://ships/Destroyer.gd"
 }, {
 "base": "Object",
 "class": "Drawback",
@@ -82,7 +82,7 @@ _global_script_classes=[ {
 "base": "Ship",
 "class": "Submarine",
 "language": "GDScript",
-"path": "res://ships/Destroyer.gd"
+"path": "res://ships/Submarine.gd"
 }, {
 "base": "Ship",
 "class": "SupplyTender",

@@ -2,7 +2,7 @@ extends Ship
 
 class_name Corvette
 
-var projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
+const projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

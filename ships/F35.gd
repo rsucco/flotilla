@@ -1,61 +1,65 @@
 extends Node2D
 
-var speed = 250
+const projectile_node = preload('res://ships/projectiles/Missile.tscn')
+const turn_speed = 2
+const speed = 150
 var flying = false
+var bombing = false
 var hidden_from_player
 var dest_hex
 var dest = null
-var path
-var path_follow
-var path_progress = 0
-var sprite
-var curve_points = []
-var points = []
-var last_point = Vector2(0, 0)
+var waypoints = []
+var on_waypoint = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	path = get_node('Path')
-	path_follow = get_node('Path/PathFollow')
-	sprite = get_node('Path/PathFollow/Sprite')
+	pass
 
 func bomb(target_x, target_y, hidden_from = -1):
+	position = Vector2(0, 0)
 	dest_hex = [target_x, target_y]
 	dest = to_local(get_parent().root.grid.get_hex_center(target_x, target_y))
 	hidden_from_player = hidden_from
-
-	points = PoolVector2Array([
+	waypoints = PoolVector2Array([
 		Vector2(0, 0),
 		Vector2(0, -250),
-		dest - Vector2(200, 100),
 		dest,
-		dest - Vector2(200, -100),
 		Vector2(0, 100),
 		Vector2(0, 0)
 	])
-	var curve = Curve2D.new()
-
-	for point in points:
-		curve.add_point(point)
-	curve_points = curve.get_baked_points()
-	path.set_curve(curve)
-	path_progress = 0
-#	rotation_degrees = 90
+	on_waypoint = 1
 	flying = true
+	bombing = true
 
-func _draw():
-	for point in curve_points:
-		draw_circle(Vector2(point), 2, Color.black)
-	for point in points:
-		draw_circle(Vector2(point), 5, Color.red)
-	if dest != null:
-		draw_circle(dest, 5, Color.green)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if flying:
-		sprite.global_rotation = last_point.angle_to_point(position)
-		last_point = position
-		path_progress += speed * delta
-		path_follow.offset = path_progress
-		update()
+		position += Vector2(0, -speed * delta).rotated(rotation)
+		var angle_to_next_waypoint = global_position.angle_to(to_global(waypoints[on_waypoint])) * 180 / PI
+		while angle_to_next_waypoint < 0:
+			angle_to_next_waypoint += 360
+		while angle_to_next_waypoint >= 360:
+			angle_to_next_waypoint -= 360
+		while rotation_degrees < 0:
+			rotation_degrees += 360
+		while rotation_degrees >= 360:
+			rotation_degrees -= 360
+		if randi() % 100 > 90:
+			print('position: ', position, ' - rotation_degrees: ', rotation_degrees, ' - angle_to_next_waypoint:', angle_to_next_waypoint, ' - on_waypoint:', waypoints[on_waypoint], ' - distance to:', position.distance_to(waypoints[on_waypoint]))
+		if angle_to_next_waypoint > rotation_degrees:
+			if angle_to_next_waypoint - rotation_degrees >= turn_speed:
+				rotation_degrees += turn_speed
+			else:
+				rotation_degrees = angle_to_next_waypoint
+		elif angle_to_next_waypoint < rotation_degrees:
+			if rotation_degrees - angle_to_next_waypoint >= turn_speed:
+				rotation_degrees += turn_speed
+			else:
+				rotation_degrees = angle_to_next_waypoint
+		if position.distance_to(waypoints[on_waypoint]) < 50:
+			on_waypoint += 1
+#		if bombing and position.distance_to(dest) < 250:
+#			var projectile = projectile_node.instance()
+#			get_parent().root.add_child(projectile)
+#			projectile.init(global_position, dest_hex, hidden_from_player)
+#			on_waypoint = 3
+#			bombing = false

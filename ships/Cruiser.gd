@@ -2,6 +2,9 @@ extends Ship
 
 class_name Cruiser
 
+const projectile_node = preload('res://ships/projectiles/Missile.tscn')
+var silo_up = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.len_fore = 1
@@ -17,6 +20,18 @@ func _ready():
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
+	var projectile = projectile_node.instance()
+	projectile.scale = Vector2(2, 2)
+	root.add_child(projectile)
+	var silo_vector
+	if silo_up == 0:
+		silo_vector = Vector2(0, -24).rotated(rotation)
+		silo_up = 1
+	else:
+		silo_vector = Vector2(0, 40).rotated(rotation)
+		silo_up = 0
+	projectile.init(global_position + silo_vector, [target_x, target_y], abs(get_parent().player_num - 1), global_rotation_degrees)
+	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
 
 func use_special(target_x, target_y):

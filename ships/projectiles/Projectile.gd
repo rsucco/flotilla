@@ -16,10 +16,10 @@ func _ready():
 	pass # Replace with function body.
 
 func init(orig, destination_hex, hidden_from = -1):
-	position = orig
+	global_position = orig
 	dest_hex = destination_hex
 	dest = get_parent().grid.get_hex_center(dest_hex[0], dest_hex[1])
-	rotation_degrees = position.angle_to_point(dest)
+	rotation = position.angle_to_point(dest)
 	hidden_from_player = hidden_from
 	moving = true
 

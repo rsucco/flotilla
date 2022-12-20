@@ -1,6 +1,6 @@
 extends Ship
 
-class_name Destroyer
+class_name Submarine
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
