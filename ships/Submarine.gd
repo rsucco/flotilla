@@ -3,6 +3,7 @@ extends Ship
 class_name Submarine
 
 const projectile_node = preload('res://ships/projectiles/Torpedo.tscn')
+const pulse_node = preload('res://ships/projectiles/SonarPulse.tscn')
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -52,4 +53,9 @@ func use_special(target_x, target_y):
 
 func use_secondary(target_x, target_y):
 	.use_secondary(target_x, target_y)
+	var pulse_location = root.grid.get_hex_center(target_x, target_y)
+	var pulse = pulse_node.instance()
+	root.add_child(pulse)
+	pulse.init(pulse_location)
+	yield(pulse, 'done')
 	emit_signal('special_animation_complete')
