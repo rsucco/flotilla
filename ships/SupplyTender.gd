@@ -18,7 +18,7 @@ func _ready():
 	self.drawback = Drawback.new('Flammable Cargo', 'Lose 2 AP per turn if damaged')
 
 # Supply tenders cannot fire
-func can_fire():
+func can_fire(aim_hex = [0, 0]):
 	return false
 
 func new_turn():

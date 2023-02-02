@@ -8,7 +8,7 @@ func _ready():
 
 func init(orig, dest_hex, hidden_from = -1):
 	.init(orig, dest_hex, hidden_from)
-	speed = 300
+	speed = 250
 	bubbles = Particles2D.new()
 	var bubbles_material = ParticlesMaterial.new()
 	bubbles_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_POINT
@@ -16,13 +16,13 @@ func init(orig, dest_hex, hidden_from = -1):
 	bubbles_material.gravity = Vector3(0, 0, 0)
 	bubbles_material.damping = 10
 	bubbles_material.color = Color.azure
-	bubbles_material.scale = 0.005
+	bubbles_material.scale = 0.01
 	bubbles.process_material = bubbles_material
-	bubbles.texture = preload('res://ships/sprites/projectiles/bubbles.png')
-	bubbles.amount = 100
+	bubbles.texture = preload('res://ships/sprites/projectiles/fire.png')
+	bubbles.amount = 50
 	bubbles.lifetime = 0.2
 	bubbles.position += Vector2(1.5, 0)
-#	add_child(bubbles)
+	add_child(bubbles)
 
 func explode():
 	.explode()

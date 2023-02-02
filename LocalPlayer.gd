@@ -123,7 +123,7 @@ func aim_secondary():
 
 # Fire at an enemy hex with the selected ship
 func fire(x, y):
-	if selected_ship != null and selected_ship.can_fire():
+	if selected_ship != null and selected_ship.can_fire([x, y]):
 		# Play fire animation
 		selected_ship.fire(x, y)
 		yield(selected_ship, 'fire_animation_complete')

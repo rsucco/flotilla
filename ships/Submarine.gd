@@ -33,6 +33,10 @@ func hit(hit_hex, from_ship):
 		# Passive ability - Silent Service
 		# If hit on non-center hex by a surface unit, hit doesn't count
 
+# Submarines cannot shoot at land tiles
+func can_fire(aim_hex = [15, 0]):
+	return .can_fire(aim_hex) and not root.grid.grid[aim_hex[0]][aim_hex[1]].island
+
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
 	var projectile = projectile_node.instance()

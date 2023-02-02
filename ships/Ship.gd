@@ -196,7 +196,7 @@ func can_rotate(rotation_offset):
 	return true
 
 # Return true if a ship can fire
-func can_fire():
+func can_fire(aim_hex = [0, 0]):
 	# 2 AP and 1 fire action required to fire
 	if ap >= 2 and fire_remaining >= 1:
 		return true
