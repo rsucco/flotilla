@@ -7,7 +7,7 @@ var fire
 func _ready():
 	pass # Replace with function body.
 
-func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0):
+func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0, instafire = false):
 	.init(orig, dest_hex, hidden_from)
 	global_rotation_degrees = starting_rotation
 	speed = 0
@@ -25,17 +25,20 @@ func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0):
 	fire.lifetime = 0.2
 	fire.position += Vector2(1.5, 0)
 	add_child(fire)
-	var t = Timer.new()
-	t.set_wait_time(.5)
-	t.set_one_shot(true)
-	self.add_child(t)
-	t.start()
-	yield(t, "timeout")
-	var tween = Tween.new()
-	tween.interpolate_property(self, 'global_rotation_degrees', global_rotation_degrees, position.angle_to_point(dest) * 180 / PI, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
-	add_child(tween)
-	tween.start()
-	yield(tween, 'tween_completed')
+	if instafire:
+		global_rotation_degrees = position.angle_to_point(dest) * 180 / PI
+	else:
+		var t = Timer.new()
+		t.set_wait_time(.5)
+		t.set_one_shot(true)
+		self.add_child(t)
+		t.start()
+		yield(t, "timeout")
+		var tween = Tween.new()
+		tween.interpolate_property(self, 'global_rotation_degrees', global_rotation_degrees, position.angle_to_point(dest) * 180 / PI, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+		add_child(tween)
+		tween.start()
+		yield(tween, 'tween_completed')
 	speed = 300
 
 func explode():

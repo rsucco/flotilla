@@ -35,12 +35,7 @@ func new_turn():
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
 	f35.bomb(target_x, target_y)
-	var t = Timer.new()
-	t.set_wait_time(0.1)
-	t.set_one_shot(true)
-	self.add_child(t)
-	t.start()
-	yield(t, "timeout")
+	yield(f35, 'done')
 	emit_signal('fire_animation_complete')
 	print('done with fire')
 
