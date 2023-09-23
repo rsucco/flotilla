@@ -34,17 +34,19 @@ func _process(delta):
 			yield(self, 'explosion_done')
 			queue_free()
 
-func explode():
-	position = dest
+func explode(pos = null):
+	if pos == null:
+		position = dest
+		pos = position
 	texture = null
 	var last_event = get_parent().grid.grid[dest_hex[0]][dest_hex[1]].get_last_event()
 	if last_event != null and last_event[1] in ['Hit', 'Sunk'] or \
 	get_parent().grid.grid[dest_hex[0]][dest_hex[1]].island:
-		boom()
+		boom(pos)
 	else:
-		splash()
+		splash(pos)
 
-func boom():
+func boom(pos):
 	var fire = Particles2D.new()
 	var fire_material = ParticlesMaterial.new()
 	fire_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_POINT
@@ -53,7 +55,6 @@ func boom():
 	fire_material.spread = 360.0
 	fire_material.damping = 10
 	fire_material.color = Color.coral
-#	fire_material.hue_variation_random = 0.7
 	fire_material.scale = 0.03
 	fire.process_material = fire_material
 	fire.texture = preload('res://ships/sprites/projectiles/fire.png')
@@ -61,7 +62,7 @@ func boom():
 	fire.lifetime = 0.7
 	fire.set_one_shot(true)
 	fire.set_explosiveness_ratio(1)
-	fire.position = position
+	fire.position = pos
 	get_parent().add_child(fire)
 
 	var smoke = Particles2D.new()
@@ -78,7 +79,7 @@ func boom():
 	smoke.lifetime = 0.9
 	smoke.set_one_shot(true)
 	smoke.set_explosiveness_ratio(1)
-	smoke.position = position
+	smoke.position = pos
 	get_parent().add_child(smoke)
 
 	var t = Timer.new()
@@ -91,7 +92,7 @@ func boom():
 	smoke.queue_free()
 	emit_signal('explosion_done')
 
-func splash():
+func splash(pos):
 	var ripples = Particles2D.new()
 	var ripples_material = ParticlesMaterial.new()
 	ripples_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
@@ -107,7 +108,7 @@ func splash():
 	ripples.lifetime = 0.75
 	ripples.set_one_shot(true)
 	ripples.set_explosiveness_ratio(1)
-	ripples.position = position
+	ripples.position = pos
 	get_parent().add_child(ripples)
 
 	var t = Timer.new()

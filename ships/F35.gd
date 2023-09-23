@@ -17,8 +17,8 @@ var sprite
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	path = $Path2D
-	path_follow = $"Path2D/PathFollow2D"
-	sprite = $"Path2D/PathFollow2D/Sprite"
+	path_follow = $Path2D/PathFollow2D
+	sprite = $Path2D/PathFollow2D/Sprite
 
 func fly_to(target_x, target_y, hidden_from = -1, target_x2 = null, target_y2 = null):
 	hidden_from_player = hidden_from

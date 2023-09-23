@@ -41,6 +41,6 @@ func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0, instafire = f
 		yield(tween, 'tween_completed')
 	speed = 300
 
-func explode():
-	.explode()
+func explode(pos = null):
+	.explode(pos)
 	fire.queue_free()

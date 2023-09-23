@@ -43,7 +43,7 @@ func fire(target_x, target_y):
 	var projectile = projectile_node.instance()
 	projectile.scale = Vector2(2, 2)
 	root.add_child(projectile)
-	projectile.init(global_position, [target_x, target_y], abs(get_parent().player_num - 1))
+	projectile.init(global_position, [target_x, target_y], abs(get_parent().player_num - 1), global_rotation)
 	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
 
