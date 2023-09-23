@@ -15,7 +15,7 @@ func _ready():
 	self.special = SpecialAbility.new(4, 'Recon Flight', 'Reveals one row of hexes on opponent\'s board')
 	self.passive = PassiveAbility.new('Flight Ops', 'Can take two attack moves in one turn instead of moving')
 	self.drawback = Drawback.new('Degraded Runway', 'If two or more hexes are damaged, can only take one attack move')
-	self.f35 = get_node('F35')
+	self.f35 = $F35
 
 # Override to implement passive ability and drawback
 func new_turn():
@@ -41,11 +41,7 @@ func fire(target_x, target_y):
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)
-	var t = Timer.new()
-	t.set_wait_time(0.1)
-	t.set_one_shot(true)
-	self.add_child(t)
-	t.start()
-	yield(t, "timeout")
+	f35.recon(target_x, target_y)
+	yield(f35, 'done')
 	emit_signal('special_animation_complete')
 	print('done with special')
