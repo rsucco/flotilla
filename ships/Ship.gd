@@ -99,9 +99,13 @@ func hit(hit_hex, from_ship):
 		root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
 			[root.current_turn, 'Hit, ' + ship_name + ' (No effect)'])
 	else:
-		root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
-			[root.current_turn, 'Hit, ' + ship_name])
 		hit_hexes[hit_hex_index] = true
+		if hit_hexes.count(true) >= len(hit_hexes) / 2:
+			root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+				[root.current_turn, 'Hit, ' + ship_name + ' (Immobilized)'])
+		else:
+			root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+				[root.current_turn, 'Hit, ' + ship_name])
 		var smoke = Particles2D.new()
 		var smoke_material = ParticlesMaterial.new()
 		smoke_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
@@ -157,8 +161,12 @@ func is_hex_hit(hex):
 	return hit_hexes[self.get_occupied_hexes().find(hex)]
 
 # Returns true if moving 1 hex forward in the current direction would not result
-# in the ship colliding with another ship, an island, or going out of bounds
+# in the ship colliding with another ship, an island, or going out of bounds, and
+# if the ship is not too damaged
 func can_move(reverse = false, distance = 1):
+	# Make sure the ship is less than 50% damaged
+	if hit_hexes.count(true) >= len(hit_hexes) / 2:
+		return false
 	# Make sure we have sufficient action points for this move
 	if ap < distance or (reverse and ap < 4):
 		return false
@@ -183,6 +191,9 @@ func can_move(reverse = false, distance = 1):
 
 # Returns true if the ship can rotate by the specified number of degrees
 func can_rotate(rotation_offset):
+	# Make sure the ship is less than 50% damaged
+	if hit_hexes.count(true) >= len(hit_hexes) / 2:
+		return false
 	# 2 AP required to rotate
 	if ap < 2:
 		return false
