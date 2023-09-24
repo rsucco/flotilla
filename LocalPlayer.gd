@@ -215,6 +215,11 @@ func get_hover_hexes(x, y):
 			return hover_hexes
 
 func select_ship(ship):
+	aiming['fire'] = false
+	aiming['special'] = false
+	aiming['recon'] = false
+	aiming['secondary'] = false
+	targeting_hex_range = -1
 	if ship != null:
 		# Move the ship to front of the line (if there is a ship, and if there is a
 		# line, and if the ship isn't already at the front of the line)

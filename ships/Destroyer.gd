@@ -4,6 +4,8 @@ class_name Destroyer
 
 const projectile_node = preload('res://ships/projectiles/Missile.tscn')
 
+var sh60
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.len_fore = 1
@@ -15,6 +17,7 @@ func _ready():
 	self.special = SpecialAbility.new(4, 'ASW Strike',
 	'Select a hex on opponent\'s board; if the hex or any of its direct neighbors contacts an enemy submarine, sink it instantly (does not affect ships)', 1)
 	self.secondary = SpecialAbility.new(5, 'Lay Mine', 'Select a hex on opponent\'s board to place a mine; if any ships move over that tile, they will take a hit in a random hex', 0)
+	self.sh60 = $SH60
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
@@ -27,8 +30,12 @@ func fire(target_x, target_y):
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)
+	sh60.bomb(target_x, target_y)
+	yield(sh60, 'done')
 	emit_signal('special_animation_complete')
 
 func use_secondary(target_x, target_y):
 	.use_secondary(target_x, target_y)
+	sh60.mine(target_x, target_y)
+	yield(sh60, 'done')
 	emit_signal('special_animation_complete')

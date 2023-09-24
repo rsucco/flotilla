@@ -8,7 +8,7 @@ signal explosion_done
 var dest
 var dest_hex
 var hidden_from_player
-var speed
+var speed = 0
 var moving = false
 
 # Called when the node enters the scene tree for the first time.

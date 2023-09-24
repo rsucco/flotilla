@@ -36,6 +36,14 @@ func fire(target_x, target_y):
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)
+	# Placeholder timer signal to prevent clicks not getting processed
+	# The animation will make this unnecessary
+	var t = Timer.new()
+	t.set_wait_time(0.1)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
 	emit_signal('special_animation_complete')
 
 func use_secondary(target_x, target_y):

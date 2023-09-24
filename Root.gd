@@ -8,6 +8,7 @@ var ships = [[], []]
 var current_turn = 0
 var players = []
 var player_up = 0
+var mine_texture
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -17,6 +18,7 @@ func _ready():
 	font = DynamicFont.new()
 	font.font_data = load("res://opensans.ttf")
 	font.size = 11
+	mine_texture = load("res://ships/sprites/projectiles/mine.png")
 	play_game()
 
 # Draw game board
@@ -100,6 +102,9 @@ func _draw():
 						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 1.0, 1.0, alpha_val))
 					elif hit_miss[1] == 'Sunk':
 						draw_circle(grid.get_hex_center(x, y), 10, Color(0.0, 0.0, 0.0, alpha_val))
+				# Draw mines if applicable
+				if grid.grid[x][y].is_mined:
+					draw_texture(mine_texture, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 4.5, grid.hex_size / 4.5), Color(0.0, 0.0, 0.0, 0.5))
 
 			# Draw tile coordinates
 			draw_string(font, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 10, -grid.hex_size / 12), y_grid_display[y] + str(x), Color(0.0, 0.0, 0.0))

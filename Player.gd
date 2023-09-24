@@ -91,12 +91,18 @@ func receive_special(x, y, from_ship, secondary = false):
 	match ability.name:
 		'ASW Strike':
 			# ASW Strike instantly sinks any submarines on a hex or its direct neighbors
-			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
+			var affected_hexes = get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe)
+			affected_hexes.append([x, y])
+			var sunk_hexes = []
+			for hex in affected_hexes:
 				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
 				if ship_at_hex != null and ship_at_hex.ship_type == 'submarine':
+					for sub_hex in ship_at_hex.get_occupied_hexes():
+						sunk_hexes.append(sub_hex)
 					ship_at_hex.sink()
 				else:
-					get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (ASW Strike)'])
+					if !sunk_hexes.has(hex):
+						get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (ASW Strike)'])
 
 		'Lay Mine':
 			# Lay Mine lays a mine, duh

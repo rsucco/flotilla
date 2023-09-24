@@ -94,36 +94,40 @@ func place():
 	placing = true
 
 func hit(hit_hex, from_ship):
-	root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
-		[root.current_turn, 'Hit, ' + ship_name])
 	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
-	hit_hexes[hit_hex_index] = true
-	var smoke = Particles2D.new()
-	var smoke_material = ParticlesMaterial.new()
-	smoke_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
-	smoke_material.emission_ring_radius = self.get_size() * 3 - 3
-	smoke_material.direction = Vector3(-50, 0, 0)
-	smoke_material.gravity = Vector3(0, 150, 0)
-	smoke_material.spread = 25.0
-	smoke_material.damping = -1.5
-	smoke_material.scale = 2.5
-	smoke_material.color = Color(0.0, 0.0, 0.0)
-	smoke.process_material = smoke_material
-	smoke.amount = pow(self.get_size(), 2) * 10
-	smoke.lifetime = 0.5
-	var hex_size = root.grid.hex_size
-	smoke.position -= Vector2(0, hex_size * (hit_hex_index - len_aft))
-	if len_fore == 0:
-		smoke.position -= Vector2(0, 10)
-	elif len_fore == 2:
-		if hit_hex_index == 0:
+	if hit_hexes[hit_hex_index]:
+		root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+			[root.current_turn, 'Hit, ' + ship_name + ' (No effect)'])
+	else:
+		root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
+			[root.current_turn, 'Hit, ' + ship_name])
+		hit_hexes[hit_hex_index] = true
+		var smoke = Particles2D.new()
+		var smoke_material = ParticlesMaterial.new()
+		smoke_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
+		smoke_material.emission_ring_radius = self.get_size() * 3 - 3
+		smoke_material.direction = Vector3(-50, 0, 0)
+		smoke_material.gravity = Vector3(0, 150, 0)
+		smoke_material.spread = 25.0
+		smoke_material.damping = -1.5
+		smoke_material.scale = 2.5
+		smoke_material.color = Color(0.0, 0.0, 0.0)
+		smoke.process_material = smoke_material
+		smoke.amount = pow(self.get_size(), 2) * 10
+		smoke.lifetime = 0.5
+		var hex_size = root.grid.hex_size
+		smoke.position -= Vector2(0, hex_size * (hit_hex_index - len_aft))
+		if len_fore == 0:
 			smoke.position -= Vector2(0, 10)
-		elif hit_hex_index == 4:
-			smoke.position += Vector2(0, 15)
-	smoke_nodes.append(smoke)
-	add_child(smoke)
-	if not false in hit_hexes:
-		self.sink()
+		elif len_fore == 2:
+			if hit_hex_index == 0:
+				smoke.position -= Vector2(0, 10)
+			elif hit_hex_index == 4:
+				smoke.position += Vector2(0, 15)
+		smoke_nodes.append(smoke)
+		add_child(smoke)
+		if not false in hit_hexes:
+			self.sink()
 
 func sink():
 	for hex in get_occupied_hexes():
