@@ -1,5 +1,7 @@
 extends Node2D
 
+const y_grid_display = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+
 var font
 var grid
 var gui
@@ -23,7 +25,6 @@ func _ready():
 
 # Draw game board
 func _draw():
-	var y_grid_display = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
 	var mouse_hex = grid.get_hex_from_coords(get_viewport().get_mouse_position())
 	var hover_hexes = players[player_up].get_hover_hexes(mouse_hex[0], mouse_hex[1])
 	var selected_hexes = []

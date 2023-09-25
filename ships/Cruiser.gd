@@ -3,6 +3,7 @@ extends Ship
 class_name Cruiser
 
 const projectile_node = preload('res://ships/projectiles/Missile.tscn')
+const ew_node = preload('res://ships/projectiles/EWStrike.tscn')
 var silo_up = 0
 
 # Called when the node enters the scene tree for the first time.
@@ -13,7 +14,7 @@ func _ready():
 	self.hit_hexes = [false, false, false]
 	self.ship_name = 'Cruiser'
 	self.weapon = 'Anti-Ship Missile'
-	self.special = SpecialAbility.new(6, 'EW Strike', 
+	self.special = SpecialAbility.new(6, 'EW Strike',
 	'Select a hex on opponent\'s board; prevents all units within two hexes of central hex from firing next turn and either resets or adds five to their special ability cooldowns, whichever is less', 2)
 	self.passive = PassiveAbility.new('Missile Defense', 
 	'50% chance of intercepting incoming missile attacks within two hexes if no move action was taken last turn (chance is reduced to 25% for incoming nuclear strike)')
@@ -36,14 +37,11 @@ func fire(target_x, target_y):
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)
-	# Placeholder timer signal to prevent clicks not getting processed
-	# The animation will make this unnecessary
-	var t = Timer.new()
-	t.set_wait_time(0.1)
-	t.set_one_shot(true)
-	self.add_child(t)
-	t.start()
-	yield(t, "timeout")
+	var ew_location = root.grid.get_hex_center(target_x, target_y)
+	var ew = ew_node.instance()
+	root.add_child(ew)
+	ew.init(ew_location)
+	yield(ew, 'done')
 	emit_signal('special_animation_complete')
 
 func use_secondary(target_x, target_y):
