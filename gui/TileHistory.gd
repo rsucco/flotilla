@@ -6,6 +6,10 @@ func _ready():
 	pass # Replace with function body.
 
 func show_history(hex):
+	var new_position = get_parent().grid.get_hex_center(hex[0], hex[1]) + Vector2(40, -60)
+	if new_position[0] + rect_size[0] > 800:
+		new_position -= Vector2(200, 0)
+	rect_position = new_position
 	var hex_events = get_parent().grid.grid[hex[0]][hex[1]].history.duplicate()
 	if len(hex_events) == 0:
 		self.visible = false

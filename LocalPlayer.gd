@@ -67,7 +67,6 @@ func _process(delta):
 	if on_hex_time > TILE_HIST_HOVER_TIME and get_parent().current_turn > 0 and \
 	get_parent().player_up == player_num and current_on_hex != [-1, -1]:
 		tile_history.show_history(current_on_hex)
-		tile_history.rect_position = get_parent().grid.get_hex_center(current_on_hex[0], current_on_hex[1]) + Vector2(40, -60)
 		if !tile_history.visible:
 			tile_history.show()
 
