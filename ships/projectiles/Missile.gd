@@ -1,11 +1,18 @@
 extends Projectile
 
-var max_speed = 300
+class_name Missile
+
+var max_speed = 500
+var enroute = false
 var fire
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
+
+func _process(delta):
+	if enroute and speed < max_speed:
+		speed += 500 * delta
 
 func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0, instafire = false):
 	.init(orig, dest_hex, hidden_from)
@@ -27,6 +34,7 @@ func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0, instafire = f
 	add_child(fire)
 	if instafire:
 		global_rotation_degrees = position.angle_to_point(dest) * 180 / PI
+		speed = max_speed
 	else:
 		var t = Timer.new()
 		t.set_wait_time(.5)
@@ -39,7 +47,7 @@ func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0, instafire = f
 		add_child(tween)
 		tween.start()
 		yield(tween, 'tween_completed')
-	speed = 300
+	enroute = true
 
 func explode(pos = null):
 	.explode(pos)

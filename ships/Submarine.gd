@@ -3,6 +3,7 @@ extends Ship
 class_name Submarine
 
 const projectile_node = preload('res://ships/projectiles/Torpedo.tscn')
+const nuke_node = preload('res://ships/projectiles/Nuke.tscn')
 const pulse_node = preload('res://ships/projectiles/SonarPulse.tscn')
 
 # Called when the node enters the scene tree for the first time.
@@ -41,14 +42,19 @@ func can_fire(aim_hex = [15, 0]):
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
 	var projectile = projectile_node.instance()
-	projectile.scale = Vector2(2, 2)
 	root.add_child(projectile)
-	projectile.init(global_position, [target_x, target_y], abs(get_parent().player_num - 1), global_rotation)
+	var torpedo_position = global_position - Vector2(0, 42).rotated(rotation)
+	projectile.init(torpedo_position, [target_x, target_y], abs(get_parent().player_num - 1), global_rotation)
 	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)
+	var nuke = nuke_node.instance()
+	nuke.scale = Vector2(2, 2)
+	root.add_child(nuke)
+	nuke.init(global_position + Vector2(0, -25).rotated(rotation), [target_x, target_y], abs(get_parent().player_num - 1), global_rotation_degrees)
+	yield(nuke, 'done')
 	emit_signal('special_animation_complete')
 
 func use_secondary(target_x, target_y):

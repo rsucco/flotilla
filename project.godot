@@ -54,6 +54,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://LocalPlayer.gd"
 }, {
+"base": "Projectile",
+"class": "Missile",
+"language": "GDScript",
+"path": "res://ships/projectiles/Missile.gd"
+}, {
 "base": "Object",
 "class": "PassiveAbility",
 "language": "GDScript",
@@ -104,6 +109,7 @@ _global_script_class_icons={
 "Drawback": "",
 "Grid": "",
 "LocalPlayer": "",
+"Missile": "",
 "PassiveAbility": "",
 "Player": "",
 "Projectile": "",

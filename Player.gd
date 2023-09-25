@@ -127,15 +127,22 @@ func receive_special(x, y, from_ship, secondary = false):
 
 		'Nuclear Strike':
 			# Nuclear Strike instantly destroys anything it hits hex dead-on (including Coastal Batteries); otherwise hits normally in AOE
+
+			var affected_hexes = get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe)
+			var checked_hexes = []
 			var dead_center = get_ship_at_hex(x, y)
 			if dead_center != null:
+				for hex in dead_center.get_occupied_hexes():s
+					checked_hexes.append(hex)
 				dead_center.sink()
-			for hex in get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe):
-				var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
-				if ship_at_hex != null:
-					ship_at_hex.hit(hex, from_ship)
-				else:
-					get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (Nuclear Strike)'])
+			for hex in affected_hexes:
+				if !checked_hexes.has(hex):
+					checked_hexes.append(hex)
+					var ship_at_hex = get_ship_at_hex(hex[0], hex[1])
+					if ship_at_hex != null:
+						ship_at_hex.hit(hex, from_ship)
+					else:
+						get_parent().grid.grid[hex[0]][hex[1]].history.append([get_parent().current_turn, 'Miss (Nuclear Strike)'])
 
 		'EW Strike':
 			# EW Strike either adds 5 turns to ability cooldown or resets it to default, whichever is less
@@ -147,7 +154,6 @@ func receive_special(x, y, from_ship, secondary = false):
 						ship_at_hex.special.cooldown_current = min(ship_at_hex.special.cooldown_current + 5, ship_at_hex.special.cooldown_interval)
 					if ship_at_hex.secondary.name != 'None':
 						ship_at_hex.secondary.cooldown_current = min(ship_at_hex.secondary.cooldown_current + 5, ship_at_hex.secondary.cooldown_interval)
-					print('EW Strike affected ', ship_at_hex.ship_name)
 					struck_ships.append(ship_at_hex)
 
 		'Salvo':

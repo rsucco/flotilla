@@ -28,7 +28,7 @@ func init(orig, destination_hex, hidden_from = -1, starting_rotation = 0):
 	dest_hex = destination_hex
 	dest = to_local(get_parent().grid.get_hex_center(dest_hex[0], dest_hex[1]))
 	hidden_from_player = hidden_from
-	speed = 75
+	speed = 150
 	enroute = true
 	# Generate bubbles
 	bubbles = Particles2D.new()
