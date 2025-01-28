@@ -4,19 +4,12 @@
 [ext_resource path="res://ShipSelection.gd" type="Script" id=2]
 [ext_resource path="res://opensans.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://ships/sprites/preview/destroyer.png" type="Texture" id=4]
+[ext_resource path="res://gui/Popup.tres" type="StyleBox" id=5]
 [ext_resource path="res://ships/sprites/preview/submarine.png" type="Texture" id=6]
 [ext_resource path="res://ships/sprites/preview/battleship.png" type="Texture" id=7]
 [ext_resource path="res://ships/sprites/preview/supply_tender.png" type="Texture" id=8]
 [ext_resource path="res://ships/sprites/preview/cruiser.png" type="Texture" id=9]
 [ext_resource path="res://ships/sprites/preview/carrier.png" type="Texture" id=10]
-
-[sub_resource type="StyleBoxFlat" id=4]
-bg_color = Color( 0.0823529, 0.0823529, 0.0823529, 0.862745 )
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color( 0, 0, 0, 1 )
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 3 )
@@ -36,7 +29,7 @@ margin_left = 320.0
 margin_top = 200.0
 margin_right = -320.0
 margin_bottom = -231.0
-custom_styles/panel = SubResource( 4 )
+custom_styles/panel = ExtResource( 5 )
 popup_exclusive = true
 script = ExtResource( 2 )
 

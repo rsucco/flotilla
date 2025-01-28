@@ -11,6 +11,8 @@ var current_turn = 0
 var players = []
 var player_up = 0
 var mine_texture
+var turn_swap_dialog
+var swapping = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -21,6 +23,7 @@ func _ready():
 	font.font_data = load("res://opensans.ttf")
 	font.size = 11
 	mine_texture = load("res://ships/sprites/projectiles/mine.png")
+	turn_swap_dialog = preload('res://gui/LocalTurnSwap.tscn')
 	play_game()
 
 # Draw game board
@@ -71,12 +74,12 @@ func _draw():
 						color = PoolColorArray([Color(0.47, 0.27, 0.14)])
 					else:
 						color = PoolColorArray([Color(0.0, 0.26, 0.5)])
-			elif selected_center_hex == [x, y]:
+			elif selected_center_hex == [x, y] and not swapping:
 				if grid.grid[x][y].island:
 					color = PoolColorArray([Color(0.7, 0.42, 0.2)])
 				else:
 					color = PoolColorArray([Color(0.0, 0.3, 0.9)])
-			elif [x, y] in selected_hexes:
+			elif [x, y] in selected_hexes and not swapping:
 				color = PoolColorArray([Color(0.0, 0.4, 0.9)])
 			elif grid.grid[x][y].island:
 				color = PoolColorArray([Color(1.0, 0.67, 0.5)])
@@ -149,6 +152,13 @@ func play_game():
 		players[player_up].finish_turn()
 		# Next player
 		player_up = abs(player_up - 1)
+		# Wait for the hotseat players to swap seats
+		swapping = true
+		var swapper = turn_swap_dialog.instance()
+		add_child(swapper)
+		swapper.popup()
+		yield(swapper, 'swap_done')
+		swapping = false
 	# TODO: Make this pretty
 	if len(players[0].ships) > len(players[1].ships):
 		print('Player 1 wins!')

@@ -266,6 +266,9 @@ func place_ships(ship_counts):
 			ship.place()
 			yield(ship, 'placed')
 			ships.append(ship)
+	# Hide ships from the next player
+	for ship in ships:
+		ship.visible = false
 	emit_signal('ships_placed')
 
 func get_ship_selection():
@@ -285,12 +288,15 @@ func new_turn():
 	# Show our ships
 	for ship in ships:
 		ship.visible = true
-	# Hide opponent's ships
-	for other_ship in get_parent().players[abs(player_num - 1)].ships:
-		other_ship.visible = false
 	ships_with_moves = ships.duplicate()
 	select_ship(ships_with_moves[0])
 	on_hex_time = 0
+
+func finish_turn():
+	.finish_turn()
+	# Hide our ships
+	for ship in ships:
+		ship.visible = false
 
 func get_move():
 	aiming = {'fire': false, 'special': false, 'secondary': false, 'recon': false}

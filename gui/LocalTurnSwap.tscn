@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://gui/Popup.tres" type="StyleBox" id=1]
+[ext_resource path="res://gui/LocalTurnSwap.gd" type="Script" id=2]
+
+[node name="LocalTurnSwap" type="PopupPanel"]
+visible = true
+margin_left = 575.0
+margin_top = 300.0
+margin_right = 130.0
+margin_bottom = 70.0
+custom_styles/panel = ExtResource( 1 )
+popup_exclusive = true
+script = ExtResource( 2 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 98.0
+margin_bottom = 39.0
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_right = 97.0
+margin_bottom = 14.0
+text = "Switching turns"
+align = 1
+
+[node name="OK" type="Button" parent="VBoxContainer"]
+margin_top = 18.0
+margin_right = 97.0
+margin_bottom = 38.0
+text = "OK"
+
+[connection signal="pressed" from="VBoxContainer/OK" to="." method="_on_OK_pressed"]
+[connection signal="pressed" from="VBoxContainer/OK" to="." method="_on_Button_pressed"]
