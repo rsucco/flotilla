@@ -71,14 +71,6 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Passive Ability: Can use two attacks in one turn instead of moving
 - Drawbacks: If at least two hexes are damaged, can only use one attack move per turn
 
-### Release History
-##### 0.1.1 (25SEP2023):
-After taking a break for a while, I've been having fun coming back to this project. All the special/passive abilities are implemented and animated, and I'm pretty happy with how the game is looking so far. Next big step is to add audio and UI for actually starting/finishing a game, at which point hotseat multiplayer will be fully playable.
-
-##### 0.1.0 (10DEC2022):
-After a couple years of off-and-on planning, a couple months of trying to learn Godot, and a couple weeks of actual coding, the core game loop and the skeleton of the game are complete, and it's playable at the most basic level. Ship placement works and ships can move and fire, but I haven't yet implemented special abilities and most of the passive abilities/drawbacks. Graphical presentation is also pretty rough at this point, and there's no sound. I estimate that I'm at the point where I've done the 20% of the work that accounts for 80% of the completed game though, which is encouraging. Going forward, I plan to focus on graphics, polish, and information presentation to the players. Once the game is suitably polished I'll consider that an 0.2.0 release, then move forward with adding an AI player, then on to adding network multiplayer.
-
-### Credits
 ##### Graphics
 - [Antony Christian Sumakud](https://opengameart.org/content/sea-warfare-set-ships-and-more) (Public Domain)
 - [Hugo Locurcio](https://github.com/Calinou/kenney-particle-pack) (CC0 1.0)

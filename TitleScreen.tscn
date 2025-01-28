@@ -69,6 +69,7 @@ text = "Online Multiplayer"
 margin_top = 96.0
 margin_right = 138.0
 margin_bottom = 116.0
+disabled = true
 text = "Credits"
 
 [node name="Exit" type="Button" parent="TextureRect/PanelContainer/Buttons"]
@@ -78,3 +79,4 @@ margin_bottom = 140.0
 text = "Exit"
 
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Hotseat" to="." method="_on_Hotseat_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Exit" to="." method="_on_Exit_pressed"]

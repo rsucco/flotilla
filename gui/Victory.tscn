@@ -4,7 +4,6 @@
 [ext_resource path="res://gui/Victory.gd" type="Script" id=2]
 
 [node name="Victory" type="PopupPanel"]
-visible = true
 margin_left = 490.0
 margin_top = 300.0
 margin_right = 300.0

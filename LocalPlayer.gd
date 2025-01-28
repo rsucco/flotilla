@@ -259,13 +259,15 @@ func update_buttons(ship):
 		get_parent().gui.disable_button('Secondary')
 
 func place_ships(ship_counts):
-	for ship_type in ship_counts:
-		for i in range(ship_counts[ship_type]):
-			var ship = load('res://ships/' + ship_type + '.tscn').instance()
-			add_child(ship)
-			ship.place()
-			yield(ship, 'placed')
-			ships.append(ship)
+	# Need this check to prevent a hard crash when the game is closed in the middle of ship selection
+	if ship_counts != null:
+		for ship_type in ship_counts:
+			for i in range(ship_counts[ship_type]):
+				var ship = load('res://ships/' + ship_type + '.tscn').instance()
+				add_child(ship)
+				ship.place()
+				yield(ship, 'placed')
+				ships.append(ship)
 	# Hide ships from the next player
 	for ship in ships:
 		ship.visible = false
