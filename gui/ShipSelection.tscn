@@ -1,15 +1,15 @@
 [gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://font.tres" type="DynamicFont" id=1]
-[ext_resource path="res://ShipSelection.gd" type="Script" id=2]
+[ext_resource path="res://ships/sprites/preview/carrier.png" type="Texture" id=2]
 [ext_resource path="res://opensans.ttf" type="DynamicFontData" id=3]
-[ext_resource path="res://ships/sprites/preview/destroyer.png" type="Texture" id=4]
-[ext_resource path="res://gui/Popup.tres" type="StyleBox" id=5]
-[ext_resource path="res://ships/sprites/preview/submarine.png" type="Texture" id=6]
-[ext_resource path="res://ships/sprites/preview/battleship.png" type="Texture" id=7]
-[ext_resource path="res://ships/sprites/preview/supply_tender.png" type="Texture" id=8]
-[ext_resource path="res://ships/sprites/preview/cruiser.png" type="Texture" id=9]
-[ext_resource path="res://ships/sprites/preview/carrier.png" type="Texture" id=10]
+[ext_resource path="res://gui/ShipSelection.gd" type="Script" id=4]
+[ext_resource path="res://ships/sprites/preview/cruiser.png" type="Texture" id=5]
+[ext_resource path="res://ships/sprites/preview/battleship.png" type="Texture" id=6]
+[ext_resource path="res://ships/sprites/preview/supply_tender.png" type="Texture" id=7]
+[ext_resource path="res://ships/sprites/preview/submarine.png" type="Texture" id=8]
+[ext_resource path="res://ships/sprites/preview/destroyer.png" type="Texture" id=9]
+[ext_resource path="res://gui/Popup.tres" type="StyleBox" id=10]
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 3 )
@@ -29,9 +29,9 @@ margin_left = 320.0
 margin_top = 200.0
 margin_right = -320.0
 margin_bottom = -231.0
-custom_styles/panel = ExtResource( 5 )
+custom_styles/panel = ExtResource( 10 )
 popup_exclusive = true
-script = ExtResource( 2 )
+script = ExtResource( 4 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 1.0
@@ -148,7 +148,7 @@ margin_bottom = 37.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource( 4 )
+texture = ExtResource( 9 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Destroyer"]
@@ -190,7 +190,7 @@ margin_bottom = 35.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource( 9 )
+texture = ExtResource( 5 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Cruiser"]
@@ -232,7 +232,7 @@ margin_bottom = 35.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource( 6 )
+texture = ExtResource( 8 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Submarine"]
@@ -275,7 +275,7 @@ margin_bottom = 35.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource( 8 )
+texture = ExtResource( 7 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/SupplyTender"]
@@ -316,7 +316,7 @@ margin_bottom = 57.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource( 7 )
+texture = ExtResource( 6 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Battleship"]
@@ -358,7 +358,7 @@ margin_bottom = 57.0
 rect_pivot_offset = Vector2( 6, 22 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource( 10 )
+texture = ExtResource( 2 )
 stretch_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]

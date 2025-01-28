@@ -6,7 +6,6 @@ var font
 var grid
 var gui
 var selecting = true
-var ships = [[], []]
 var current_turn = 0
 var players = []
 var player_up = 0
@@ -137,6 +136,14 @@ func play_game():
 		# Increment turn counter at the start of player 1's turn
 		if player_up == 0:
 			current_turn += 1
+		# Wait for the hotseat players to swap seats, except on player 1's first turn
+		if current_turn != 1 or player_up == 1:
+			swapping = true
+			var swapper = turn_swap_dialog.instance()
+			add_child(swapper)
+			swapper.popup()
+			yield(swapper, 'swap_done')
+			swapping = false
 		gui.update_turn()
 		# Reset AP counts, decrement ability timers, etc.
 		players[player_up].new_turn()
@@ -150,21 +157,20 @@ func play_game():
 			# Make sure the player only receives signals from the buttons if it's their turn
 			players[player_up].disconnect_buttons()
 		players[player_up].finish_turn()
-		# Next player
-		player_up = abs(player_up - 1)
-		# Wait for the hotseat players to swap seats
-		swapping = true
-		var swapper = turn_swap_dialog.instance()
-		add_child(swapper)
-		swapper.popup()
-		yield(swapper, 'swap_done')
-		swapping = false
-	# TODO: Make this pretty
+		# Go to the next player if they have any ships remaining
+		if len(players[abs(player_up - 1)].ships) > 0:
+			player_up = abs(player_up - 1)
+
+	# Display victory screen
+	print(player_up)
+	var victory_dialog = preload('res://gui/Victory.tscn').instance()
 	if len(players[0].ships) > len(players[1].ships):
-		print('Player 1 wins!')
+		victory_dialog.update_winner('One')
 	else:
-		print('Player 2 wins!')
-	queue_free()
+		victory_dialog.update_winner('Two')
+	add_child(victory_dialog)
+	victory_dialog.popup()
+
 
 func get_ship_at_hex(x, y):
 	var all_ships = players[0].ships + players[1].ships

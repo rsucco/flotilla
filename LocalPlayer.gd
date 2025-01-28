@@ -272,7 +272,7 @@ func place_ships(ship_counts):
 	emit_signal('ships_placed')
 
 func get_ship_selection():
-	var select_dialog = preload('res://ShipSelection.tscn').instance()
+	var select_dialog = preload('res://gui/ShipSelection.tscn').instance()
 	select_dialog.get_node('VBoxContainer/Label').text = 'Player ' + str(player_num + 1) + ', choose your ships:'
 	var num_island_tiles = get_parent().grid.get_num_island_tiles(player_num)
 	select_dialog.get_node('VBoxContainer/SelectionGrid/CoastalBattery/CountSlider').max_value = num_island_tiles
