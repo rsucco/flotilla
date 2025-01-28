@@ -132,7 +132,7 @@ func receive_special(x, y, from_ship, secondary = false):
 			var checked_hexes = []
 			var dead_center = get_ship_at_hex(x, y)
 			if dead_center != null:
-				for hex in dead_center.get_occupied_hexes():s
+				for hex in dead_center.get_occupied_hexes():
 					checked_hexes.append(hex)
 				dead_center.sink()
 			for hex in affected_hexes:

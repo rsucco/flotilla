@@ -18,11 +18,6 @@ func _ready():
 	self.passive = PassiveAbility.new('Fortified', 'Must be hit five times to destroy')
 	self.drawback = Drawback.new('Stationary', 'Cannot move, reveals itself when firing')
 
-func _draw():
-	if get_parent().get_parent().current_turn != 0:
-		draw_string(get_parent().get_parent().font, \
-			Vector2(-8, -10), str(hp) + '/5', Color(0.0, 0.0, 0.0))
-
 # Drawback - Stationary
 # Coastal batteries can't move; always return false
 func can_move(reverse = false, distance = 1):
@@ -64,6 +59,8 @@ func fire(target_x, target_y):
 # Coastal batteries have 5 HP rather than a set number of hexes to be hit
 func hit(hit_hex, from_ship):
 	hp -= 1
+	var hp_bar = get_node('HPBar')
+	hp_bar.value = hp
 	root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
 	[root.current_turn, 'Hit, Coastal Battery (' + str(hp) + 'HP)'])
 	if hp == 0:
