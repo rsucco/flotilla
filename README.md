@@ -85,3 +85,4 @@ After a couple years of off-and-on planning, a couple months of trying to learn 
 - [sbed](https://opengameart.org/content/95-game-icons) (CC BY 3.0)
 - [Lorc](https://lorcblog.blogspot.com/) (CC BY 3.0)
 - [Delapouite](https://delapouite.com/) (CC BY 3.0)
+- [Japan Maritime Self-Defense Force](https://www.mod.go.jp/msdf/) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
