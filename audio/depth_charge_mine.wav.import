@@ -1,0 +1,23 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/depth_charge_mine.wav-620de28a9afdc5891fe1c89af24febbd.sample"
+
+[deps]
+
+source_file="res://audio/depth_charge_mine.wav"
+dest_files=[ "res://.import/depth_charge_mine.wav-620de28a9afdc5891fe1c89af24febbd.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

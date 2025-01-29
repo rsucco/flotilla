@@ -71,10 +71,29 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Passive Ability: Can use two attacks in one turn instead of moving
 - Drawbacks: If at least two hexes are damaged, can only use one attack move per turn
 
-##### Graphics
-- [Antony Christian Sumakud](https://opengameart.org/content/sea-warfare-set-ships-and-more) (Public Domain)
-- [Hugo Locurcio](https://github.com/Calinou/kenney-particle-pack) (CC0 1.0)
-- [sbed](https://opengameart.org/content/95-game-icons) (CC BY 3.0)
-- [Lorc](https://lorcblog.blogspot.com/) (CC BY 3.0)
-- [Delapouite](https://delapouite.com/) (CC BY 3.0)
+##### Credits
+
+###### Graphics
+- [Antony Christian Sumakud](https://opengameart.org/content/sea-warfare-set-ships-and-more) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Hugo Locurcio](https://github.com/Calinou/kenney-particle-pack) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [sbed](https://opengameart.org/content/95-game-icons) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
+- [Lorc](https://lorcblog.blogspot.com/) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
+- [Delapouite](https://delapouite.com/) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
 - [Japan Maritime Self-Defense Force](https://www.mod.go.jp/msdf/) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
+- Ryan Succo
+
+###### Sound
+- [Iwan Gabovitch](https://opengameart.org/content/tiny-naval-battle-sounds-set) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [yd](https://opengameart.org/content/war-on-water-sndfx) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Kenney](https://www.kenney.nl/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [BananaMilkshake](https://freesound.org/s/632703/) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
+- [SamsterBirdies](https://www.samsterbirdies.com/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Jason Lee](https://freesound.org/people/jasonlee3071/sounds/624588/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Benboncan](https://freesound.org/people/Benboncan/sounds/61304/?) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
+- [Sheyvan](https://freesound.org/people/Sheyvan/packs/26842/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Thimras](https://opengameart.org/content/ship-sinking) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [David Dumais](https://pixabay.com/sound-effects/large-underwater-explosion-190270/) [Pixabay Content License](https://pixabay.com/service/license-summary/)
+- [DeevDaRabbit](https://freesound.org/people/DeevDaRabbit/sounds/636717/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+
+###### Programming
+- Ryan Succo

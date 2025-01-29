@@ -6,6 +6,7 @@ signal placed
 signal fire_animation_complete
 signal special_animation_complete
 
+var hit_sound = preload('res://audio/water_hit1.wav')
 const SHIP_TYPES = ['coastal_battery', 'corvette', 'destroyer', 'submarine', 'cruiser', 'supply_tender', 'battleship', 'carrier']
 var direction = 0
 var root
@@ -95,6 +96,7 @@ func place():
 
 func hit(hit_hex, from_ship):
 	var hit_hex_index = self.get_occupied_hexes().find(hit_hex)
+	# Don't count hits on already hit hexes (maybe rework this if it's unfun)
 	if hit_hexes[hit_hex_index]:
 		root.grid.grid[hit_hex[0]][hit_hex[1]].history.append(
 			[root.current_turn, 'Hit, ' + ship_name + ' (No effect)'])
@@ -132,6 +134,14 @@ func hit(hit_hex, from_ship):
 		add_child(smoke)
 		if not false in hit_hexes:
 			self.sink()
+		else:
+			# Play hit sound
+			var audio_player = AudioStreamPlayer2D.new()
+			add_child(audio_player)
+			audio_player.stream = hit_sound
+			audio_player.play()
+			yield(audio_player, 'finished')
+			audio_player.queue_free()
 
 func sink():
 	for hex in get_occupied_hexes():

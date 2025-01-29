@@ -3,6 +3,7 @@ extends Ship
 class_name Corvette
 
 const projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
+const fire_sound = preload('res://audio/corvette.wav')
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -57,10 +58,16 @@ func fire(target_x, target_y):
 	add_child(tween)
 	tween.start()
 	yield(tween, 'tween_completed')
+	# Fire projectile
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = fire_sound
+	audio_player.play()
 	var projectile = projectile_node.instance()
 	projectile.scale = Vector2(0.5, 0.5)
 	root.add_child(projectile)
 	projectile.init(turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), [target_x, target_y], abs(get_parent().player_num - 1))
 	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
-	emit_signal('fire_animation_complete')
+	yield(audio_player, 'finished')
+	audio_player.queue_free()
