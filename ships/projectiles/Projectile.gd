@@ -44,12 +44,13 @@ func explode(pos = null):
 	var last_event = get_parent().grid.grid[dest_hex[0]][dest_hex[1]].get_last_event()
 	var on_island = get_parent().grid.grid[dest_hex[0]][dest_hex[1]].island
 	if last_event != null:
-		if last_event[1] in ['Hit', 'Sunk']:
-			boom(pos, false)
-		elif on_island:
-			boom(pos, true)
-	else:
-		splash(pos)
+		if on_island:
+			if last_event[1] in ['Hit', 'Sunk']:
+				boom(pos, false)
+			else:
+				boom(pos, true)
+		else:
+			splash(pos)
 
 func boom(pos, land_miss = false):
 	var audio_player = AudioStreamPlayer2D.new()

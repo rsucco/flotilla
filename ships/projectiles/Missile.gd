@@ -50,7 +50,7 @@ func init(orig, dest_hex, hidden_from = -1, starting_rotation = 0, instafire = f
 		t.start()
 		yield(t, "timeout")
 		var tween = Tween.new()
-		tween.interpolate_property(self, 'global_rotation_degrees', global_rotation_degrees, position.angle_to_point(dest) * 180 / PI, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+		tween.interpolate_property(self, 'global_rotation_degrees', global_rotation_degrees, position.angle_to_point(dest) * 180 / PI, 0.5, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 		add_child(tween)
 		tween.start()
 		yield(tween, 'tween_completed')
