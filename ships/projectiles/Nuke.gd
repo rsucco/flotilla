@@ -1,12 +1,18 @@
 extends Missile
 
+const nuke_sound = preload('res://audio/nuke.wav')
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	self.rotate_sound = preload('res://audio/torpedo.wav')
 
 
 func explode(pos = null):
+	# Play sound
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = nuke_sound
+	audio_player.play()
 	fire.queue_free()
 	position = dest
 	texture = null
@@ -66,4 +72,6 @@ func explode(pos = null):
 	fire.queue_free()
 	smoke.queue_free()
 	flash.queue_free()
+	yield(audio_player, 'finished')
+	audio_player.queue_free()
 	emit_signal('explosion_done')

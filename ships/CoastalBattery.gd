@@ -3,7 +3,7 @@ extends Ship
 class_name CoastalBattery
 
 const projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
-const fire_sound = preload('res://audio/battleship.wav')
+
 const turret_sound = preload('res://audio/artillery_rotate.wav')
 var hp
 
@@ -20,6 +20,7 @@ func _ready():
 	self.passive = PassiveAbility.new('Fortified', 'Must be hit five times to destroy')
 	self.drawback = Drawback.new('Stationary', 'Cannot move, reveals itself when firing')
 	self.hit_sound = preload('res://audio/land_hit.wav')
+	self.sink_sound = preload('res://audio/battery_destroyed.wav')
 
 # Drawback - Stationary
 # Coastal batteries can't move; always return false
@@ -58,16 +59,12 @@ func fire(target_x, target_y):
 	tween.start()
 	yield(tween, 'tween_completed')
 	# Stop rotation sound and play fire sound
-	audio_player.stop()
-	audio_player.stream = fire_sound
-	audio_player.play()
+	audio_player.queue_free()
 	var projectile = projectile_node.instance()
 	root.add_child(projectile)
 	projectile.init(turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), [target_x, target_y], abs(get_parent().player_num - 1))
 	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
-	yield(audio_player, 'finished')
-	audio_player.queue_free()
 
 
 # Coastal batteries have 5 HP rather than a set number of hexes to be hit

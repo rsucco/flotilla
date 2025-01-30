@@ -18,6 +18,7 @@ func _ready():
 	'Select a hex on opponent\'s board; if the hex or any of its direct neighbors contacts an enemy submarine, sink it instantly (does not affect ships)', 1)
 	self.secondary = SpecialAbility.new(5, 'Lay Mine', 'Select a hex on opponent\'s board to place a mine; if any ships move over that tile, they will take a hit in a random hex', 0)
 	self.sh60 = $SH60
+	self.move_sound = preload('res://audio/smallship.ogg')
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
@@ -37,5 +38,5 @@ func use_special(target_x, target_y):
 func use_secondary(target_x, target_y):
 	.use_secondary(target_x, target_y)
 	sh60.mine(target_x, target_y)
-	yield(sh60, 'done')
+	yield(sh60, 'landed')
 	emit_signal('special_animation_complete')

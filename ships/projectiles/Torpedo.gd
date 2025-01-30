@@ -5,6 +5,7 @@ var path
 var path_follow
 var sprite
 var enroute = false
+const fire_sound = preload('res://audio/torpedo.wav')
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -23,6 +24,11 @@ func _process(delta):
 		queue_free()
 
 func init(orig, destination_hex, hidden_from = -1, starting_rotation = 0):
+	# Play sound
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = fire_sound
+	audio_player.play()
 	rotation = starting_rotation
 	global_position = orig
 	dest_hex = destination_hex

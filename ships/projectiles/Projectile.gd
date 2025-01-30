@@ -10,6 +10,8 @@ var dest_hex
 var hidden_from_player
 var speed = 0
 var moving = false
+const water_miss_sound = preload('res://audio/water_miss.wav')
+const land_miss_sound = preload('res://audio/land_miss.wav')
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -40,13 +42,21 @@ func explode(pos = null):
 		pos = position
 	texture = null
 	var last_event = get_parent().grid.grid[dest_hex[0]][dest_hex[1]].get_last_event()
-	if last_event != null and last_event[1] in ['Hit', 'Sunk'] or \
-	get_parent().grid.grid[dest_hex[0]][dest_hex[1]].island:
-		boom(pos)
+	var on_island = get_parent().grid.grid[dest_hex[0]][dest_hex[1]].island
+	if last_event != null:
+		if last_event[1] in ['Hit', 'Sunk']:
+			boom(pos, false)
+		elif on_island:
+			boom(pos, true)
 	else:
 		splash(pos)
 
-func boom(pos):
+func boom(pos, land_miss = false):
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = land_miss_sound
+	if land_miss:
+		audio_player.play()
 	var fire = Particles2D.new()
 	var fire_material = ParticlesMaterial.new()
 	fire_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_POINT
@@ -91,8 +101,15 @@ func boom(pos):
 	fire.queue_free()
 	smoke.queue_free()
 	emit_signal('explosion_done')
+	if land_miss:
+		yield(audio_player, 'finished')
+	audio_player.queue_free()
 
 func splash(pos):
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = water_miss_sound
+	audio_player.play()
 	var ripples = Particles2D.new()
 	var ripples_material = ParticlesMaterial.new()
 	ripples_material.emission_shape = ParticlesMaterial.EMISSION_SHAPE_RING
@@ -119,3 +136,5 @@ func splash(pos):
 	yield(t, "timeout")
 	ripples.queue_free()
 	emit_signal('explosion_done')
+	yield(audio_player, 'finished')
+	audio_player.queue_free()

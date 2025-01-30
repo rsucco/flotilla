@@ -4,8 +4,13 @@ extends Projectile
 func _ready():
 	pass # Replace with function body.
 
-func init(orig, dest_hex, hidden_from = -1):
+func init(orig, dest_hex, hidden_from = -1, fire_sound = preload('res://audio/battleship.wav')):
 	.init(orig, dest_hex, hidden_from)
+	# Play sound
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = fire_sound
+	audio_player.play()
 	speed = 400
 	var fire = Particles2D.new()
 	var fire_material = ParticlesMaterial.new()

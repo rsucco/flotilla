@@ -7,6 +7,7 @@ signal fire_animation_complete
 signal special_animation_complete
 
 var hit_sound = preload('res://audio/water_hit1.wav')
+var sink_sound = preload('res://audio/ship_destroyed.wav')
 const SHIP_TYPES = ['coastal_battery', 'corvette', 'destroyer', 'submarine', 'cruiser', 'supply_tender', 'battleship', 'carrier']
 var direction = 0
 var root
@@ -28,6 +29,7 @@ var drawback = Drawback.new()
 var selected = false
 var placing = false
 var fire_remaining = 0
+var move_sound
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -144,13 +146,23 @@ func hit(hit_hex, from_ship):
 			audio_player.queue_free()
 
 func sink():
+	# Play sink sound
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = sink_sound
+	audio_player.play()
 	for hex in get_occupied_hexes():
 		root.grid.grid[hex[0]][hex[1]].history.append([root.current_turn, 'Sunk, ' + ship_name])
 	get_parent().ships.remove(get_parent().ships.find(self))
 	root.gui.update_fleets()
+	yield(audio_player, 'finished')
 	queue_free()
 
 func rotate(rotation_offset):
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = move_sound
+	audio_player.play()
 	var rotated_hexes = get_occupied_hexes(self.x, self.y, self.direction + rotation_offset)
 	var any_land = false
 	var already_occupied = false
@@ -166,6 +178,8 @@ func rotate(rotation_offset):
 		tween.interpolate_property(self, 'rotation_degrees', self.rotation_degrees, self.direction, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 		add_child(tween)
 		tween.start()
+		yield(tween, 'tween_completed')
+		audio_player.queue_free()
 
 func is_hex_hit(hex):
 	return hit_hexes[self.get_occupied_hexes().find(hex)]
@@ -241,6 +255,10 @@ func can_secondary():
 		return true
 
 func forward():
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = move_sound
+	audio_player.play()
 	var new_hex = root.grid.get_hex_neighbor(x, y, direction)
 	self.x = new_hex[0]
 	self.y = new_hex[1]
@@ -250,8 +268,14 @@ func forward():
 	add_child(tween)
 	tween.start()
 	check_for_mine()
+	yield(tween, 'tween_completed')
+	audio_player.queue_free()
 
 func reverse():
+	var audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = move_sound
+	audio_player.play()
 	var new_hex = root.grid.get_hex_neighbor(x, y, direction + 180)
 	self.x = new_hex[0]
 	self.y = new_hex[1]
@@ -261,6 +285,8 @@ func reverse():
 	add_child(tween)
 	tween.start()
 	check_for_mine()
+	yield(tween, 'tween_completed')
+	audio_player.queue_free()
 
 func port():
 	rotate(-60)

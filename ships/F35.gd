@@ -3,6 +3,8 @@ extends Node2D
 signal done
 
 const projectile_node = preload('res://ships/projectiles/Missile.tscn')
+const jet_sound = preload('res://audio/f35.ogg')
+const recon_sound = preload('res://audio/recon.wav')
 var speed = 0
 var flying = false
 var bombing = false
@@ -13,12 +15,21 @@ var dest = null
 var path
 var path_follow
 var sprite
-
+var audio_player
+var recon_audio_player
+	
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	path = $Path2D
 	path_follow = $Path2D/PathFollow2D
 	sprite = $Path2D/PathFollow2D/Sprite
+	audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = jet_sound
+	recon_audio_player = AudioStreamPlayer2D.new()
+	add_child(recon_audio_player)
+	recon_audio_player.stream = recon_sound
+
 
 func fly_to(target_x, target_y, hidden_from = -1, target_x2 = null, target_y2 = null):
 	hidden_from_player = hidden_from
@@ -51,6 +62,8 @@ func fly_to(target_x, target_y, hidden_from = -1, target_x2 = null, target_y2 = 
 	# following the path, but I'm sleepy and this fixes it
 	sprite.rotation_degrees = 90
 	sprite.z_index = 1
+	# Play sound
+	audio_player.play()
 	flying = true
 
 func bomb(target_x, target_y, hidden_from = -1):
@@ -84,6 +97,9 @@ func recon(target_x, target_y, hidden_from = -1):
 func _process(delta):
 	if flying:
 		path_follow.offset += speed * delta
+		# Start playing camera sounds when beginning a recon path
+		if reconning and path_follow.position.distance_to(dest) < 100 and not recon_audio_player.playing:
+			recon_audio_player.play()
 		if path_follow.position.distance_to(dest) < 70:
 			if bombing:
 				var projectile = projectile_node.instance()
@@ -98,4 +114,5 @@ func _process(delta):
 
 		if path_follow.offset >= path.curve.get_baked_length():
 			flying = false
+			audio_player.stop()
 			path_follow.offset = 0

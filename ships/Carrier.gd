@@ -16,6 +16,7 @@ func _ready():
 	self.passive = PassiveAbility.new('Flight Ops', 'Can take two attack moves in one turn instead of moving')
 	self.drawback = Drawback.new('Degraded Runway', 'If two or more hexes are damaged, can only take one attack move')
 	self.f35 = $F35
+	self.move_sound = preload('res://audio/bigship.ogg')
 
 # Override to implement passive ability and drawback
 func new_turn():

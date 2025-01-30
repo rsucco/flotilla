@@ -1,11 +1,14 @@
 extends Node2D
 
 signal done
+signal landed
 
 const speed = 150
 const idle_rotor_speed = 3
 const flying_rotor_speed = 35
 const projectile_node = preload('res://ships/projectiles/Projectile.tscn')
+const rotor_sound = preload('res://audio/seahawk.wav')
+const drop_sound = preload('res://audio/depth_charge_mine.wav')
 
 var path
 var path_follow
@@ -19,6 +22,7 @@ var hidden_from_player
 var target_hex
 var start_point
 var dest
+var audio_player
 
 func _ready():
 	path = $Path2D
@@ -26,6 +30,9 @@ func _ready():
 	chassis = $Path2D/PathFollow2D/Chassis
 	rotor = $Path2D/PathFollow2D/Chassis/Rotor
 	rotor_speed = idle_rotor_speed
+	audio_player = AudioStreamPlayer2D.new()
+	add_child(audio_player)
+	audio_player.stream = rotor_sound
 
 func _process(delta):
 	if flying:
@@ -44,9 +51,15 @@ func _process(delta):
 				get_parent().root.add_child(projectile)
 				projectile.init(path_follow.global_position, target_hex, -1)
 				yield(projectile, 'done')
+			var drop_audio_player = AudioStreamPlayer2D.new()
+			add_child(drop_audio_player)
+			drop_audio_player.stream = drop_sound
+			drop_audio_player.play()
 			bombing = false
 			mining = false
 			emit_signal('done')
+			yield(drop_audio_player, 'finished')
+			drop_audio_player.queue_free()
 		if path_follow.offset >= path.curve.get_baked_length():
 			path_follow.offset = 0
 			flying = false
@@ -58,6 +71,12 @@ func _process(delta):
 		# Spin down rotors
 		if rotor_speed > idle_rotor_speed:
 			rotor_speed -= delta * 15
+			audio_player.volume_db -= 0.05
+		# Stop sound once rotors are stopped
+		else:
+			if audio_player.playing:
+				audio_player.stop()
+				emit_signal('landed')
 	rotor.rotation += rotor_speed * delta
 
 func fly_to(target_x, target_y, hidden_from = -1):
@@ -71,6 +90,9 @@ func fly_to(target_x, target_y, hidden_from = -1):
 	path.curve = flight_curve
 	path_follow.offset = 0
 	chassis.z_index = 1
+	# Play sound
+	audio_player.volume_db = 0.0
+	audio_player.play()
 	var tween = Tween.new()
 	tween.interpolate_property(chassis, 'rotation', chassis.rotation, position.angle_to_point(dest) - PI/2, 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 	add_child(tween)

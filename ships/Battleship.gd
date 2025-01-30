@@ -5,7 +5,6 @@ class_name Battleship
 signal turrets_pointed
 
 const projectile_node = preload('res://ships/projectiles/BattleshipProjectile.tscn')
-const fire_sound = preload('res://audio/battleship.wav')
 const turret_sound = preload('res://audio/artillery_rotate.wav')
 const armor_sound = preload('res://audio/plink.wav')
 var turret_up = 0
@@ -21,16 +20,12 @@ func _ready():
 	self.special = SpecialAbility.new(7, 'Salvo', 
 	'Shoot one central hex and damage whatever it contains as well as all of its immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly', 1)
 	self.passive = PassiveAbility.new('Armor', 'Armor grants 25% chance of hits not counting')
+	self.move_sound = preload('res://audio/bigship.ogg')
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
 	point_turrets(target_x, target_y)
 	yield(self, 'turrets_pointed')
-	# Play sound
-	var audio_player = AudioStreamPlayer2D.new()
-	add_child(audio_player)
-	audio_player.stream = fire_sound
-	audio_player.play()
 	var projectile = projectile_node.instance()
 	var turret = get_node('Turret' + str(turret_up))
 	turret_up += 1
@@ -40,8 +35,6 @@ func fire(target_x, target_y):
 	projectile.init(turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), [target_x, target_y], abs(get_parent().player_num - 1))
 	yield(projectile, 'done')
 	emit_signal('fire_animation_complete')
-	yield(audio_player, 'finished')
-	audio_player.queue_free()
 
 func hit(hit_hex, from_ship):
 	randomize()
@@ -69,17 +62,10 @@ func use_special(target_x, target_y):
 	# so add it to the beginning and end of the array
 	target_hexes.append([target_x, target_y])
 	target_hexes.push_front([target_x, target_y])
-	var audio_players = []
 	# Divert shots to center hex if they'd otherwise go out of bounds
 	while len(target_hexes) < 8:
 		target_hexes.append([target_x, target_y])
 	for i in range(0, 8, 2):
-		# Play sound
-		var audio_player = AudioStreamPlayer2D.new()
-		add_child(audio_player)
-		audio_players.append(audio_player)
-		audio_player.stream = fire_sound
-		audio_player.play()
 		var turret = get_node('Turret' + str(i / 2))
 		var projectile1 = projectile_node.instance()
 		root.add_child(projectile1)
@@ -97,10 +83,6 @@ func use_special(target_x, target_y):
 		if i == 6:
 			yield(projectile2, 'done')
 	emit_signal('special_animation_complete')
-	# Clean up audio players
-	yield(audio_players[-1], 'finished')
-	for audio_player in audio_players:
-		audio_player.queue_free()
 
 func point_turrets(target_x, target_y):
 	# Play sound
