@@ -4,7 +4,6 @@
 [ext_resource path="res://gui/LocalTurnSwap.gd" type="Script" id=2]
 
 [node name="LocalTurnSwap" type="PopupPanel"]
-visible = true
 margin_left = 570.0
 margin_top = 300.0
 margin_right = 680.0

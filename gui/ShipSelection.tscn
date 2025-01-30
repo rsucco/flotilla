@@ -23,7 +23,6 @@ flags = 4
 load_path = "res://.import/corvette.png-b4ec457647882e4d8e441a3477e23d4d.stex"
 
 [node name="ShipSelection" type="PopupPanel"]
-visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 320.0

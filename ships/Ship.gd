@@ -32,6 +32,7 @@ var fire_remaining = 0
 var move_sound
 var movement_audio_player
 var moves_queued = 0
+var revealed_buddy = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -151,6 +152,8 @@ func hit(hit_hex, from_ship):
 			audio_player.queue_free()
 
 func sink():
+	if revealed_buddy != null and is_instance_valid(revealed_buddy):
+		revealed_buddy.queue_free()
 	# Play sink sound
 	var audio_player = AudioStreamPlayer2D.new()
 	add_child(audio_player)

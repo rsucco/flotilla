@@ -41,7 +41,8 @@ func new_turn():
 # End of turn cleanup
 func finish_turn():
 	for revealed_ship in temp_revealed_ships:
-		revealed_ship.queue_free()
+		if is_instance_valid(revealed_ship):
+			revealed_ship.queue_free()
 	temp_revealed_ships = []
 	selected_ship = null
 
@@ -121,7 +122,9 @@ func receive_special(x, y, from_ship, secondary = false):
 
 		'Sonar Pulse':
 			# Sonar Pulse reveals all ships around a hex and its direct neighbors and also reveals the submarine
-			temp_revealed_ships.append(from_ship.duplicate())
+			var revealed_ship = from_ship.duplicate()
+			temp_revealed_ships.append(revealed_ship)
+			from_ship.revealed_buddy = revealed_ship
 			for sub_hex in from_ship.get_occupied_hexes():
 				get_parent().grid.grid[sub_hex[0]][sub_hex[1]].history.append([get_parent().current_turn, 'Submarine used Sonar Pulse'])
 			var revealed_ships = []
