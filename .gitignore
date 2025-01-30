@@ -2,6 +2,6 @@
 .import/
 export.cfg
 export_presets.cfg
-Flotilla.exe
-Flotilla.x86_64
-Flotilla.dmg
+Flotilla_Linux.x86_64
+Flotilla_Windows.exe
+Flotilla_macOS.zip
