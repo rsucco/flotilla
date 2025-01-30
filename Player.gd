@@ -43,6 +43,7 @@ func finish_turn():
 	for revealed_ship in temp_revealed_ships:
 		revealed_ship.queue_free()
 	temp_revealed_ships = []
+	selected_ship = null
 
 func hide_ships():
 	pass

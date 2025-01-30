@@ -168,6 +168,8 @@ func sink():
 	get_parent().ships.remove(get_parent().ships.find(self))
 	root.gui.update_fleets()
 	yield(tween, 'tween_completed')
+	visible = false
+	yield(audio_player, 'finished')
 	queue_free()
 
 func rotate(rotation_offset):

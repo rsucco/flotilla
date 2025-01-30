@@ -22,7 +22,7 @@ var selected_count = {
 	'SupplyTender': 0,
 	'Battleship': 0,
 	'Carrier': 0
-	}
+}
 
 var island_tiles = 0
 
@@ -42,7 +42,7 @@ func _on_CountSlider_value_changed(value):
 	for ship_type in selected_count.keys():
 		var already_spent_points = selected_count[ship_type] * point_values[ship_type]
 		var max_slider_value = int((points_budget - used_points + already_spent_points) / point_values[ship_type])
-		if ship_type == 'CoastalBattery':
+		if ship_type == 'Coastal Battery':
 			max_slider_value = min(max_slider_value, island_tiles)
 		var slider_value = min(max_slider_value, 5)
 		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/CountSlider').max_value = slider_value
@@ -53,9 +53,14 @@ func _on_CountSlider_value_changed(value):
 	
 func _on_Reset_pressed():
 	for ship_type in selected_count.keys():
+		var written_ship_type
+		if ship_type == 'CoastalBattery':
+			written_ship_type = 'Coastal Battery'
+		else:
+			written_ship_type = ship_type
 		selected_count[ship_type] = 0
 		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/CountSlider').value = 0
-		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/Label').text += ' (' + str(point_values[ship_type]) + ' Points)'
+		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/Label').text = written_ship_type + ' (' + str(point_values[ship_type]) + ' Points)'
 		get_node('VBoxContainer/SelectionGrid/Points/PointsUsed').text = '0/' + str(points_budget)
 
 func _on_OK_pressed():
@@ -66,3 +71,11 @@ func set_island_tiles(num_tiles):
 	island_tiles = num_tiles
 	get_node('VBoxContainer/SelectionGrid/CoastalBattery/CountSlider').max_value = island_tiles
 	get_node('VBoxContainer/SelectionGrid/CoastalBattery/CountSlider').tick_count = island_tiles + 1
+
+
+func _on_Classic_pressed():
+	# Reset them to 0 before setting them to 1, otherwise the value_changed signal gets confused
+	for ship_type in selected_count.keys():
+		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/CountSlider').value = 0
+	for ship_type in selected_count.keys():
+		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/CountSlider').value = 1
