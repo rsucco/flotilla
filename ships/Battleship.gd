@@ -17,7 +17,7 @@ func _ready():
 	self.hit_hexes = [false, false, false, false]
 	self.ship_name = 'Battleship'
 	self.weapon = 'Big Gun'
-	self.special = SpecialAbility.new(7, 'Salvo', 
+	self.special = SpecialAbility.new(2, 'Salvo', 
 	'Shoot one central hex and damage whatever it contains as well as all of its immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly', 1)
 	self.passive = PassiveAbility.new('Armor', 'Armor grants 25% chance of hits not counting')
 	self.move_sound = preload('res://audio/bigship.ogg')
