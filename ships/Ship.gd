@@ -156,11 +156,18 @@ func sink():
 	add_child(audio_player)
 	audio_player.stream = sink_sound
 	audio_player.play()
+	# Play sink animation
+	# Make visible to opponent
+	visible = true
+	var tween = Tween.new()
+	tween.interpolate_property(self, 'modulate', Color(1.0, 1.0, 1.0), Color(0.0, 0.5, 0.62, 0.5), 3.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+	add_child(tween)
+	tween.start()
 	for hex in get_occupied_hexes():
 		root.grid.grid[hex[0]][hex[1]].history.append([root.current_turn, 'Sunk, ' + ship_name])
 	get_parent().ships.remove(get_parent().ships.find(self))
 	root.gui.update_fleets()
-	yield(audio_player, 'finished')
+	yield(tween, 'tween_completed')
 	queue_free()
 
 func rotate(rotation_offset):
