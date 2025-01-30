@@ -30,10 +30,14 @@ var selected = false
 var placing = false
 var fire_remaining = 0
 var move_sound
+var movement_audio_player
+var moves_queued = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	root = get_parent().get_parent()
+	movement_audio_player = AudioStreamPlayer2D.new()
+	add_child(movement_audio_player)
 
 func set_grid_position(x, y, direction):
 	self.direction = direction
@@ -94,6 +98,7 @@ func new_turn():
 		secondary.cooldown_current -= 1
 
 func place():
+	movement_audio_player.stream = move_sound
 	placing = true
 
 func hit(hit_hex, from_ship):
@@ -159,10 +164,9 @@ func sink():
 	queue_free()
 
 func rotate(rotation_offset):
-	var audio_player = AudioStreamPlayer2D.new()
-	add_child(audio_player)
-	audio_player.stream = move_sound
-	audio_player.play()
+	moves_queued += 1
+	if not movement_audio_player.playing:
+		movement_audio_player.play()
 	var rotated_hexes = get_occupied_hexes(self.x, self.y, self.direction + rotation_offset)
 	var any_land = false
 	var already_occupied = false
@@ -179,7 +183,9 @@ func rotate(rotation_offset):
 		add_child(tween)
 		tween.start()
 		yield(tween, 'tween_completed')
-		audio_player.queue_free()
+		moves_queued -= 1
+		if moves_queued == 0:
+			movement_audio_player.stop()
 
 func is_hex_hit(hex):
 	return hit_hexes[self.get_occupied_hexes().find(hex)]
@@ -255,38 +261,40 @@ func can_secondary():
 		return true
 
 func forward():
-	var audio_player = AudioStreamPlayer2D.new()
-	add_child(audio_player)
-	audio_player.stream = move_sound
-	audio_player.play()
+	moves_queued += 1
+	if not movement_audio_player.playing:
+		movement_audio_player.play()
 	var new_hex = root.grid.get_hex_neighbor(x, y, direction)
 	self.x = new_hex[0]
 	self.y = new_hex[1]
 	self.ap -= 1
 	var tween = Tween.new()
-	tween.interpolate_property(self, 'position', position, root.grid.get_hex_center(self.x, self.y), 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+	tween.interpolate_property(self, 'position', position, root.grid.get_hex_center(self.x, self.y), 1.5, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 	add_child(tween)
 	tween.start()
 	check_for_mine()
 	yield(tween, 'tween_completed')
-	audio_player.queue_free()
+	moves_queued -= 1
+	if moves_queued == 0:
+		movement_audio_player.stop()
 
 func reverse():
-	var audio_player = AudioStreamPlayer2D.new()
-	add_child(audio_player)
-	audio_player.stream = move_sound
-	audio_player.play()
+	moves_queued += 1
+	if not movement_audio_player.playing:
+		movement_audio_player.play()
 	var new_hex = root.grid.get_hex_neighbor(x, y, direction + 180)
 	self.x = new_hex[0]
 	self.y = new_hex[1]
 	self.ap -= 4
 	var tween = Tween.new()
-	tween.interpolate_property(self, 'position', position, root.grid.get_hex_center(self.x, self.y), 1.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
+	tween.interpolate_property(self, 'position', position, root.grid.get_hex_center(self.x, self.y), 2.0, Tween.TRANS_SINE, Tween.EASE_IN_OUT)
 	add_child(tween)
 	tween.start()
 	check_for_mine()
 	yield(tween, 'tween_completed')
-	audio_player.queue_free()
+	moves_queued -= 1
+	if moves_queued == 0:
+		movement_audio_player.stop()
 
 func port():
 	rotate(-60)
