@@ -95,5 +95,9 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - [David Dumais](https://pixabay.com/sound-effects/large-underwater-explosion-190270/) [Pixabay Content License](https://pixabay.com/service/license-summary/)
 - [DeevDaRabbit](https://freesound.org/people/DeevDaRabbit/sounds/636717/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
 
+###### Music
+- [Matthew Pablo](https://opengameart.org/content/blackmoor-tides-epic-pirate-battle-theme) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
+- [yd](https://opengameart.org/content/enemy-ship-approaching) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+
 ###### Programming
 - Ryan Succo
