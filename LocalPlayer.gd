@@ -276,9 +276,7 @@ func place_ships(ship_counts):
 func get_ship_selection():
 	var select_dialog = preload('res://gui/ShipSelection.tscn').instance()
 	select_dialog.get_node('VBoxContainer/Label').text = 'Player ' + str(player_num + 1) + ', choose your ships:'
-	var num_island_tiles = get_parent().grid.get_num_island_tiles(player_num)
-	select_dialog.get_node('VBoxContainer/SelectionGrid/CoastalBattery/CountSlider').max_value = num_island_tiles
-	select_dialog.get_node('VBoxContainer/SelectionGrid/CoastalBattery/CountSlider').tick_count = num_island_tiles + 1
+	select_dialog.set_island_tiles(get_parent().grid.get_num_island_tiles(player_num))
 	add_child(select_dialog)
 	select_dialog.popup()
 	yield(select_dialog, 'popup_hide')

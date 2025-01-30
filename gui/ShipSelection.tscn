@@ -87,7 +87,7 @@ ticks_on_borders = true
 margin_top = 79.0
 margin_right = 210.0
 margin_bottom = 93.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Corvette" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -130,7 +130,7 @@ ticks_on_borders = true
 margin_top = 79.0
 margin_right = 210.0
 margin_bottom = 93.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Destroyer" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -172,7 +172,7 @@ ticks_on_borders = true
 margin_top = 79.0
 margin_right = 210.0
 margin_bottom = 93.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Cruiser" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -214,7 +214,7 @@ ticks_on_borders = true
 margin_top = 77.0
 margin_right = 210.0
 margin_bottom = 91.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Submarine" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -256,7 +256,7 @@ ticks_on_borders = true
 margin_top = 77.0
 margin_right = 210.0
 margin_bottom = 91.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="SupplyTender" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -299,7 +299,7 @@ ticks_on_borders = true
 margin_top = 77.0
 margin_right = 210.0
 margin_bottom = 91.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Battleship" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -340,7 +340,7 @@ ticks_on_borders = true
 margin_top = 99.0
 margin_right = 210.0
 margin_bottom = 113.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Carrier" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
@@ -382,7 +382,7 @@ ticks_on_borders = true
 margin_top = 99.0
 margin_right = 210.0
 margin_bottom = 113.0
-text = "0"
+text = "0 (0 Points)"
 align = 1
 
 [node name="Points" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
