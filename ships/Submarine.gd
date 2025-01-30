@@ -33,7 +33,7 @@ func hit(hit_hex, from_ship):
 		sink()
 	else:
 		get_parent().get_parent().grid.grid[hit_hex[0]][hit_hex[1]].history.append(
-			[get_parent().get_parent().current_turn, 'Miss'])
+			[get_parent().get_parent().current_turn, 'Miss (Silent Service)'])
 		print('passive - silent service')
 		# Passive ability - Silent Service
 		# If hit on non-center hex by a surface unit, hit doesn't count

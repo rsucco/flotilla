@@ -9,7 +9,8 @@ var selecting = true
 var current_turn = 0
 var players = []
 var player_up = 0
-var mine_texture
+const mine_texture = preload("res://ships/sprites/projectiles/mine.png")
+const hitmiss_texture = preload('res://gui/sprites/hitmiss.png')
 var turn_swap_dialog
 var swapping = false
 
@@ -21,7 +22,6 @@ func _ready():
 	font = DynamicFont.new()
 	font.font_data = load("res://opensans.ttf")
 	font.size = 11
-	mine_texture = load("res://ships/sprites/projectiles/mine.png")
 	turn_swap_dialog = preload('res://gui/LocalTurnSwap.tscn')
 	play_game()
 
@@ -105,6 +105,9 @@ func _draw():
 						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 1.0, 1.0, alpha_val))
 					elif hit_miss[1] == 'Sunk':
 						draw_circle(grid.get_hex_center(x, y), 10, Color(0.0, 0.0, 0.0, alpha_val))
+					# Draw a mixed hit/miss marker if a potential hit was blocked by a special ability
+					elif hit_miss[1].begins_with('Miss ('):
+						draw_texture(hitmiss_texture, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 4.5, grid.hex_size / 4.5), Color(1.0, 1.0, 1.0, alpha_val))
 				# Draw mines if applicable
 				if grid.grid[x][y].is_mined:
 					draw_texture(mine_texture, grid.get_hex_center(x, y) - Vector2(grid.hex_size / 4.5, grid.hex_size / 4.5), Color(0.0, 0.0, 0.0, 0.5))
