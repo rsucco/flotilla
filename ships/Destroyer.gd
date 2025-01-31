@@ -22,6 +22,7 @@ func _ready():
 
 func fire(target_x, target_y):
 	.fire(target_x, target_y)
+	sh60.instant_recall()
 	var projectile = projectile_node.instance()
 	projectile.scale = Vector2(2, 2)
 	root.add_child(projectile)
@@ -31,12 +32,14 @@ func fire(target_x, target_y):
 
 func use_special(target_x, target_y):
 	.use_special(target_x, target_y)
+	sh60.instant_recall()
 	sh60.bomb(target_x, target_y)
 	yield(sh60, 'done')
 	emit_signal('special_animation_complete')
 
 func use_secondary(target_x, target_y):
 	.use_secondary(target_x, target_y)
+	sh60.instant_recall()
 	sh60.mine(target_x, target_y)
-	yield(sh60, 'landed')
+	yield(sh60, 'done')
 	emit_signal('special_animation_complete')

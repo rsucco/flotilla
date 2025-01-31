@@ -76,8 +76,23 @@ func _process(delta):
 		else:
 			if audio_player.playing:
 				audio_player.stop()
-				emit_signal('landed')
+			emit_signal('landed')
 	rotor.rotation += rotor_speed * delta
+
+func instant_recall():
+	if flying:
+		if bombing:
+			var projectile = projectile_node.instance()
+			get_parent().root.add_child(projectile)
+			projectile.init(get_parent().root.grid.get_hex_center(target_hex[0], target_hex[1]), target_hex, -1)
+			yield(projectile, 'done')
+		emit_signal('done')
+		audio_player.stop()
+		path_follow.offset = 0
+		flying = false
+		rotor_speed = idle_rotor_speed
+		chassis.global_rotation = get_parent().global_rotation
+		emit_signal('landed')
 
 func fly_to(target_x, target_y, hidden_from = -1):
 	target_hex = [target_x, target_y]

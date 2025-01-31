@@ -101,7 +101,7 @@ func _draw():
 					var alpha_val = max(1.0 - (current_turn - hit_miss[0]) / 10.0, 0.0)
 					if hit_miss[1] == 'Hit':
 						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 0.0, 0.0, alpha_val))
-					elif hit_miss[1] == 'Miss':
+					elif hit_miss[1] in ['Miss', 'Miss (ASW Strike)', 'Miss (Nuclear Strike)', 'Miss (Salvo)']:
 						draw_circle(grid.get_hex_center(x, y), 10, Color(1.0, 1.0, 1.0, alpha_val))
 					elif hit_miss[1] == 'Sunk':
 						draw_circle(grid.get_hex_center(x, y), 10, Color(0.0, 0.0, 0.0, alpha_val))

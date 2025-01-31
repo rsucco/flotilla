@@ -87,7 +87,7 @@ func receive_fire(x, y, from_ship):
 		if !hit_countered:
 			ship_at_hex.hit([x, y], from_ship)
 		else:
-			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Missile Defense intercepted hit'])
+			get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss (CIWS intercepted hit)'])
 	else:
 		get_parent().grid.grid[x][y].history.append([get_parent().current_turn, 'Miss'])
 	return ship_at_hex
@@ -140,7 +140,6 @@ func receive_special(x, y, from_ship, secondary = false):
 
 		'Nuclear Strike':
 			# Nuclear Strike instantly destroys anything it hits hex dead-on (including Coastal Batteries); otherwise hits normally in AOE
-
 			var affected_hexes = get_parent().grid.get_all_hex_neighbors(x, y, ability.aoe)
 			var checked_hexes = []
 			var dead_center = get_ship_at_hex(x, y)
