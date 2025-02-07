@@ -100,7 +100,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - [Benboncan](https://freesound.org/people/Benboncan/sounds/61304/?) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
 - [Sheyvan](https://freesound.org/people/Sheyvan/packs/26842/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
 - [Thimras](https://opengameart.org/content/ship-sinking) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
-- [David Dumais](https://pixabay.com/sound-effects/large-underwater-explosion-190270/) [Pixabay Content License](https://pixabay.com/service/license-summary/)
+- [David Dumais](https://pixabay.com/sound-effects/large-underwater-explosion-190270/) [(Pixabay Content License)](https://pixabay.com/service/license-summary/)
 - [DeevDaRabbit](https://freesound.org/people/DeevDaRabbit/sounds/636717/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
 
 ###### Music
