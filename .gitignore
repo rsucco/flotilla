@@ -2,7 +2,4 @@
 .import/
 export.cfg
 export_presets.cfg
-Flotilla_Linux.x86_64
-Flotilla_Linux.arm64
-Flotilla_Windows.exe
-Flotilla_macOS.zip
+builds/
