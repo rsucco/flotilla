@@ -6,6 +6,7 @@ signal ships_selected
 signal ships_placed
 signal made_move
 const intercept_sound = preload('res://audio/ciws.wav')
+var intercept_audio_player = AudioStreamPlayer2D.new()
 var player_num
 var ships = []
 var temp_revealed_ships = []
@@ -17,6 +18,8 @@ func _ready():
 
 func _init(num):
 	player_num = num
+	add_child(intercept_audio_player)
+	intercept_audio_player.stream = intercept_sound
 
 # Check whether the player has moves remaining
 func has_moves():
@@ -75,13 +78,8 @@ func receive_fire(x, y, from_ship):
 						hit_countered = true
 						ship_at_hex = null
 						print('passive - missile defense')
-						# Play sound
-						var audio_player = AudioStreamPlayer2D.new()
-						add_child(audio_player)
-						audio_player.stream = intercept_sound
-						audio_player.play()
-						yield(audio_player, 'finished')
-						audio_player.queue_free()
+						# Play intercept sound
+						intercept_audio_player.play()
 					# Effect does not stack
 					break
 		if !hit_countered:

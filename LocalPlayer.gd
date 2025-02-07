@@ -10,6 +10,7 @@ var targeting_hex_range = -1
 var current_on_hex = [-1, -1]
 var on_hex_time = 0
 var tile_history
+var animation_playing = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -32,7 +33,7 @@ func _unhandled_input(event):
 			if event.button_index == BUTTON_LEFT:
 				# Left-clicking on own grid
 				if on_hex[0] in range(player_num * 16, player_num * 16 + 15):
-					if ship_at_hex != null and get_parent().current_turn != 0:
+					if ship_at_hex != null and get_parent().current_turn != 0 and !animation_playing:
 						select_ship(ship_at_hex)
 				# Left-clicking on opponent's grid
 				elif on_hex[0] in range(abs(player_num - 1) * 16, abs(player_num - 1) * 16 + 15):
@@ -123,42 +124,54 @@ func aim_secondary():
 # Fire at an enemy hex with the selected ship
 func fire(x, y):
 	if selected_ship != null and selected_ship.can_fire([x, y]):
-		get_parent().gui.disable_button('EndTurn')
+		animation_playing = true
+		for button in ['Fire', 'Special', 'Secondary', 'EndTurn']:
+			get_parent().gui.disable_button(button)
 		# Play fire animation
 		selected_ship.fire(x, y)
 		yield(selected_ship, 'fire_animation_complete')
-		get_parent().gui.disable_button('EndTurn', false)
+		for button in ['Fire', 'Special', 'Secondary', 'EndTurn']:
+			get_parent().gui.disable_button(button, false)
 		# Send fire event to other player for tracking
 		var is_hit = get_parent().players[abs(player_num - 1)].receive_fire(x, y, selected_ship)
 		if selected_ship != null:
 			update_buttons(selected_ship)
 			get_parent().gui.update_ship_info(selected_ship)
+		animation_playing = false
 		emit_signal('made_move')
 
 func special(x, y):
 	if selected_ship != null and selected_ship.can_special():
-		get_parent().gui.disable_button('EndTurn')
+		animation_playing = true
+		for button in ['Fire', 'Special', 'Secondary', 'EndTurn']:
+			get_parent().gui.disable_button(button)
 		# Play special animation
 		selected_ship.use_special(x, y)
 		yield(selected_ship, 'special_animation_complete')
-		get_parent().gui.disable_button('EndTurn', false)
+		for button in ['Fire', 'Special', 'Secondary', 'EndTurn']:
+			get_parent().gui.disable_button(button, false)
 		# Send special to other player to check for hits
 		var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship)
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
+		animation_playing = false
 		emit_signal('made_move')
 
 func secondary(x, y):
 	if selected_ship != null and selected_ship.can_secondary():
-		get_parent().gui.disable_button('EndTurn')
+		animation_playing = true
+		for button in ['Fire', 'Special', 'Secondary', 'EndTurn']:
+			get_parent().gui.disable_button(button)
 		# Play animation
 		selected_ship.use_secondary(x, y)
 		yield(selected_ship, 'special_animation_complete')
-		get_parent().gui.disable_button('EndTurn', false)
+		for button in ['Fire', 'Special', 'Secondary', 'EndTurn']:
+			get_parent().gui.disable_button(button, false)
 		# Send secondary to other player to check for hits
 		var hits = get_parent().players[abs(player_num - 1)].receive_special(x, y, selected_ship, true)
 		update_buttons(selected_ship)
 		get_parent().gui.update_ship_info(selected_ship)
+		animation_playing = false
 		emit_signal('made_move')
 
 

@@ -72,6 +72,6 @@ func explode(pos = null):
 	fire.queue_free()
 	smoke.queue_free()
 	flash.queue_free()
+	emit_signal('explosion_done')
 	yield(audio_player, 'finished')
 	audio_player.queue_free()
-	emit_signal('explosion_done')
