@@ -2,4 +2,9 @@
 .import/
 export.cfg
 export_presets.cfg
+
+# Ignore builds directory
 builds/
+
+# Ignore VSCode stuff
+.vscode/
