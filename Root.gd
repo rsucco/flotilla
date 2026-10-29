@@ -148,6 +148,7 @@ func play_game():
 			yield(swapper, 'swap_done')
 			swapping = false
 		gui.update_turn()
+		gui.update_fleets()
 		# Reset AP counts, decrement ability timers, etc.
 		players[player_up].new_turn()
 		# Get moves from the player as long as they can make a move

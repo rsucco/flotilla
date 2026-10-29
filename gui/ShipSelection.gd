@@ -42,7 +42,7 @@ func _on_CountSlider_value_changed(value):
 	for ship_type in selected_count.keys():
 		var already_spent_points = selected_count[ship_type] * point_values[ship_type]
 		var max_slider_value = int((points_budget - used_points + already_spent_points) / point_values[ship_type])
-		if ship_type == 'Coastal Battery':
+		if ship_type == 'CoastalBattery':
 			max_slider_value = min(max_slider_value, island_tiles)
 		var slider_value = min(max_slider_value, 5)
 		get_node('VBoxContainer/SelectionGrid/' + ship_type + '/CountSlider').max_value = slider_value
