@@ -36,6 +36,9 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 - `export_presets.cfg` is gitignored but present locally; it also has an HTML5 preset.
 
 ## Task Tracking
-- Trello board "Flotilla" (via the Trello MCP): https://trello.com/b/PqNY5kex/flotilla
-- Lists: Maybe, Backlog, Todo, In progress, Done. Labels: Game logic, UI, Graphics, Sound, Balance.
-- Bugs and feature work go on the board, not in this file.
+All tracking is in Beads (`bd`, issue prefix `fl-`). Not in this file, and not on the old Trello board (read-only archive).
+- Find work: `bd ready` (unblocked), `bd list`, `bd show <id>`, `bd children fl-3un` (Godot 4 port epic)
+- Track work: `bd create "Title" -t bug|feature|task|epic|decision -p 0-4 [-l label] [--parent <id>] -d "..."`, `bd update <id> -s in_progress`, `bd close <id>`, `bd dep add <issue> <depends-on>`
+- Priorities: P0 blocking/soft-lock, P1 important, P2 normal, P3 later, P4 someday (usually `-s deferred`)
+- Labels: `port`, `readme-spec` (code doesn't match README), `playtest-confirmed`, `balance`, `ui`, `graphics`, `sound`, `game-logic`, `release`
+- Issue data lives in `.beads/embeddeddolt/` (gitignored). Backup/sync is `bd dolt push` (to `refs/dolt/data` on origin). Claude may run it without asking after changing issues. Git pushes are still Ryan's.
