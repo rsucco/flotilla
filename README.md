@@ -1,6 +1,9 @@
 # Flotilla
 Turn-based naval strategy game inspired by Battleship and XCOM and written in Godot
 
+#### Note
+I first started this project back in 2022, doing all the programming myself. Over the next few years I lost interest in it due to the proliferation of LLM coding tools making it feel pointless. I've come around a bit since then from using Claude at work. It's not the same as it was and it's never going to be, but I'm actually having fun with it again and finally able to make progress on things that I quite frankly didn't possess the Godot expertise to make much headway on. All art is still human-created and credited below, but the vast majority of the code from commits from 2026 onwards will be written by Claude.
+
 Basic gameplay is similar to Battleship, with some exceptions:
 - Rather than a 10x10 rectangular grid, each player places their ships on a 15x15 hexagonal grid. Ships can be placed diagonally.
 - Rather than starting with one of each ship, each player is alloted a certain amount of points to purchase ships, and can choose their own fleet composition.
@@ -109,3 +112,4 @@ Basic gameplay is similar to Battleship, with some exceptions:
 
 ###### Programming
 - Ryan Succo
+- [Claude Code](https://claude.ai)
