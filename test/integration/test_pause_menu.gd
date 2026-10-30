@@ -65,3 +65,18 @@ func test_replay_keeps_board_and_fleets_but_places_again() -> void:
 		driver._dialog(game.players[0], "res://gui/ship_selection.tscn"), "no selection dialog"
 	)
 	assert_true(Root.replay.is_empty(), "only replays once")
+
+
+func test_esc_works_during_ship_selection_and_placement() -> void:
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	var dialog := await driver.find_dialog(game.players[0], "res://gui/ship_selection.tscn")
+	press_esc(game)
+	assert_true(game.pause_menu.visible, "opens over ship selection")
+	press_esc(game)
+	driver.press(dialog.get_node("VBoxContainer/Buttons/Classic"))
+	driver.press(dialog.get_node("VBoxContainer/Buttons/OK"))
+	await driver.placing_ship(game.players[0])
+	press_esc(game)
+	assert_true(game.pause_menu.visible, "opens during placement")
+	press_esc(game)
