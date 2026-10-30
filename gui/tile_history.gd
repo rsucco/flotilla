@@ -5,12 +5,23 @@ extends PanelContainer
 @onready var label: Label = $VBoxContainer/TileHistory
 
 
-func show_history(hex: Vector2i) -> void:
-	var new_position := root.grid.get_hex_center(hex) + Vector2(40, -60)
-	if new_position.x + size.x > 800:
-		new_position.x -= 200
+# What `viewer` may see of a hex's history: mines the opponent laid on the
+# viewer's side stay hidden
+func events_for(hex: Vector2i, viewer: int) -> Array:
+	var events: Array = root.grid.tile(hex).history.duplicate()
+	if root.grid.side_of(hex) == viewer:
+		events = events.filter(func(event: Array) -> bool: return event[1] != "Mine laid")
+	return events
+
+
+func show_history(hex: Vector2i, viewer: int) -> void:
+	var center := root.grid.get_hex_center(hex)
+	var new_position := center + Vector2(40, -60)
+	# Flip to the hex's left if it would run off the screen
+	if new_position.x + size.x > get_viewport_rect().size.x:
+		new_position.x = center.x - 40 - size.x
 	position = new_position
-	var events := root.grid.tile(hex).history.duplicate()
+	var events := events_for(hex, viewer)
 	if events.is_empty():
 		visible = false
 		return

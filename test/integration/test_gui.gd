@@ -125,3 +125,23 @@ func test_title_button_asks_first() -> void:
 	assert_eq(dialog.get_node("VBoxContainer/Confirm/Label").text, "Return to the title screen?")
 	dialog.get_node("VBoxContainer/Confirm/No").pressed.emit()
 	assert_true(dialog.get_node("VBoxContainer/Buttons").visible)
+
+
+func test_tile_history_on_own_side_hides_enemy_mines() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	var popup: TileHistory = game.get_node("TileHistory")
+	# Player 1's own side
+	game.grid.tile(Vector2i(4, 10)).history.append([1, "Miss"])
+	game.grid.tile(Vector2i(6, 10)).history.append([1, "Mine laid"])
+	driver.hover(Vector2i(4, 10))
+	await wait_seconds(0.8)
+	assert_true(popup.visible, "shows the opponent's shot")
+	driver.hover(Vector2i(6, 10))
+	await wait_seconds(0.8)
+	assert_false(popup.visible, "the opponent's mine stays hidden")
+	assert_eq(popup.events_for(Vector2i(6, 10), 1).size(), 1, "the mine's owner still sees it")
+	get_node("/root/GutRunner/GutLayer").visible = true

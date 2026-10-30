@@ -55,7 +55,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_select_ship(null)
 	elif event is InputEventMouseMotion and root.current_turn > 0:
-		if side == 1 - player_num:
+		# Either side: ours shows what the opponent has fired at us
+		if side != -1:
 			# Restart the history popup timer when moving to a new hex
 			if on_hex != current_on_hex:
 				current_on_hex = on_hex
@@ -67,7 +68,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	if root.grid.side_of(current_on_hex) == 1 - player_num:
+	if current_on_hex != Grid.OFF_GRID:
 		on_hex_time += delta
 	else:
 		on_hex_time = 0
@@ -78,9 +79,12 @@ func _process(delta: float) -> void:
 		and root.player_up == player_num
 		and current_on_hex != Grid.OFF_GRID
 	):
-		tile_history.show_history(current_on_hex)
+		tile_history.show_history(current_on_hex, player_num)
 		# show_history() hides the popup for hexes with nothing to show
-		if not tile_history.visible and not root.grid.tile(current_on_hex).history.is_empty():
+		if (
+			not tile_history.visible
+			and not tile_history.events_for(current_on_hex, player_num).is_empty()
+		):
 			tile_history.fade_in()
 
 
