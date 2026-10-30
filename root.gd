@@ -259,7 +259,6 @@ func hex_color(
 
 func draw_markers(hex: Vector2i, tile: Tile) -> void:
 	var center := grid.get_hex_center(hex)
-	var icon_pos := center - Vector2.ONE * grid.hex_size / 4.5
 	var last_event := tile.get_last_event()
 	if not last_event.is_empty():
 		var alpha := maxf(1.0 - (current_turn - last_event[0]) / 10.0, 0.0)
@@ -272,6 +271,10 @@ func draw_markers(hex: Vector2i, tile: Tile) -> void:
 			draw_circle(center, 10, Color(0.0, 0.0, 0.0, alpha))
 		elif event.begins_with("Miss ("):
 			# Mixed marker when a potential hit was blocked by an ability
-			draw_texture(HITMISS_TEXTURE, icon_pos, Color(1.0, 1.0, 1.0, alpha))
+			draw_texture(
+				HITMISS_TEXTURE,
+				center - HITMISS_TEXTURE.get_size() / 2,
+				Color(1.0, 1.0, 1.0, alpha)
+			)
 	if tile.is_mined:
-		draw_texture(MINE_TEXTURE, icon_pos, Color(0.0, 0.0, 0.0, 0.5))
+		draw_texture(MINE_TEXTURE, center - MINE_TEXTURE.get_size() / 2, Color(0.0, 0.0, 0.0, 0.5))
