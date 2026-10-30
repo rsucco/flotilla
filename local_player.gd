@@ -201,11 +201,11 @@ func _finish_action() -> void:
 	made_move.emit()
 
 
-# Ends the selected ship's turn
+# Selects the next ship with AP left, coming back around to this one later
 func _next_ship() -> void:
-	if selected_ship != null:
-		selected_ship.ap = 0
-		made_move.emit()
+	if selected_ship == ships_with_moves[0]:
+		ships_with_moves.push_back(ships_with_moves.pop_front())
+	_select_ship(ships_with_moves[0])
 
 
 # Ends every ship's turn

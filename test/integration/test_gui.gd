@@ -147,16 +147,25 @@ func test_tile_history_on_own_side_hides_enemy_mines() -> void:
 	get_node("/root/GutRunner/GutLayer").visible = true
 
 
-func test_next_ship_ends_only_the_selected_ship() -> void:
+func test_next_ship_keeps_ap_and_wraps_around() -> void:
 	get_node("/root/GutRunner/GutLayer").visible = false
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
 	var driver := GameDriver.new(game)
 	driver.prepare_board()
 	await driver.start_game()
+	var player := game.players[0]
+	var done := driver.ship_of(0, "battleship")
+	done.ap = 0
+	# As the turn loop does after a move used it up
+	player.get_move()
 	await driver.select("cruiser")
-	driver.press(driver.action_button("NextShip"))
-	assert_eq(driver.ship_of(0, "cruiser").ap, 0)
-	assert_eq(driver.ship_of(0, "battleship").ap, 4, "other ships keep their AP")
+	var seen: Array[Ship] = []
+	for _i in player.ships.size():
+		driver.press(driver.action_button("NextShip"))
+		seen.append(player.selected_ship)
+	assert_eq(driver.ship_of(0, "cruiser").ap, 4, "keeps its AP")
+	assert_false(seen.has(done), "skips ships with no AP")
+	assert_eq(seen[-2], driver.ship_of(0, "cruiser"), "comes back around")
 	assert_eq(game.player_up, 0, "still player 1's turn")
 	get_node("/root/GutRunner/GutLayer").visible = true
 
