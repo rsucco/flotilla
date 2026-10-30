@@ -201,3 +201,14 @@ func test_victory_shows_attack_stats() -> void:
 	assert_eq(cells.slice(9, 12), ["Ships left", "8/8", "0/8"])
 	assert_eq(victory.get_node("VBoxContainer/Turns").text, "Turns: 1")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_history_is_stamped_with_the_turn() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	await driver.act("cruiser", "Fire", Vector2i(28, 13))
+	assert_eq(game.grid.tile(Vector2i(28, 13)).history, [[1, "Miss"]] as Array[Array])
+	get_node("/root/GutRunner/GutLayer").visible = true

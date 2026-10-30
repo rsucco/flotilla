@@ -20,6 +20,8 @@ var on_hex_time := 0.0
 var animation_playing := false
 # Only the player whose move it is responds to the action buttons
 var awaiting_move := false
+# From the start of our turn (after any replay) to its end
+var active := false
 var tile_history: TileHistory
 # Whether to watch the opponent's turn replay at the next swap
 var watch_replay := true
@@ -36,7 +38,7 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Only pay attention to the mouse, and only on our turn (after any replay)
-	if root.player_up != player_num or root.swapping or not (event is InputEventMouse):
+	if not active or not (event is InputEventMouse):
 		return
 	var on_hex := grid.get_hex_from_coords(event.position)
 	var side := grid.side_of(on_hex)
@@ -48,7 +50,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					# UNREP targets an adjacent friendly ship instead of selecting it
 					if ship in (selected_ship as SupplyTender).adjacent_ships():
 						_special(on_hex)
-				elif ship != null and root.current_turn != 0 and not animation_playing:
+				elif ship != null and not animation_playing:
 					_select_ship(ship)
 			elif side == 1 - player_num:
 				# If aiming a shot or ability, use it
@@ -60,7 +62,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					_secondary(on_hex)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_select_ship(null)
-	elif event is InputEventMouseMotion and root.current_turn > 0:
+	elif event is InputEventMouseMotion:
 		# Either side: ours shows what the opponent has fired at us
 		if side != -1:
 			# Restart the history popup timer when moving to a new hex
@@ -79,12 +81,7 @@ func _process(delta: float) -> void:
 	else:
 		on_hex_time = 0
 	# Show the history popup after hovering over the same hex for a moment
-	if (
-		on_hex_time > TILE_HIST_HOVER_TIME
-		and root.current_turn > 0
-		and root.player_up == player_num
-		and current_on_hex != Grid.OFF_GRID
-	):
+	if on_hex_time > TILE_HIST_HOVER_TIME and active and current_on_hex != Grid.OFF_GRID:
 		tile_history.show_history(current_on_hex, player_num)
 		# show_history() hides the popup for hexes with nothing to show
 		if (
@@ -185,17 +182,17 @@ func _attack(kind: String, hex: Vector2i) -> void:
 			await ship.use_secondary(hex)
 	_set_attack_buttons_disabled(false)
 	root.turn_replay.land()
-	var damage := opponent().damage_taken()
-	var afloat := opponent().ships.size()
+	var damage := opponent.damage_taken()
+	var afloat := opponent.ships.size()
 	if kind == "fire":
-		opponent().receive_fire(hex, ship)
+		opponent.receive_fire(hex, ship)
 	else:
-		opponent().receive_special(hex, ship, kind == "secondary")
+		opponent.receive_special(hex, ship, kind == "secondary")
 	root.turn_replay.end()
 	var ability := ship.special if kind == "special" else ship.secondary
 	if kind == "fire" or ability.name in DAMAGING_ABILITIES:
 		attacks += 1
-		if opponent().damage_taken() > damage or opponent().ships.size() < afloat:
+		if opponent.damage_taken() > damage or opponent.ships.size() < afloat:
 			hits += 1
 	_finish_action()
 
@@ -335,10 +332,12 @@ func new_turn() -> void:
 	ships_with_moves = ships.duplicate()
 	_select_ship(ships_with_moves[0])
 	on_hex_time = 0
+	active = true
 
 
 func finish_turn() -> void:
 	super()
+	active = false
 	for ship in ships:
 		ship.visible = false
 	# Its history is about the opponent's fleet

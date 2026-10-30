@@ -228,7 +228,7 @@ func test_unrep_heals_only_the_clicked_ship() -> void:
 	target.hit_hexes = [true, true, false]
 	var other := spawn(p0, "destroyer", Vector2i(4, 7))
 	other.hit_hexes = [true, false, false]
-	game.current_turn = 1
+	p0.active = true
 	p0.selected_ship = tender
 	p0._aim_special()
 	click(p0, tender.hex)

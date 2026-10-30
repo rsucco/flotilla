@@ -46,7 +46,7 @@ func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 		super(hit_hex, from_ship)
 	else:
 		Sfx.play(self, ARMOR_SOUND)
-		log_event(hit_hex, "Miss (Blocked by Armor)")
+		grid.log_event(hit_hex, "Miss (Blocked by Armor)")
 
 
 func use_special(target: Vector2i) -> void:

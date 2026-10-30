@@ -15,6 +15,8 @@ var temp_revealed_ships: Array[Ship] = []
 var selected_ship: Ship
 var root: Root
 var grid: Grid
+# Set by Root once both players exist
+var opponent: Player
 # For the victory screen
 var fleet_size := 0
 var attacks := 0
@@ -30,13 +32,9 @@ func _ready() -> void:
 	root = get_parent()
 
 
-func opponent() -> Player:
-	return root.players[1 - player_num]
-
-
 func has_moves() -> bool:
 	# Don't make any more moves if the opponent is defeated
-	if opponent().ships.is_empty():
+	if opponent.ships.is_empty():
 		return false
 	return ships.any(func(s: Ship) -> bool: return s.ap > 0)
 
@@ -96,19 +94,15 @@ func get_hover_hexes(hex: Vector2i) -> Array[Vector2i]:
 	return [hex]
 
 
-func log_event(hex: Vector2i, event: String) -> void:
-	grid.tile(hex).history.append([root.current_turn, event])
-
-
 # Resolves a shot at one of our hexes; returns the ship hit, or null on a miss
 func receive_fire(hex: Vector2i, from_ship: Ship) -> Ship:
 	var target := get_ship_at_hex(hex)
 	if target == null:
-		log_event(hex, "Miss")
+		grid.log_event(hex, "Miss")
 		return null
 	# Missile-based weapons (cruisers, destroyers, carriers) can be intercepted
 	if from_ship.ship_type in ["destroyer", "cruiser", "carrier"] and cruiser_intercepts(hex, 0.5):
-		log_event(hex, "Miss (CIWS intercepted hit)")
+		grid.log_event(hex, "Miss (CIWS intercepted hit)")
 		return null
 	target.hit(hex, from_ship)
 	return target
@@ -142,11 +136,11 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 					sunk_hexes.append_array(ship.get_occupied_hexes())
 					ship.sink()
 				elif not sunk_hexes.has(h):
-					log_event(h, "Miss (ASW Strike)")
+					grid.log_event(h, "Miss (ASW Strike)")
 
 		"Lay Mine":
 			grid.tile(hex).is_mined = true
-			log_event(hex, "Mine laid")
+			grid.log_event(hex, "Mine laid")
 
 		"Sonar Pulse":
 			# Reveals ships around the hex, and also reveals the submarine
@@ -154,7 +148,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 			temp_revealed_ships.append(revealed_sub)
 			from_ship.revealed_buddy = revealed_sub
 			for h in from_ship.get_occupied_hexes():
-				log_event(h, "Submarine used Sonar Pulse")
+				grid.log_event(h, "Submarine used Sonar Pulse")
 			var searched := grid.get_all_hex_neighbors(hex, ability.aoe)
 			searched.append(hex)
 			var revealed: Array[Ship] = []
@@ -169,7 +163,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 			# otherwise hits normally in the area of effect. An intercept
 			# cancels the whole strike.
 			if cruiser_intercepts(hex, 0.25):
-				log_event(hex, "Miss (CIWS intercepted Nuclear Strike)")
+				grid.log_event(hex, "Miss (CIWS intercepted Nuclear Strike)")
 				return
 			var checked: Array[Vector2i] = []
 			var dead_center := get_ship_at_hex(hex)
@@ -184,7 +178,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 				if ship != null:
 					ship.hit(h, from_ship)
 				else:
-					log_event(h, "Miss (Nuclear Strike)")
+					grid.log_event(h, "Miss (Nuclear Strike)")
 
 		"EW Strike":
 			# Prevents firing next turn, and adds 5 turns to ability cooldowns
@@ -206,7 +200,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 			var dead_center := get_ship_at_hex(hex)
 			var search := grid.get_all_hex_neighbors(hex, ability.aoe)
 			if dead_center == null:
-				log_event(hex, "Miss (Salvo)")
+				grid.log_event(hex, "Miss (Salvo)")
 			elif dead_center.is_hex_hit(hex):
 				for h in dead_center.get_occupied_hexes():
 					search.erase(h)
@@ -218,7 +212,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 				if ship != null:
 					ship.hit(h, from_ship)
 				else:
-					log_event(h, "Miss (Salvo)")
+					grid.log_event(h, "Miss (Salvo)")
 
 		"Recon Flight":
 			# Reveals everything but submarines in the target row
@@ -234,4 +228,4 @@ func reveal(ship: Ship, event: String) -> void:
 	ship.visible = true
 	ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
 	for h in ship.get_occupied_hexes():
-		log_event(h, ship.ship_name + event)
+		grid.log_event(h, ship.ship_name + event)

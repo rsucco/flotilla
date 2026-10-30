@@ -27,6 +27,8 @@ var setup := {}
 
 func _ready() -> void:
 	players = [LocalPlayer.new(0), LocalPlayer.new(1)]
+	players[0].opponent = players[1]
+	players[1].opponent = players[0]
 	for player in players:
 		add_child(player)
 		player.ship_shown.connect(gui.update_ship_info)
@@ -65,6 +67,7 @@ func play_game() -> void:
 		# Increment the turn counter at the start of player 1's turn
 		if player_up == 0:
 			current_turn += 1
+			grid.turn = current_turn
 		# Wait for the hotseat players to swap seats, except on player 1's first turn
 		if current_turn != 1 or player_up == 1:
 			swapping = true

@@ -43,7 +43,7 @@ func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 		sink()
 	else:
 		# Passive - Silent Service: off-center hits from surface units don't count
-		log_event(hit_hex, "Miss (Silent Service)")
+		grid.log_event(hit_hex, "Miss (Silent Service)")
 		print("passive - silent service")
 
 

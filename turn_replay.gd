@@ -99,7 +99,7 @@ func mine_blast(player: Player, hex: Vector2i) -> void:
 func land() -> void:
 	if recording == null:
 		return
-	var defender := recording.player.opponent()
+	var defender := recording.player.opponent
 	for ship in defender.ships:
 		recording.smoke_before[ship] = ship.smoke_nodes.size()
 		if ship is CoastalBattery:
@@ -114,7 +114,7 @@ func end() -> void:
 		return
 	var action := recording
 	recording = null
-	var defender := action.player.opponent()
+	var defender := action.player.opponent
 	for ship: Ship in action.smoke_before:
 		var added := ship.smoke_nodes.slice(action.smoke_before[ship])
 		action.smoke.append_array(added)
@@ -195,7 +195,7 @@ func _run() -> void:
 func _process(_delta: float) -> void:
 	if not playing:
 		return
-	var defender := actions[0].player.opponent().player_num
+	var defender := actions[0].player.opponent.player_num
 	for node in masked:
 		if is_instance_valid(node):
 			# Torpedoes move along their own path rather than moving themselves
@@ -251,7 +251,7 @@ func _make_ghost(action: Action) -> Ship:
 
 # Puts the defender's fleet back as it was before the turn
 func _rewind() -> void:
-	var defender := actions[0].player.opponent()
+	var defender := actions[0].player.opponent
 	for ship in defender.ships:
 		ship.visible = true
 		# Undo the opponent's reveals, which are faded

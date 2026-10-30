@@ -49,9 +49,9 @@ func fire(target: Vector2i) -> void:
 	# Drawback - Stationary: reveals itself to the opponent on their next turn
 	if not ghost:
 		var buddy: Ship = duplicate()
-		player.opponent().temp_revealed_ships.append(buddy)
+		player.opponent.temp_revealed_ships.append(buddy)
 		revealed_buddy = buddy
-		log_event(hex, "Coastal Battery revealed by firing")
+		grid.log_event(hex, "Coastal Battery revealed by firing")
 	var sound := Sfx.play(self, TURRET_SOUND)
 	await aim_turret(turret, grid.get_hex_center(target), 1.0)
 	sound.queue_free()
@@ -75,7 +75,7 @@ func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 	Sfx.play(self, hit_sound)
 	hp -= 1
 	hp_bar.value = hp
-	log_event(hit_hex, "Hit, Coastal Battery (" + str(hp) + "HP)")
+	grid.log_event(hit_hex, "Hit, Coastal Battery (" + str(hp) + "HP)")
 	if hp == 0:
 		sink()
 	else:

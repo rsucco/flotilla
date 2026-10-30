@@ -164,21 +164,17 @@ func spawn(effect: Node2D) -> void:
 	root.add_child(effect)
 
 
-func log_event(h: Vector2i, event: String) -> void:
-	grid.tile(h).history.append([root.current_turn, event])
-
-
 func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 	var index := get_occupied_hexes().find(hit_hex)
 	# Don't count hits on already hit hexes (maybe rework this if it's unfun)
 	if hit_hexes[index]:
-		log_event(hit_hex, "Hit, " + ship_name + " (No effect)")
+		grid.log_event(hit_hex, "Hit, " + ship_name + " (No effect)")
 		return
 	hit_hexes[index] = true
 	if is_immobilized():
-		log_event(hit_hex, "Hit, " + ship_name + " (Immobilized)")
+		grid.log_event(hit_hex, "Hit, " + ship_name + " (Immobilized)")
 	else:
-		log_event(hit_hex, "Hit, " + ship_name)
+		grid.log_event(hit_hex, "Hit, " + ship_name)
 	_add_smoke(index)
 	if not hit_hexes.has(false):
 		sink()
@@ -218,7 +214,7 @@ func sink() -> void:
 	if is_instance_valid(revealed_buddy):
 		revealed_buddy.queue_free()
 	for h in get_occupied_hexes():
-		log_event(h, "Sunk, " + ship_name)
+		grid.log_event(h, "Sunk, " + ship_name)
 	sank.emit()
 	await sink_effect()
 	if not held:

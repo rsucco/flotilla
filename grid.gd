@@ -30,6 +30,8 @@ const ODDQ_DIRECTIONS: Array[Array] = [
 ]
 
 var hex_size: float
+# The current turn, set by Root, for stamping history entries
+var turn := 0
 # Indexed [x][y]
 var tiles: Array[Array] = []
 
@@ -48,6 +50,10 @@ func _init(size: float = 50.0) -> void:
 
 func tile(hex: Vector2i) -> Tile:
 	return tiles[hex.x][hex.y]
+
+
+func log_event(hex: Vector2i, event: String) -> void:
+	tile(hex).history.append([turn, event])
 
 
 # Returns which player's side a hex is on, or -1 for no-man's-land/off-grid
