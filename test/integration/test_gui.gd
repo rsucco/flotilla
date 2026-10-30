@@ -62,3 +62,21 @@ func test_tile_history_only_shows_hexes_with_history() -> void:
 	await wait_seconds(0.8)
 	assert_true(popup.visible, "shows a hex with history")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_ship_hidden_until_placement_finds_a_spot() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	var player := game.players[0]
+	var dialog := await driver.find_dialog(player, "res://gui/ship_selection.tscn")
+	dialog.set_island_tiles(game.grid.get_num_island_tiles(0))
+	driver.press(dialog.get_node("VBoxContainer/Buttons/Classic"))
+	driver.press(dialog.get_node("VBoxContainer/Buttons/OK"))
+	var ship := await driver.placing_ship(player)
+	assert_false(ship.visible, "not drawn at the origin before it has a hex")
+	driver.hover(GameDriver.spot(0, ship.ship_type))
+	await wait_frames(1)
+	assert_true(ship.visible, "shown once it snaps to a hex")
+	get_node("/root/GutRunner/GutLayer").visible = true

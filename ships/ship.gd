@@ -80,6 +80,7 @@ func _input(event: InputEvent) -> void:
 			and root.grid.side_of(mouse_hex) == player.player_num
 		):
 			set_grid_position(mouse_hex, direction)
+			visible = true
 	elif event is InputEventMouseButton and event.pressed:
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
@@ -145,6 +146,8 @@ func new_turn() -> void:
 
 func place() -> void:
 	movement_audio_player.stream = move_sound
+	# Hidden until the mouse finds a valid spot, or it shows at the origin
+	visible = false
 	placing = true
 
 

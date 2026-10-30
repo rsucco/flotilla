@@ -91,11 +91,20 @@ func _draw() -> void:
 
 	for x in Grid.COLUMNS:
 		# Column labels, highlighted under the mouse
-		var label_pos := grid.get_hex_center(Vector2i(x, 0)) - Vector2(4, row_step)
+		# Centered across the hex's width, so wider numbers don't drift right
+		var label_pos := grid.get_hex_center(Vector2i(x, 0)) - Vector2(grid.hex_size / 2, row_step)
 		if x % 2 != 0:
 			label_pos.y -= row_step * 0.75
 		var label_color := Color.RED if mouse_hex.x == x and current_turn != 0 else Color.WHITE
-		draw_string(FONT, label_pos, str(x), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, label_color)
+		draw_string(
+			FONT,
+			label_pos,
+			str(x),
+			HORIZONTAL_ALIGNMENT_CENTER,
+			grid.hex_size,
+			FONT_SIZE,
+			label_color
+		)
 
 		for y in Grid.ROWS:
 			var hex := Vector2i(x, y)
@@ -137,10 +146,10 @@ func _draw() -> void:
 
 			draw_string(
 				FONT,
-				grid.get_hex_center(hex) - Vector2(grid.hex_size / 10, -grid.hex_size / 12),
+				grid.get_hex_center(hex) + Vector2(-grid.hex_size / 2, grid.hex_size / 12),
 				ROW_LABELS[y] + str(x),
-				HORIZONTAL_ALIGNMENT_LEFT,
-				-1,
+				HORIZONTAL_ALIGNMENT_CENTER,
+				grid.hex_size,
 				FONT_SIZE,
 				Color.BLACK
 			)
