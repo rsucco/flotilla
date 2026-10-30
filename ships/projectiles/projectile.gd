@@ -3,6 +3,7 @@ extends Sprite2D
 
 # Emitted on arrival, before the explosion plays, so the hit can be resolved
 signal done
+signal released
 
 const WATER_MISS_SOUND := preload("res://audio/water_miss.wav")
 const LAND_MISS_SOUND := preload("res://audio/land_miss.wav")
@@ -15,6 +16,8 @@ var dest: Vector2
 var dest_hex: Vector2i
 var speed := 0.0
 var moving := false
+# Set by volleys that resolve all at once, so no shell reads its tile early
+var held := false
 
 
 # Call after adding to the tree, with `grid` set
@@ -35,8 +38,15 @@ func _process(delta: float) -> void:
 		moving = false
 		done.emit()
 		position = dest
+		if held:
+			await released
 		await explode(dest)
 		queue_free()
+
+
+func release() -> void:
+	held = false
+	released.emit()
 
 
 # Plays the impact effect at `pos`; returns when it's finished

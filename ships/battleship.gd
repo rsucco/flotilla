@@ -59,18 +59,23 @@ func use_special(target: Vector2i) -> void:
 	# Divert shots to the center hex if they'd otherwise go out of bounds
 	while targets.size() < 8:
 		targets.append(target)
-	var last: Projectile
+	var shells: Array[Projectile] = []
 	# Each turret fires two barrels, offset left and right
 	for i in turrets.size():
 		var turret := turrets[i]
 		for barrel in 2:
 			var offset := Vector2(-5 if barrel == 0 else 5, -20).rotated(turret.global_rotation)
-			last = PROJECTILE_SCENE.instantiate()
-			spawn(last)
-			last.launch(turret.global_position + offset, targets[i * 2 + barrel])
+			var shell: Projectile = PROJECTILE_SCENE.instantiate()
+			shell.held = true
+			spawn(shell)
+			shell.launch(turret.global_position + offset, targets[i * 2 + barrel])
+			shells.append(shell)
 		# Stagger fire times slightly
 		await get_tree().create_timer(0.075, false).timeout
-	await last.done
+	await shells[-1].done
+	# The salvo is resolved as soon as this returns; explode once it has been
+	for shell in shells:
+		shell.release.call_deferred()
 
 
 # Rotates all turrets toward the target together

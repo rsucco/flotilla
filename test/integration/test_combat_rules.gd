@@ -99,6 +99,23 @@ func test_salvo_on_undamaged_battery_is_normal_hit() -> void:
 	assert_eq(battery.hp, 4)
 
 
+func test_salvo_miss_splashes_every_shell() -> void:
+	var splashes: Array[CPUParticles2D] = []
+	game.effects.child_entered_tree.connect(
+		func(node: Node) -> void:
+			if node is CPUParticles2D and node.emission_shape == CPUParticles2D.EMISSION_SHAPE_RING:
+				splashes.append(node)
+	)
+	var battleship := spawn(p0, "battleship", Vector2i(5, 7))
+	battleship.ap = 2
+	# Resolved right after the animation, as LocalPlayer does
+	await battleship.use_special(Vector2i(22, 7))
+	p1.receive_special(Vector2i(22, 7), battleship)
+	await wait_seconds(0.5)
+	# Four turrets, two barrels each
+	assert_eq(splashes.size(), 8)
+
+
 # Cruiser: EW Strike and Missile Defense
 
 
