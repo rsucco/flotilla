@@ -53,6 +53,10 @@ class Action:
 	var hp_changes: Array[Array] = []
 	var sunk: Array[Ship] = []
 	var sounds: Array[Array] = []
+	# Copies of the attacker's ship that the attack gave away (battery fire,
+	# Sonar Pulse), shown from the start of its replay
+	var revealed_before := 0
+	var revealed: Array[Ship] = []
 
 
 func _exit_tree() -> void:
@@ -77,6 +81,7 @@ func begin(ship: Ship, kind: String, target: Vector2i) -> void:
 	recording.rotation = ship.global_rotation
 	recording.kind = kind
 	recording.target = target
+	recording.revealed_before = ship.player.opponent.temp_revealed_ships.size()
 	for child in ship.get_children():
 		if child.name.begins_with("Turret"):
 			recording.turrets[child.name] = (child as Node2D).rotation
@@ -135,6 +140,7 @@ func end() -> void:
 				action.sounds.append([defender.get_ship_at_hex(hex), Battleship.ARMOR_SOUND])
 			elif event[1].begins_with("Miss (CIWS"):
 				action.sounds.append([defender, Player.INTERCEPT_SOUND])
+	action.revealed = defender.temp_revealed_ships.slice(action.revealed_before)
 	actions.append(action)
 
 
@@ -171,8 +177,11 @@ func _run() -> void:
 			await _blast(action.target)
 		else:
 			var ghost := _make_ghost(action)
-			# Batteries give themselves away by firing anyway
-			masking = not ghost is CoastalBattery
+			for ship in action.revealed:
+				if is_instance_valid(ship):
+					action.player.opponent.show_revealed(ship)
+			# No hiding where shots come from once the ship has given itself away
+			masking = action.revealed.is_empty()
 			match action.kind:
 				"fire":
 					await ghost.fire(action.target)

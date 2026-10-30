@@ -202,3 +202,31 @@ func test_mine_blasts_are_replayed() -> void:
 		if is_instance_valid(node) and node is CPUParticles2D:
 			assert_true(node.visible, "shown on the attacker's side")
 	await driver.wait_until(replay_done, 20, "the replay")
+
+
+func revealed_shown(kind: String) -> bool:
+	return game.players[1].temp_revealed_ships.any(
+		func(s: Ship) -> bool: return s.ship_type == kind and s.is_inside_tree() and s.visible
+	)
+
+
+func test_battery_revealed_as_it_fires() -> void:
+	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
+	await driver.end_turn()
+	await driver.swap(true)
+	await wait_process_frames(2)
+	assert_true(game.turn_replay.playing, "replay started")
+	assert_true(revealed_shown("coastal_battery"), "shown before the shell lands")
+	await driver.wait_until(replay_done, 20, "the replay")
+	assert_true(revealed_shown("coastal_battery"), "still shown for the turn")
+
+
+func test_sub_revealed_by_its_sonar_pulse() -> void:
+	await driver.act("submarine", "Secondary", Vector2i(20, 10))
+	await driver.end_turn()
+	await driver.swap(true)
+	await wait_process_frames(2)
+	assert_true(game.turn_replay.playing, "replay started")
+	assert_true(revealed_shown("submarine"), "shown as the pulse plays")
+	await driver.wait_until(replay_done, 20, "the replay")
+	assert_true(revealed_shown("submarine"), "still shown for the turn")

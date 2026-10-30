@@ -59,9 +59,16 @@ func new_turn() -> void:
 			ship.fire_remaining = 0
 			ship.jammed = false
 	for revealed in temp_revealed_ships:
-		adopt(revealed)
-		revealed.visible = true
-		revealed.modulate = Color(1.0, 1.0, 1.0, 0.8)
+		show_revealed(revealed)
+
+
+# Shows a copy of an opponent's ship that gave itself away (the turn replay
+# may already have shown it)
+func show_revealed(ship: Ship) -> void:
+	if not ship.is_inside_tree():
+		adopt(ship)
+	ship.visible = true
+	ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
 
 
 func finish_turn() -> void:
