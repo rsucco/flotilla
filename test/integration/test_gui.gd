@@ -145,3 +145,32 @@ func test_tile_history_on_own_side_hides_enemy_mines() -> void:
 	assert_false(popup.visible, "the opponent's mine stays hidden")
 	assert_eq(popup.events_for(Vector2i(6, 10), 1).size(), 1, "the mine's owner still sees it")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_next_ship_ends_only_the_selected_ship() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	await driver.select("cruiser")
+	driver.press(driver.action_button("NextShip"))
+	assert_eq(driver.ship_of(0, "cruiser").ap, 0)
+	assert_eq(driver.ship_of(0, "battleship").ap, 4, "other ships keep their AP")
+	assert_eq(game.player_up, 0, "still player 1's turn")
+	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_end_turn_ends_the_whole_fleet_with_nothing_selected() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	await driver.click(GameDriver.spot(0, "cruiser"), MOUSE_BUTTON_RIGHT)
+	assert_null(game.players[0].selected_ship, "deselected")
+	driver.press(driver.action_button("EndTurn"))
+	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
+	assert_eq(game.player_up, 1)
+	assert_true(driver.action_button("EndTurn").disabled, "disabled between turns")
+	get_node("/root/GutRunner/GutLayer").visible = true

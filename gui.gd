@@ -24,7 +24,7 @@ func _ready() -> void:
 
 
 func disable_button(button: String, disabled: bool = true) -> void:
-	get_node("GUIGrid/Actions/" + button).disabled = disabled
+	(find_child(button) as Button).disabled = disabled
 
 
 func update_ship_info(ship: Ship) -> void:

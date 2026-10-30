@@ -193,14 +193,14 @@ size_flags_horizontal = 0
 disabled = true
 icon = ExtResource("7")
 
-[node name="EndTurn" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="NextShip" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
 offset_top = 35.0
 offset_right = 82.0
 offset_bottom = 66.0
 theme_override_fonts/font = ExtResource("1")
 theme_override_font_sizes/font_size = 10
 disabled = true
-text = "End Turn"
+text = "Next Ship"
 icon = ExtResource("5")
 
 [node name="Secondary" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
@@ -258,6 +258,13 @@ offset_bottom = 49.0
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="EndTurn" type="Button" parent="GUIGrid/TurnNumber"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "End Turn"
 
 [node name="VSeparator2" type="VSeparator" parent="GUIGrid"]
 offset_left = 644.0

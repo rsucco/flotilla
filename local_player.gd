@@ -2,7 +2,7 @@ class_name LocalPlayer
 extends Player
 
 const TILE_HIST_HOVER_TIME := 0.5
-const ATTACK_BUTTONS: Array[String] = ["Fire", "Special", "Secondary", "EndTurn"]
+const ATTACK_BUTTONS: Array[String] = ["Fire", "Special", "Secondary", "NextShip", "EndTurn"]
 
 var aiming := {"fire": false, "special": false, "secondary": false, "recon": false, "unrep": false}
 var ships_with_moves: Array[Ship] = []
@@ -26,6 +26,9 @@ func _ready() -> void:
 	tile_history = root.get_node("TileHistory")
 	for button: Button in get_tree().get_nodes_in_group("action_buttons"):
 		button.pressed.connect(_button_pressed.bind(button))
+	# Not an action button: it works with no ship selected
+	var end_turn: Button = root.gui.find_child("EndTurn")
+	end_turn.pressed.connect(_button_pressed.bind(end_turn))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -98,6 +101,8 @@ func _button_pressed(button: Button) -> void:
 			_aim_special()
 		"Secondary":
 			_aim_secondary()
+		"NextShip":
+			_next_ship()
 		"EndTurn":
 			_end_turn()
 		"Forward":
@@ -190,10 +195,18 @@ func _finish_action() -> void:
 	made_move.emit()
 
 
-func _end_turn() -> void:
+# Ends the selected ship's turn
+func _next_ship() -> void:
 	if selected_ship != null:
 		selected_ship.ap = 0
 		made_move.emit()
+
+
+# Ends every ship's turn
+func _end_turn() -> void:
+	for ship in ships:
+		ship.ap = 0
+	made_move.emit()
 
 
 func _forward() -> void:
@@ -262,6 +275,7 @@ func _update_buttons(ship: Ship) -> void:
 	root.gui.disable_button("Fire", not ship.can_fire())
 	root.gui.disable_button("Special", not ship.can_special())
 	root.gui.disable_button("Secondary", not ship.can_secondary())
+	root.gui.disable_button("NextShip", false)
 	root.gui.disable_button("EndTurn", false)
 
 
@@ -306,6 +320,7 @@ func finish_turn() -> void:
 		ship.visible = false
 	# Its history is about the opponent's fleet
 	tile_history.visible = false
+	root.gui.disable_button("EndTurn")
 
 
 func get_move() -> void:

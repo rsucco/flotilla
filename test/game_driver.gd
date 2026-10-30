@@ -71,7 +71,7 @@ func press(button: Button) -> void:
 
 
 func action_button(button: String) -> Button:
-	return game.gui.get_node("GUIGrid/Actions/" + button)
+	return game.gui.find_child(button)
 
 
 # Fixed islands, one per side, for the coastal batteries
@@ -158,8 +158,8 @@ func ship_of(player: int, ship_type: String) -> Ship:
 	return null
 
 
-# Ends the turn of every ship with AP left. Presses at least once, since the
-# game waits for a move even when none are left (e.g. the opponent is sunk).
+# Ends the whole fleet's turn. Presses at least once, since the game waits
+# for a move even when none are left (e.g. the opponent is sunk).
 func end_turn() -> void:
 	var player := game.players[game.player_up]
 	while true:
