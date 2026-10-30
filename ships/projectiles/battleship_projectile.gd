@@ -10,12 +10,12 @@ func launch(
 	super(origin, target)
 	Sfx.play(self, fire_sound)
 	speed = 400.0
-	# Muzzle flash, blown toward the opponent's side
+	# Muzzle flash, blown along the line of fire
 	var flash := CPUParticles2D.new()
 	flash.gravity = Vector2.ZERO
-	var velocity := 15.0 if root.player_up == 0 else -15.0
-	flash.initial_velocity_min = velocity
-	flash.initial_velocity_max = velocity
+	flash.direction = Vector2.RIGHT.rotated(rotation)
+	flash.initial_velocity_min = 15.0
+	flash.initial_velocity_max = 15.0
 	flash.damping_min = 10.0
 	flash.damping_max = 10.0
 	flash.color = Color.SALMON

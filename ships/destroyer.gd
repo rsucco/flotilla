@@ -48,4 +48,9 @@ func use_special(target: Vector2i) -> void:
 func use_secondary(target: Vector2i) -> void:
 	super(target)
 	sh60.instant_recall()
-	await sh60.mine(target)
+	if ghost:
+		# Replays don't give away where the mine went: just circle the middle
+		# of the opponent's side
+		await sh60.patrol(Vector2i(root.grid.columns_of(1 - player.player_num)[7], 7))
+	else:
+		await sh60.mine(target)

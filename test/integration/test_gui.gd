@@ -77,7 +77,7 @@ func test_ship_hidden_until_placement_finds_a_spot() -> void:
 	var ship := await driver.placing_ship(player)
 	assert_false(ship.visible, "not drawn at the origin before it has a hex")
 	driver.hover(GameDriver.spot(0, ship.ship_type))
-	await wait_frames(1)
+	await wait_process_frames(1)
 	assert_true(ship.visible, "shown once it snaps to a hex")
 	get_node("/root/GutRunner/GutLayer").visible = true
 

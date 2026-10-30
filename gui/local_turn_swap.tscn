@@ -26,6 +26,11 @@ offset_bottom = 24.0
 text = "Switching turns"
 horizontal_alignment = 1
 
+[node name="WatchReplay" type="CheckBox" parent="VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Watch replay"
+
 [node name="OK" type="Button" parent="VBoxContainer"]
 offset_left = 40.0
 offset_top = 30.0

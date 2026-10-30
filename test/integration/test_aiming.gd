@@ -102,7 +102,7 @@ func test_torpedo_points_along_its_path() -> void:
 	torpedo.launch(game.grid.get_hex_center(Vector2i(5, 7)), Vector2i(25, 9))
 	await wait_seconds(1.0)
 	var before := torpedo.sprite.global_position
-	await wait_frames(5)
+	await wait_process_frames(5)
 	var heading := before.direction_to(torpedo.sprite.global_position)
 	# The torpedo sprite points right
 	assert_lt(off_by(torpedo.sprite, Vector2.RIGHT, heading), 10.0)

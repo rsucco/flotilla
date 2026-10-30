@@ -38,6 +38,10 @@ var placing := false
 var moves_queued := 0
 var revealed_buddy: Ship
 var sunk := false
+# A stand-in that replays this ship's attacks for the opponent (TurnReplay)
+var ghost := false
+# Kept (hidden) after sinking until the opponent's turn replay has shown it
+var held := false
 # Set by EW Strike; blocks firing on the ship's next turn
 var jammed := false
 var root: Root
@@ -204,13 +208,20 @@ func sink() -> void:
 	sunk = true
 	if is_instance_valid(revealed_buddy):
 		revealed_buddy.queue_free()
-	var sound := Sfx.play(self, sink_sound)
-	# Make visible to the opponent while it sinks
-	visible = true
 	for h in get_occupied_hexes():
 		log_event(h, "Sunk, " + ship_name)
 	player.ships.erase(self)
 	root.gui.update_fleets()
+	await sink_effect()
+	if not held:
+		queue_free()
+
+
+# Fades out with the sinking sound; returns when both are done
+func sink_effect() -> void:
+	var sound := Sfx.play(self, sink_sound)
+	# Make visible to the opponent while it sinks
+	visible = true
 	var tween := create_tween()
 	(
 		tween
@@ -223,7 +234,6 @@ func sink() -> void:
 	visible = false
 	if sound.playing:
 		await sound.finished
-	queue_free()
 
 
 # Rotates by a multiple of 60 degrees if the new position is clear
@@ -322,6 +332,7 @@ func check_for_mine() -> void:
 		var tile := root.grid.tile(h)
 		if tile.is_mined:
 			tile.is_mined = false
+			root.turn_replay.mine_blast(player, h)
 			# A random hex takes the hit (no effect if it's already damaged)
 			hit(get_occupied_hexes().pick_random(), self)
 

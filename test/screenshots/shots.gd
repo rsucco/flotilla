@@ -1,7 +1,10 @@
 extends SceneTree
-# Plays a scripted game in a real window (not headless: that renders nothing)
-# and saves a screenshot of each state, to compare against earlier builds.
-#   godot --audio-driver Dummy --path . -s res://test/screenshots/shots.gd -- <out dir>
+# Plays a scripted game with real rendering (not headless: that renders
+# nothing) and saves a screenshot of each state, to compare against earlier
+# builds. Runs on a virtual X display so no window takes focus:
+#   xvfb-run -a -s "-screen 0 1280x800x24" godot --display-driver x11 \
+#     --rendering-driver opengl3 --audio-driver Dummy --path . \
+#     -s res://test/screenshots/shots.gd -- <out dir>
 
 const GameDriver := preload("res://test/game_driver.gd")
 
@@ -95,8 +98,12 @@ func run() -> void:
 	await wait(0.3)
 	await shot("13_turn_swap")
 	d.press(swap.get_node("VBoxContainer/OK"))
+	# Player 1's first shot, replayed for player 2
+	await wait(1.3)
+	await shot("14_replay")
+	d.press(game.turn_replay.get_node("Bar/Row/Skip"))
 	await wait(0.5)
-	await shot("14_player2_view")
+	await shot("15_player2_view")
 	await d.end_turn()
 	await d.swap()
 
@@ -105,5 +112,5 @@ func run() -> void:
 	await d.end_turn()
 	await d.find_dialog(game, "res://gui/victory.tscn")
 	await wait(0.5)
-	await shot("15_victory")
+	await shot("16_victory")
 	quit()

@@ -2,6 +2,7 @@ class_name SH60
 extends Node2D
 
 signal done
+signal landed
 
 const SPEED := 150.0
 const IDLE_ROTOR_SPEED := 3.0
@@ -9,11 +10,13 @@ const FLYING_ROTOR_SPEED := 35.0
 const PROJECTILE_SCENE := preload("res://ships/projectiles/projectile.tscn")
 const ROTOR_SOUND := preload("res://audio/seahawk.wav")
 const DROP_SOUND := preload("res://audio/depth_charge_mine.wav")
+const PATROL_RADIUS := 90.0
 
 var rotor_speed := IDLE_ROTOR_SPEED
 var flying := false
 var bombing := false
 var mining := false
+var patrolling := false
 var target_hex: Vector2i
 var dest: Vector2
 var audio_player: AudioStreamPlayer2D
@@ -47,6 +50,11 @@ func _process(delta: float) -> void:
 		rotor_speed += delta * 30
 	else:
 		path_follow.progress += SPEED * delta
+		if patrolling:
+			# Face along the loop (the chassis sprite's nose is -y)
+			var ahead := path.curve.sample_baked(path_follow.progress + 10)
+			var heading := (ahead - path_follow.position).angle() + PI / 2
+			chassis.rotation = lerp_angle(chassis.rotation, heading, delta * 5)
 
 	if path_follow.position.distance_to(dest) < 20 and (bombing or mining):
 		var dropping_charge := bombing
@@ -64,7 +72,9 @@ func _process(delta: float) -> void:
 	if path_follow.progress >= path.curve.get_baked_length():
 		path_follow.progress = 0
 		flying = false
+		patrolling = false
 		turn_chassis(0.0, 0.5)
+		landed.emit()
 
 
 func turn_chassis(angle: float, duration: float) -> void:
@@ -100,12 +110,34 @@ func fly_to(target: Vector2i) -> void:
 	curve.add_point(chassis.position)
 	curve.add_point(dest)
 	curve.add_point(chassis.position)
+	_take_off(curve)
+
+
+# Flies a loop around `center` and back without dropping anything; returns
+# once landed
+func patrol(center: Vector2i) -> void:
+	var middle := to_local(ship.root.grid.get_hex_center(center))
+	# Bézier handles for a circle drawn with 8 points
+	var handle := PATROL_RADIUS * 4.0 / 3.0 * tan(PI / 16)
+	var curve := Curve2D.new()
+	curve.add_point(chassis.position)
+	for i in 9:
+		var spoke := Vector2.RIGHT.rotated(TAU * i / 8)
+		var tangent := spoke.orthogonal() * handle
+		curve.add_point(middle + spoke * PATROL_RADIUS, -tangent, tangent)
+	curve.add_point(chassis.position)
+	_take_off(curve)
+	patrolling = true
+	await landed
+
+
+func _take_off(curve: Curve2D) -> void:
 	path.curve = curve
 	path_follow.progress = 0
 	chassis.z_index = 1
 	audio_player.volume_db = 0.0
 	audio_player.play()
-	turn_chassis((position - dest).angle() - PI / 2, 1.0)
+	turn_chassis((position - curve.get_point_position(1)).angle() - PI / 2, 1.0)
 	flying = true
 
 

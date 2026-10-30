@@ -13,6 +13,8 @@ var animation_playing := false
 # Only the player whose move it is responds to the action buttons
 var awaiting_move := false
 var tile_history: TileHistory
+# Whether to watch the opponent's turn replay at the next swap
+var watch_replay := true
 
 
 func _init(num: int) -> void:
@@ -27,8 +29,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Only pay attention to the mouse, and only on our turn
-	if root.player_up != player_num or not (event is InputEventMouse):
+	# Only pay attention to the mouse, and only on our turn (after any replay)
+	if root.player_up != player_num or root.swapping or not (event is InputEventMouse):
 		return
 	var on_hex := root.grid.get_hex_from_coords(event.position)
 	var side := root.grid.side_of(on_hex)
@@ -138,38 +140,41 @@ func _set_attack_buttons_disabled(disabled: bool) -> void:
 
 
 func _fire(hex: Vector2i) -> void:
-	if selected_ship == null or not selected_ship.can_fire(hex):
-		return
-	animation_playing = true
-	_set_attack_buttons_disabled(true)
-	@warning_ignore("redundant_await")
-	await selected_ship.fire(hex)
-	_set_attack_buttons_disabled(false)
-	opponent().receive_fire(hex, selected_ship)
-	_finish_action()
+	if selected_ship != null and selected_ship.can_fire(hex):
+		_attack("fire", hex)
 
 
 func _special(hex: Vector2i) -> void:
-	if selected_ship == null or not selected_ship.can_special():
-		return
-	animation_playing = true
-	_set_attack_buttons_disabled(true)
-	@warning_ignore("redundant_await")
-	await selected_ship.use_special(hex)
-	_set_attack_buttons_disabled(false)
-	opponent().receive_special(hex, selected_ship)
-	_finish_action()
+	if selected_ship != null and selected_ship.can_special():
+		_attack("special", hex)
 
 
 func _secondary(hex: Vector2i) -> void:
-	if selected_ship == null or not selected_ship.can_secondary():
-		return
+	if selected_ship != null and selected_ship.can_secondary():
+		_attack("secondary", hex)
+
+
+# Plays the attack's animation, then has the opponent resolve it. Recorded
+# for the opponent's turn replay.
+func _attack(kind: String, hex: Vector2i) -> void:
+	var ship := selected_ship
 	animation_playing = true
 	_set_attack_buttons_disabled(true)
-	@warning_ignore("redundant_await")
-	await selected_ship.use_secondary(hex)
+	root.turn_replay.begin(ship, kind, hex)
+	match kind:
+		"fire":
+			await ship.fire(hex)
+		"special":
+			await ship.use_special(hex)
+		"secondary":
+			await ship.use_secondary(hex)
 	_set_attack_buttons_disabled(false)
-	opponent().receive_special(hex, selected_ship, true)
+	root.turn_replay.land()
+	if kind == "fire":
+		opponent().receive_fire(hex, ship)
+	else:
+		opponent().receive_special(hex, ship, kind == "secondary")
+	root.turn_replay.end()
 	_finish_action()
 
 
@@ -295,6 +300,8 @@ func finish_turn() -> void:
 	super()
 	for ship in ships:
 		ship.visible = false
+	# Its history is about the opponent's fleet
+	tile_history.visible = false
 
 
 func get_move() -> void:

@@ -22,6 +22,7 @@ var swapping := false
 var setup := {}
 
 @onready var pause_menu: PauseMenu = $PauseMenu
+@onready var turn_replay: TurnReplay = $TurnReplay
 
 
 func _ready() -> void:
@@ -59,10 +60,20 @@ func play_game() -> void:
 		# Wait for the hotseat players to swap seats, except on player 1's first turn
 		if current_turn != 1 or player_up == 1:
 			swapping = true
+			var player := players[player_up]
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
-			await swapper.swap_done
+			swapper.offer_replay(turn_replay.has_actions(), player.watch_replay)
+			var watch: bool = await swapper.swap_done
+			# The board was last drawn from the other player's side
+			queue_redraw()
+			if turn_replay.has_actions():
+				# Remember the choice for this player's next swap
+				player.watch_replay = watch
+				if watch:
+					await turn_replay.play()
 			swapping = false
+		turn_replay.clear()
 		gui.update_turn()
 		gui.update_fleets()
 		# Reset AP counts, decrement ability timers, etc.

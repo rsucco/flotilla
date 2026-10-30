@@ -171,9 +171,11 @@ func end_turn() -> void:
 			return
 
 
-func swap() -> void:
+# Skips the turn replay unless `watch` is set
+func swap(watch: bool = false) -> void:
 	var dialog := await find_dialog(game, "res://gui/local_turn_swap.tscn")
 	if dialog != null:
+		(dialog.get_node("VBoxContainer/WatchReplay") as CheckBox).button_pressed = watch
 		press(dialog.get_node("VBoxContainer/OK"))
 
 
