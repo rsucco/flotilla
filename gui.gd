@@ -1,11 +1,13 @@
 class_name GUI
 extends PanelContainer
 
+# A button was pressed, by its node name (Fire, NextShip, EndTurn...)
+signal action_pressed(action: String)
+
 const BUTTON_TEMPLATE := preload("res://gui/sprites/buttons/button_template.png")
 
 var ship_icons := {}
 
-@onready var root: Root = get_parent()
 @onready var special_info: Label = $GUIGrid/ShipInfo/AbilityInfo/SpecialAbility
 @onready var secondary_info: Label = $GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility
 @onready var passive_info: Label = $GUIGrid/ShipInfo/AbilityInfo/PassiveAbility
@@ -20,11 +22,14 @@ var ship_icons := {}
 func _ready() -> void:
 	for ship_type in Ship.SHIP_TYPES:
 		ship_icons[ship_type] = load("res://gui/sprites/" + ship_type + "_icon.png")
-	root.gui = self
+	for button: Button in find_children("*", "Button"):
+		button.pressed.connect(func() -> void: action_pressed.emit(button.name))
 
 
-func disable_button(button: String, disabled: bool = true) -> void:
-	(find_child(button) as Button).disabled = disabled
+# Button name -> whether it can be pressed; buttons not listed are unchanged
+func set_buttons(enabled: Dictionary) -> void:
+	for button: String in enabled:
+		(find_child(button) as Button).disabled = not enabled[button]
 
 
 func update_ship_info(ship: Ship) -> void:
@@ -77,13 +82,13 @@ func update_ability(button: Button, info: Label, kind: String, ability: SpecialA
 		)
 
 
-func update_turn() -> void:
-	$GUIGrid/TurnNumber/TurnNumber.text = str(root.current_turn)
+func update_turn(turn: int) -> void:
+	$GUIGrid/TurnNumber/TurnNumber.text = str(turn)
 
 
-func update_fleets() -> void:
-	fill_fleet($GUIGrid/YourFleet/YourFleetIcons, root.players[root.player_up].ships)
-	fill_fleet($GUIGrid/OpponentFleet/OpponentFleetIcons, root.players[1 - root.player_up].ships)
+func update_fleets(ours: Array[Ship], theirs: Array[Ship]) -> void:
+	fill_fleet($GUIGrid/YourFleet/YourFleetIcons, ours)
+	fill_fleet($GUIGrid/OpponentFleet/OpponentFleetIcons, theirs)
 
 
 # Replaces a container's contents with an icon and count per ship type

@@ -2,6 +2,8 @@ class_name Player
 extends Control
 
 signal made_move
+# A ship of ours sank
+signal fleet_changed
 
 const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
 # Abilities that can damage ships, which count toward the hit rate
@@ -74,7 +76,13 @@ func damage_taken() -> int:
 # Adds one of our ships (or a copy of an opponent's) with what it needs
 func adopt(ship: Ship) -> void:
 	ship.grid = grid
+	ship.sank.connect(_on_ship_sank.bind(ship))
 	add_child(ship)
+
+
+func _on_ship_sank(ship: Ship) -> void:
+	ships.erase(ship)
+	fleet_changed.emit()
 
 
 func get_ship_at_hex(hex: Vector2i) -> Ship:

@@ -2,6 +2,7 @@ class_name Ship
 extends Sprite2D
 
 signal placed
+signal sank
 
 const SHIP_TYPES: Array[String] = [
 	"coastal_battery",
@@ -218,8 +219,7 @@ func sink() -> void:
 		revealed_buddy.queue_free()
 	for h in get_occupied_hexes():
 		log_event(h, "Sunk, " + ship_name)
-	player.ships.erase(self)
-	root.gui.update_fleets()
+	sank.emit()
 	await sink_effect()
 	if not held:
 		queue_free()

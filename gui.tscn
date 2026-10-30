@@ -157,7 +157,7 @@ size_flags_horizontal = 6
 size_flags_vertical = 4
 columns = 4
 
-[node name="Fire" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Fire" type="Button" parent="GUIGrid/Actions"]
 offset_right = 82.0
 offset_bottom = 31.0
 theme_override_fonts/font = ExtResource("1")
@@ -166,7 +166,7 @@ disabled = true
 text = "Fire"
 icon = ExtResource("4")
 
-[node name="Special" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Special" type="Button" parent="GUIGrid/Actions"]
 offset_left = 86.0
 offset_right = 174.0
 offset_bottom = 31.0
@@ -176,7 +176,7 @@ disabled = true
 text = "Special"
 icon = ExtResource("3")
 
-[node name="Forward" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Forward" type="Button" parent="GUIGrid/Actions"]
 offset_left = 178.0
 offset_right = 215.0
 offset_bottom = 31.0
@@ -185,7 +185,7 @@ disabled = true
 icon = ExtResource("10")
 icon_alignment = 1
 
-[node name="Port" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Port" type="Button" parent="GUIGrid/Actions"]
 offset_left = 219.0
 offset_right = 256.0
 offset_bottom = 31.0
@@ -193,7 +193,7 @@ size_flags_horizontal = 0
 disabled = true
 icon = ExtResource("7")
 
-[node name="NextShip" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="NextShip" type="Button" parent="GUIGrid/Actions"]
 offset_top = 35.0
 offset_right = 82.0
 offset_bottom = 66.0
@@ -203,7 +203,7 @@ disabled = true
 text = "Next Ship"
 icon = ExtResource("5")
 
-[node name="Secondary" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Secondary" type="Button" parent="GUIGrid/Actions"]
 offset_left = 86.0
 offset_top = 35.0
 offset_right = 174.0
@@ -214,7 +214,7 @@ disabled = true
 text = "Secondary"
 icon = ExtResource("3")
 
-[node name="Reverse" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Reverse" type="Button" parent="GUIGrid/Actions"]
 offset_left = 178.0
 offset_top = 35.0
 offset_right = 215.0
@@ -223,7 +223,7 @@ size_flags_horizontal = 0
 disabled = true
 icon = ExtResource("9")
 
-[node name="Starboard" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+[node name="Starboard" type="Button" parent="GUIGrid/Actions"]
 offset_left = 219.0
 offset_top = 35.0
 offset_right = 256.0

@@ -1,7 +1,15 @@
 class_name LocalPlayer
 extends Player
 
+# The ship whose info the GUI should show (null clears it)
+signal ship_shown(ship: Ship)
+# Button name -> whether it can be pressed
+signal buttons_changed(enabled: Dictionary)
+
 const TILE_HIST_HOVER_TIME := 0.5
+const ACTION_BUTTONS: Array[String] = [
+	"Fire", "Special", "Secondary", "NextShip", "Forward", "Reverse", "Port", "Starboard"
+]
 const ATTACK_BUTTONS: Array[String] = ["Fire", "Special", "Secondary", "NextShip", "EndTurn"]
 
 var aiming := {"fire": false, "special": false, "secondary": false, "recon": false, "unrep": false}
@@ -24,11 +32,6 @@ func _init(num: int) -> void:
 func _ready() -> void:
 	super()
 	tile_history = root.get_node("TileHistory")
-	for button: Button in get_tree().get_nodes_in_group("action_buttons"):
-		button.pressed.connect(_button_pressed.bind(button))
-	# Not an action button: it works with no ship selected
-	var end_turn: Button = root.gui.find_child("EndTurn")
-	end_turn.pressed.connect(_button_pressed.bind(end_turn))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -91,10 +94,11 @@ func _process(delta: float) -> void:
 			tile_history.fade_in()
 
 
-func _button_pressed(button: Button) -> void:
+# A GUI button (by name) was pressed
+func press(action: String) -> void:
 	if not awaiting_move:
 		return
-	match button.name:
+	match action:
 		"Fire":
 			_aim_fire()
 		"Special":
@@ -144,8 +148,10 @@ func _aim_secondary() -> void:
 
 
 func _set_attack_buttons_disabled(disabled: bool) -> void:
+	var enabled := {}
 	for button in ATTACK_BUTTONS:
-		root.gui.disable_button(button, disabled)
+		enabled[button] = not disabled
+	buttons_changed.emit(enabled)
 
 
 func _fire(hex: Vector2i) -> void:
@@ -197,7 +203,7 @@ func _attack(kind: String, hex: Vector2i) -> void:
 func _finish_action() -> void:
 	if selected_ship != null:
 		_update_buttons(selected_ship)
-		root.gui.update_ship_info(selected_ship)
+		ship_shown.emit(selected_ship)
 	animation_playing = false
 	made_move.emit()
 
@@ -268,22 +274,31 @@ func _select_ship(ship: Ship) -> void:
 			ships_with_moves.push_front(ship)
 		_update_buttons(ship)
 	else:
-		for button: Button in get_tree().get_nodes_in_group("action_buttons"):
-			button.disabled = true
+		var enabled := {}
+		for button in ACTION_BUTTONS:
+			enabled[button] = false
+		buttons_changed.emit(enabled)
 	selected_ship = ship
-	root.gui.update_ship_info(ship)
+	ship_shown.emit(ship)
 
 
 func _update_buttons(ship: Ship) -> void:
-	root.gui.disable_button("Forward", not ship.can_move())
-	root.gui.disable_button("Reverse", not ship.can_move(true))
-	root.gui.disable_button("Port", not ship.can_rotate(-60))
-	root.gui.disable_button("Starboard", not ship.can_rotate(60))
-	root.gui.disable_button("Fire", not ship.can_fire())
-	root.gui.disable_button("Special", not ship.can_special())
-	root.gui.disable_button("Secondary", not ship.can_secondary())
-	root.gui.disable_button("NextShip", false)
-	root.gui.disable_button("EndTurn", false)
+	(
+		buttons_changed
+		. emit(
+			{
+				"Forward": ship.can_move(),
+				"Reverse": ship.can_move(true),
+				"Port": ship.can_rotate(-60),
+				"Starboard": ship.can_rotate(60),
+				"Fire": ship.can_fire(),
+				"Special": ship.can_special(),
+				"Secondary": ship.can_secondary(),
+				"NextShip": true,
+				"EndTurn": true,
+			}
+		)
+	)
 
 
 # `counts` is keyed by PascalCase ship type (ship selection node names)
@@ -328,7 +343,7 @@ func finish_turn() -> void:
 		ship.visible = false
 	# Its history is about the opponent's fleet
 	tile_history.visible = false
-	root.gui.disable_button("EndTurn")
+	buttons_changed.emit({"EndTurn": false})
 
 
 func get_move() -> void:

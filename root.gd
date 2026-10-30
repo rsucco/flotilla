@@ -13,7 +13,6 @@ const VICTORY_SCENE := preload("res://gui/victory.tscn")
 static var replay := {}
 
 var grid: Grid
-var gui: GUI
 var players: Array[LocalPlayer] = []
 var player_up := 0
 var current_turn := 0
@@ -21,6 +20,7 @@ var swapping := false
 # The board and fleets this game started with, once both players have chosen
 var setup := {}
 
+@onready var gui: GUI = $GUI
 @onready var pause_menu: PauseMenu = $PauseMenu
 @onready var turn_replay: TurnReplay = $TurnReplay
 
@@ -29,6 +29,10 @@ func _ready() -> void:
 	players = [LocalPlayer.new(0), LocalPlayer.new(1)]
 	for player in players:
 		add_child(player)
+		player.ship_shown.connect(gui.update_ship_info)
+		player.buttons_changed.connect(gui.set_buttons)
+		player.fleet_changed.connect(_update_fleets)
+	gui.action_pressed.connect(func(action: String) -> void: players[player_up].press(action))
 	play_game()
 
 
@@ -55,7 +59,7 @@ func play_game() -> void:
 		await player.place_ships(selections[player.player_num])
 	setup = {"islands": grid.get_islands(), "selections": selections}
 	pause_menu.can_replay = true
-	gui.update_fleets()
+	_update_fleets()
 	# Play until one player has no more ships
 	while not players[0].ships.is_empty() and not players[1].ships.is_empty():
 		# Increment the turn counter at the start of player 1's turn
@@ -78,8 +82,8 @@ func play_game() -> void:
 					await turn_replay.play()
 			swapping = false
 		turn_replay.clear()
-		gui.update_turn()
-		gui.update_fleets()
+		gui.update_turn(current_turn)
+		_update_fleets()
 		# Reset AP counts, decrement ability timers, etc.
 		players[player_up].new_turn()
 		# The player emits made_move once a move has been made. This makes it
@@ -99,6 +103,10 @@ func play_game() -> void:
 	victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
 	add_child(victory)
 	victory.show_stats(players, current_turn)
+
+
+func _update_fleets() -> void:
+	gui.update_fleets(players[player_up].ships, players[1 - player_up].ships)
 
 
 func _on_pause_menu_replay_requested() -> void:
