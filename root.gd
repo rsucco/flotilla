@@ -21,6 +21,8 @@ var current_turn := 0
 var swapping := false
 # The board and fleets this game started with, once both players have chosen
 var setup := {}
+# Testing cheat (debug builds): V shows both fleets
+var reveal_all := false
 
 @onready var gui: GUI = $GUI
 @onready var pause_menu: PauseMenu = $PauseMenu
@@ -52,6 +54,26 @@ func _ready() -> void:
 
 func _input(_event: InputEvent) -> void:
 	queue_redraw()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not OS.is_debug_build() or not event is InputEventKey:
+		return
+	var key := event as InputEventKey
+	if key.pressed and not key.echo and key.physical_keycode == KEY_V:
+		reveal_all = not reveal_all
+		if not reveal_all:
+			for player in players:
+				for ship in player.ships:
+					ship.visible = player.active
+
+
+func _process(_delta: float) -> void:
+	# Ships hide and show themselves all turn, so keep overriding them
+	if reveal_all:
+		for player in players:
+			for ship in player.ships:
+				ship.visible = true
 
 
 func play_game() -> void:
