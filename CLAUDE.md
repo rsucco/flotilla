@@ -7,6 +7,7 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 ## Current State
 - **Godot 4.7** project, Compatibility renderer (Web/mobile targets). Run/check it with `godot`.
 - Headless parse check: `godot --headless --path . --check-only -s res://<file>.gd`
+- After adding a `class_name` (or on a fresh checkout), run `godot --headless --path . --import` first. Headless runs don't rescan the class cache in `.godot/`, so the new type won't resolve.
 - Code follows the global style rules, including call down, signal up (see Wiring below).
 - Local hot-seat multiplayer only.
 
