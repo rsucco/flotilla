@@ -411,6 +411,10 @@ offset_right = 638.0
 offset_bottom = 367.0
 alignment = 1
 
+[node name="Title" type="Button" parent="VBoxContainer/Buttons"]
+layout_mode = 2
+text = "Title Screen"
+
 [node name="Classic" type="Button" parent="VBoxContainer/Buttons"]
 offset_left = 200.0
 offset_right = 260.0
@@ -430,6 +434,24 @@ offset_bottom = 20.0
 disabled = true
 text = "OK"
 
+[node name="Confirm" type="HBoxContainer" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/Confirm"]
+layout_mode = 2
+
+[node name="Yes" type="Button" parent="VBoxContainer/Confirm"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Yes"
+
+[node name="No" type="Button" parent="VBoxContainer/Confirm"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "No"
+
 [connection signal="value_changed" from="VBoxContainer/SelectionGrid/CoastalBattery/CountSlider" to="." method="_on_CountSlider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/SelectionGrid/Corvette/CountSlider" to="." method="_on_CountSlider_value_changed"]
 [connection signal="value_changed" from="VBoxContainer/SelectionGrid/Destroyer/CountSlider" to="." method="_on_CountSlider_value_changed"]
@@ -441,3 +463,6 @@ text = "OK"
 [connection signal="pressed" from="VBoxContainer/Buttons/Classic" to="." method="_on_Classic_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/Reset" to="." method="_on_Reset_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/OK" to="." method="_on_OK_pressed"]
+[connection signal="pressed" from="VBoxContainer/Confirm/Yes" to="." method="_on_Yes_pressed"]
+[connection signal="pressed" from="VBoxContainer/Confirm/No" to="." method="_on_No_pressed"]
+[connection signal="pressed" from="VBoxContainer/Buttons/Title" to="." method="_on_Title_pressed"]

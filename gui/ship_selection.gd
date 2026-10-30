@@ -20,6 +20,8 @@ const POINT_VALUES := {
 
 var selected_count := {}
 var island_tiles := 0
+var used_points := 0
+var pending: Callable
 
 @onready var grid: GridContainer = $VBoxContainer/SelectionGrid
 
@@ -39,7 +41,7 @@ func label(ship_type: String) -> Label:
 
 
 func _on_CountSlider_value_changed(_value: float) -> void:
-	var used_points := 0
+	used_points = 0
 	for ship_type: String in POINT_VALUES:
 		selected_count[ship_type] = int(slider(ship_type).value)
 		var cost: int = selected_count[ship_type] * POINT_VALUES[ship_type]
@@ -74,8 +76,47 @@ func _on_Reset_pressed() -> void:
 
 
 func _on_OK_pressed() -> void:
+	if can_add_ship():
+		ask("You have " + str(POINTS_BUDGET - used_points) + " points left. Start anyway?", _start)
+	else:
+		_start()
+
+
+func _on_Title_pressed() -> void:
+	ask(
+		"Return to the title screen?",
+		get_tree().change_scene_to_file.bind("res://title_screen.tscn")
+	)
+
+
+# Whether any leftover points could still buy a ship
+func can_add_ship() -> bool:
+	for ship_type: String in POINT_VALUES:
+		if slider(ship_type).value < slider(ship_type).max_value:
+			return true
+	return false
+
+
+# Swaps the buttons for a yes/no question; Yes runs `action`
+func ask(question: String, action: Callable) -> void:
+	pending = action
+	$VBoxContainer/Buttons.visible = false
+	$VBoxContainer/Confirm/Label.text = question
+	$VBoxContainer/Confirm.visible = true
+
+
+func _start() -> void:
 	confirmed.emit(selected_count)
 	queue_free()
+
+
+func _on_Yes_pressed() -> void:
+	pending.call()
+
+
+func _on_No_pressed() -> void:
+	$VBoxContainer/Confirm.visible = false
+	$VBoxContainer/Buttons.visible = true
 
 
 func set_island_tiles(count: int) -> void:

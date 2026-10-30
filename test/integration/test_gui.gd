@@ -80,3 +80,48 @@ func test_ship_hidden_until_placement_finds_a_spot() -> void:
 	await wait_frames(1)
 	assert_true(ship.visible, "shown once it snaps to a hex")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_ok_needs_at_least_one_ship() -> void:
+	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
+	var ok: Button = dialog.get_node("VBoxContainer/Buttons/OK")
+	assert_true(ok.disabled, "disabled with nothing picked")
+	slider(dialog, "Destroyer").value = 1
+	assert_false(ok.disabled)
+	dialog.get_node("VBoxContainer/Buttons/Reset").pressed.emit()
+	assert_true(ok.disabled, "disabled again after Reset")
+
+
+func test_unspent_points_ask_before_starting() -> void:
+	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
+	watch_signals(dialog)
+	slider(dialog, "Destroyer").value = 1
+	dialog.get_node("VBoxContainer/Buttons/OK").pressed.emit()
+	assert_signal_not_emitted(dialog, "confirmed", "asks first")
+	assert_true(dialog.get_node("VBoxContainer/Confirm").visible)
+	assert_string_contains(dialog.get_node("VBoxContainer/Confirm/Label").text, "22 points left")
+	dialog.get_node("VBoxContainer/Confirm/No").pressed.emit()
+	assert_true(dialog.get_node("VBoxContainer/Buttons").visible, "back to picking")
+	dialog.get_node("VBoxContainer/Buttons/OK").pressed.emit()
+	dialog.get_node("VBoxContainer/Confirm/Yes").pressed.emit()
+	assert_signal_emitted(dialog, "confirmed")
+
+
+func test_no_prompt_when_leftover_points_buy_nothing() -> void:
+	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
+	dialog.set_island_tiles(0)
+	watch_signals(dialog)
+	# 24 of 25 points; nothing costs 1
+	slider(dialog, "Carrier").value = 4
+	slider(dialog, "Battleship").value = 1
+	dialog.get_node("VBoxContainer/Buttons/OK").pressed.emit()
+	assert_signal_emitted(dialog, "confirmed")
+
+
+func test_title_button_asks_first() -> void:
+	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
+	dialog.get_node("VBoxContainer/Buttons/Title").pressed.emit()
+	assert_true(dialog.get_node("VBoxContainer/Confirm").visible)
+	assert_eq(dialog.get_node("VBoxContainer/Confirm/Label").text, "Return to the title screen?")
+	dialog.get_node("VBoxContainer/Confirm/No").pressed.emit()
+	assert_true(dialog.get_node("VBoxContainer/Buttons").visible)
