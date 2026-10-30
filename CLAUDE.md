@@ -50,7 +50,7 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 - The version is `application/config/version` in `project.godot`; the presets leave theirs empty so they inherit it. Keep it in step with the release tag.
 
 ## Task Tracking
-All tracking is in Beads (`bd`, issue prefix `fl-`). Not in this file, and not on the old Trello board (read-only archive).
+All tracking is in Beads (`bd`, issue prefix `fl-`), not in this file.
 - Find work: `bd ready` (unblocked), `bd list`, `bd show <id>`, `bd children <epic>`
 - Track work: `bd create "Title" -t bug|feature|task|epic|decision -p 0-4 [-l label] [--parent <id>] -d "..."`, `bd update <id> -s in_progress`, `bd close <id>`, `bd dep add <issue> <depends-on>`
 - Priorities: P0 blocking/soft-lock, P1 important, P2 normal, P3 later, P4 someday (usually `-s deferred`)
