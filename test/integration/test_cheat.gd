@@ -29,3 +29,19 @@ func test_v_shows_both_fleets_and_back() -> void:
 	assert_false(enemy.visible, "hidden again")
 	assert_true(game.players[0].ships[0].visible, "own fleet still shown")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_turning_v_off_keeps_revealed_ships() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	var enemy: Ship = game.players[1].ships[0]
+	press_v(game)
+	await wait_physics_frames(2)
+	game.players[1].reveal(enemy, " revealed by Recon Flight")
+	press_v(game)
+	await wait_physics_frames(2)
+	assert_true(enemy.visible, "still revealed")
+	get_node("/root/GutRunner/GutLayer").visible = true

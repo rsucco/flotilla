@@ -65,7 +65,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not reveal_all:
 			for player in players:
 				for ship in player.ships:
-					ship.visible = player.active
+					# Ships revealed by an ability are drawn translucent
+					ship.visible = player.active or ship.modulate.a < 1.0
 
 
 func _process(_delta: float) -> void:
