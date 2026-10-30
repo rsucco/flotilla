@@ -35,6 +35,14 @@ func _init(num: int) -> void:
 	player_num = num
 
 
+func _exit_tree() -> void:
+	# Copies aren't in the tree until new_turn() adopts them, so a game that
+	# ends first must free them itself
+	for revealed in temp_revealed_ships:
+		if is_instance_valid(revealed) and not revealed.is_inside_tree():
+			revealed.free()
+
+
 func has_moves() -> bool:
 	# Don't make any more moves if the opponent is defeated
 	if opponent.ships.is_empty():

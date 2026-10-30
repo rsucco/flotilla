@@ -158,6 +158,8 @@ func test_sonar_pulse_reveals_ship_on_center_hex() -> void:
 	p1.receive_special(Vector2i(22, 7), spawn(p0, "submarine", Vector2i(5, 7)), true)
 	assert_true(target.visible)
 	p1.finish_turn()
+	# Its revealed copy is freed at the end of the frame
+	await wait_process_frames(1)
 
 
 # Coastal Battery: Stationary drawback
@@ -171,6 +173,8 @@ func test_battery_reveals_itself_when_firing() -> void:
 	assert_eq(p1.temp_revealed_ships.size(), 1)
 	assert_eq(game.grid.tile(Vector2i(5, 7)).history[-1][1], "Coastal Battery revealed by firing")
 	p1.finish_turn()
+	# Its revealed copy is freed at the end of the frame
+	await wait_process_frames(1)
 
 
 # Destroyer: Lay Mine
