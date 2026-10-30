@@ -238,7 +238,7 @@ func sink_effect() -> void:
 	)
 	await tween.finished
 	visible = false
-	if sound.playing:
+	if is_instance_valid(sound) and sound.playing:
 		await sound.finished
 
 

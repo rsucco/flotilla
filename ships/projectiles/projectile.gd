@@ -95,7 +95,7 @@ func boom(pos: Vector2, land_miss: bool) -> void:
 	await get_tree().create_timer(0.9, false).timeout
 	fire.queue_free()
 	smoke.queue_free()
-	if sound and sound.playing:
+	if is_instance_valid(sound) and sound.playing:
 		await sound.finished
 
 
@@ -122,5 +122,5 @@ func splash(pos: Vector2) -> void:
 
 	await get_tree().create_timer(ripples.lifetime, false).timeout
 	ripples.queue_free()
-	if sound.playing:
+	if is_instance_valid(sound) and sound.playing:
 		await sound.finished

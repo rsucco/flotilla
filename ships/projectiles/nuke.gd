@@ -73,5 +73,5 @@ func explode(pos: Vector2) -> void:
 	fire.queue_free()
 	smoke.queue_free()
 	flash.queue_free()
-	if sound.playing:
+	if is_instance_valid(sound) and sound.playing:
 		await sound.finished

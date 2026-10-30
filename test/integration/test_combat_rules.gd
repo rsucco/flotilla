@@ -177,6 +177,14 @@ func test_battery_reveals_itself_when_firing() -> void:
 	await wait_process_frames(1)
 
 
+func test_battery_sinks_cleanly() -> void:
+	# Its sink sound ends before the fade does, freeing the sound player first
+	var battery := spawn_battery(p0, Vector2i(5, 7))
+	battery.held = true
+	await battery.sink_effect()
+	assert_false(battery.visible)
+
+
 # Destroyer: Lay Mine
 
 
