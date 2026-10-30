@@ -4,6 +4,13 @@ extends Control
 signal made_move
 # A ship of ours sank
 signal fleet_changed
+# An attack on the opponent: before its animation, just before the opponent
+# resolves it, and once resolved (the turn replay records them)
+signal attack_started(ship: Ship, kind: String, target: Vector2i)
+signal attack_landed
+signal attack_resolved
+# One of our ships set off an opponent's mine at `hex`
+signal mine_blast(hex: Vector2i)
 
 const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
 # Abilities that can damage ships, which count toward the hit rate
@@ -75,6 +82,7 @@ func damage_taken() -> int:
 func adopt(ship: Ship) -> void:
 	ship.grid = grid
 	ship.sank.connect(_on_ship_sank.bind(ship))
+	ship.mine_hit.connect(mine_blast.emit)
 	add_child(ship)
 
 

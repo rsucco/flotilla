@@ -172,7 +172,7 @@ func _attack(kind: String, hex: Vector2i) -> void:
 	var ship := selected_ship
 	animation_playing = true
 	_set_attack_buttons_disabled(true)
-	root.turn_replay.begin(ship, kind, hex)
+	attack_started.emit(ship, kind, hex)
 	match kind:
 		"fire":
 			await ship.fire(hex)
@@ -181,14 +181,14 @@ func _attack(kind: String, hex: Vector2i) -> void:
 		"secondary":
 			await ship.use_secondary(hex)
 	_set_attack_buttons_disabled(false)
-	root.turn_replay.land()
+	attack_landed.emit()
 	var damage := opponent.damage_taken()
 	var afloat := opponent.ships.size()
 	if kind == "fire":
 		opponent.receive_fire(hex, ship)
 	else:
 		opponent.receive_special(hex, ship, kind == "secondary")
-	root.turn_replay.end()
+	attack_resolved.emit()
 	var ability := ship.special if kind == "special" else ship.secondary
 	if kind == "fire" or ability.name in DAMAGING_ABILITIES:
 		attacks += 1

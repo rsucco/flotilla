@@ -3,6 +3,8 @@ extends Sprite2D
 
 signal placed
 signal sank
+# Set off a mine at `hex`
+signal mine_hit(hex: Vector2i)
 
 const SHIP_TYPES: Array[String] = [
 	"coastal_battery",
@@ -336,7 +338,7 @@ func check_for_mine() -> void:
 		var tile := grid.tile(h)
 		if tile.is_mined:
 			tile.is_mined = false
-			root.turn_replay.mine_blast(player, h)
+			mine_hit.emit(h)
 			# A random hex takes the hit (no effect if it's already damaged)
 			hit(get_occupied_hexes().pick_random(), self)
 

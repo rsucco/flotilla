@@ -87,7 +87,7 @@ func begin(ship: Ship, kind: String, target: Vector2i) -> void:
 
 
 # Call when the attacker moves onto one of the defender's mines
-func mine_blast(player: Player, hex: Vector2i) -> void:
+func mine_blast(hex: Vector2i, player: Player) -> void:
 	var action := Action.new()
 	action.player = player
 	action.kind = "mine"

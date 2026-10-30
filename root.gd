@@ -34,6 +34,10 @@ func _ready() -> void:
 		player.ship_shown.connect(gui.update_ship_info)
 		player.buttons_changed.connect(gui.set_buttons)
 		player.fleet_changed.connect(_update_fleets)
+		player.attack_started.connect(turn_replay.begin)
+		player.attack_landed.connect(turn_replay.land)
+		player.attack_resolved.connect(turn_replay.end)
+		player.mine_blast.connect(turn_replay.mine_blast.bind(player))
 	gui.action_pressed.connect(func(action: String) -> void: players[player_up].press(action))
 	play_game()
 
