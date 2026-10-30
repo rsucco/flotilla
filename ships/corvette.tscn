@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ships/corvette.gd" id="1"]
+[ext_resource type="Texture2D" path="res://ships/sprites/corvette.png" id="2"]
+[ext_resource type="Texture2D" path="res://ships/sprites/corvette_weapon.png" id="3"]
+
+[node name="Corvette" type="Sprite2D"]
+scale = Vector2(1, 1.3)
+texture = ExtResource("2")
+offset = Vector2(0, 15)
+script = ExtResource("1")
+
+[node name="Turret" type="Sprite2D" parent="."]
+scale = Vector2(0.3, 0.2)
+texture = ExtResource("3")
+offset = Vector2(0, -20)

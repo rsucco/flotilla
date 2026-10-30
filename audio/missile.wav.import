@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/missile.wav-9b82743bac8ae336dbd166b650ab7b31.sample"
+type="AudioStreamWAV"
+uid="uid://byn6hti3xwx2m"
+path="res://.godot/imported/missile.wav-9b82743bac8ae336dbd166b650ab7b31.sample"
 
 [deps]
 
 source_file="res://audio/missile.wav"
-dest_files=[ "res://.import/missile.wav-9b82743bac8ae336dbd166b650ab7b31.sample" ]
+dest_files=["res://.godot/imported/missile.wav-9b82743bac8ae336dbd166b650ab7b31.sample"]
 
 [params]
 

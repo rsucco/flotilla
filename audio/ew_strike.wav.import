@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/ew_strike.wav-5b708cffcb3cbe2cd1a1c344a41be6e6.sample"
+type="AudioStreamWAV"
+uid="uid://botqqodouk3o8"
+path="res://.godot/imported/ew_strike.wav-5b708cffcb3cbe2cd1a1c344a41be6e6.sample"
 
 [deps]
 
 source_file="res://audio/ew_strike.wav"
-dest_files=[ "res://.import/ew_strike.wav-5b708cffcb3cbe2cd1a1c344a41be6e6.sample" ]
+dest_files=["res://.godot/imported/ew_strike.wav-5b708cffcb3cbe2cd1a1c344a41be6e6.sample"]
 
 [params]
 

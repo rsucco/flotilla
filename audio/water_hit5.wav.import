@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/water_hit5.wav-9110a3f77663eefec36a86ae9ec95239.sample"
+type="AudioStreamWAV"
+uid="uid://cu6txea3gp7qd"
+path="res://.godot/imported/water_hit5.wav-9110a3f77663eefec36a86ae9ec95239.sample"
 
 [deps]
 
 source_file="res://audio/water_hit5.wav"
-dest_files=[ "res://.import/water_hit5.wav-9110a3f77663eefec36a86ae9ec95239.sample" ]
+dest_files=["res://.godot/imported/water_hit5.wav-9110a3f77663eefec36a86ae9ec95239.sample"]
 
 [params]
 

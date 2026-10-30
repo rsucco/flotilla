@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ships/submarine.gd" id="1"]
+[ext_resource type="Texture2D" path="res://ships/sprites/submarine.png" id="2"]
+
+[node name="Submarine" type="Sprite2D"]
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("2")
+script = ExtResource("1")

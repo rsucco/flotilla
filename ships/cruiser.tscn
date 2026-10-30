@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ships/cruiser.gd" id="1"]
+[ext_resource type="Texture2D" path="res://ships/sprites/cruiser_hull.png" id="2"]
+
+[node name="Cruiser" type="Sprite2D"]
+texture = ExtResource("2")
+script = ExtResource("1")

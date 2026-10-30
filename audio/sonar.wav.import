@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/sonar.wav-1da5ebdaaeabd69de224036ad0d137d0.sample"
+type="AudioStreamWAV"
+uid="uid://c2mkv8cqralko"
+path="res://.godot/imported/sonar.wav-1da5ebdaaeabd69de224036ad0d137d0.sample"
 
 [deps]
 
 source_file="res://audio/sonar.wav"
-dest_files=[ "res://.import/sonar.wav-1da5ebdaaeabd69de224036ad0d137d0.sample" ]
+dest_files=["res://.godot/imported/sonar.wav-1da5ebdaaeabd69de224036ad0d137d0.sample"]
 
 [params]
 

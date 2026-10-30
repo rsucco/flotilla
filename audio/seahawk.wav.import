@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/seahawk.wav-2ca41a1e6175d470740dcb9348fd5c8c.sample"
+type="AudioStreamWAV"
+uid="uid://dog6yhdif3mgs"
+path="res://.godot/imported/seahawk.wav-2ca41a1e6175d470740dcb9348fd5c8c.sample"
 
 [deps]
 
 source_file="res://audio/seahawk.wav"
-dest_files=[ "res://.import/seahawk.wav-2ca41a1e6175d470740dcb9348fd5c8c.sample" ]
+dest_files=["res://.godot/imported/seahawk.wav-2ca41a1e6175d470740dcb9348fd5c8c.sample"]
 
 [params]
 

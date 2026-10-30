@@ -1,15 +1,19 @@
 [remap]
 
-importer="ogg_vorbis"
-type="AudioStreamOGGVorbis"
-path="res://.import/game_music.ogg-7f53a5c29636dde2b87c4b7fc91ed71d.oggstr"
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://ueowk0g23kfv"
+path="res://.godot/imported/game_music.ogg-7f53a5c29636dde2b87c4b7fc91ed71d.oggvorbisstr"
 
 [deps]
 
 source_file="res://audio/game_music.ogg"
-dest_files=[ "res://.import/game_music.ogg-7f53a5c29636dde2b87c4b7fc91ed71d.oggstr" ]
+dest_files=["res://.godot/imported/game_music.ogg-7f53a5c29636dde2b87c4b7fc91ed71d.oggvorbisstr"]
 
 [params]
 
 loop=true
 loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

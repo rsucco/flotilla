@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/depth_charge_mine.wav-620de28a9afdc5891fe1c89af24febbd.sample"
+type="AudioStreamWAV"
+uid="uid://i6y6g4036ryl"
+path="res://.godot/imported/depth_charge_mine.wav-620de28a9afdc5891fe1c89af24febbd.sample"
 
 [deps]
 
 source_file="res://audio/depth_charge_mine.wav"
-dest_files=[ "res://.import/depth_charge_mine.wav-620de28a9afdc5891fe1c89af24febbd.sample" ]
+dest_files=["res://.godot/imported/depth_charge_mine.wav-620de28a9afdc5891fe1c89af24febbd.sample"]
 
 [params]
 

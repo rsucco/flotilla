@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/battery_destroyed.wav-f36c55c5dcdc8d062719415e0aa8d1ae.sample"
+type="AudioStreamWAV"
+uid="uid://c041ltqdk2iv0"
+path="res://.godot/imported/battery_destroyed.wav-f36c55c5dcdc8d062719415e0aa8d1ae.sample"
 
 [deps]
 
 source_file="res://audio/battery_destroyed.wav"
-dest_files=[ "res://.import/battery_destroyed.wav-f36c55c5dcdc8d062719415e0aa8d1ae.sample" ]
+dest_files=["res://.godot/imported/battery_destroyed.wav-f36c55c5dcdc8d062719415e0aa8d1ae.sample"]
 
 [params]
 

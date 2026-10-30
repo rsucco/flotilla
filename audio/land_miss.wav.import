@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/land_miss.wav-7a32efbe26f6dbeb68d28de354cbc50b.sample"
+type="AudioStreamWAV"
+uid="uid://c0x46u7vrqath"
+path="res://.godot/imported/land_miss.wav-7a32efbe26f6dbeb68d28de354cbc50b.sample"
 
 [deps]
 
 source_file="res://audio/land_miss.wav"
-dest_files=[ "res://.import/land_miss.wav-7a32efbe26f6dbeb68d28de354cbc50b.sample" ]
+dest_files=["res://.godot/imported/land_miss.wav-7a32efbe26f6dbeb68d28de354cbc50b.sample"]
 
 [params]
 

@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/missile_rotate.wav-6d6dc4c9ac67ea630ee74b93104fda33.sample"
+type="AudioStreamWAV"
+uid="uid://cfye17vkdt1il"
+path="res://.godot/imported/missile_rotate.wav-6d6dc4c9ac67ea630ee74b93104fda33.sample"
 
 [deps]
 
 source_file="res://audio/missile_rotate.wav"
-dest_files=[ "res://.import/missile_rotate.wav-6d6dc4c9ac67ea630ee74b93104fda33.sample" ]
+dest_files=["res://.godot/imported/missile_rotate.wav-6d6dc4c9ac67ea630ee74b93104fda33.sample"]
 
 [params]
 

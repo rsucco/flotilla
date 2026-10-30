@@ -1,0 +1,321 @@
+[gd_scene format=3]
+
+[ext_resource type="FontVariation" path="res://font.tres" id="1"]
+[ext_resource type="Script" path="res://gui.gd" id="2"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/button_template.png" id="3"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/fire.png" id="4"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/end_turn.png" id="5"]
+[ext_resource type="Texture2D" path="res://gui/sprites/carrier_icon.png" id="6"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/port.png" id="7"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/starboard.png" id="8"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/reverse.png" id="9"]
+[ext_resource type="Texture2D" path="res://gui/sprites/buttons/forward.png" id="10"]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0, 0.137255, 0.423529, 1)
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+border_blend = true
+
+[sub_resource type="StyleBoxLine" id="2"]
+vertical = true
+
+[node name="GUI" type="PanelContainer"]
+offset_top = 2.0
+offset_right = 1260.0
+offset_bottom = 90.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("1")
+script = ExtResource("2")
+
+[node name="GUIGrid" type="HBoxContainer" parent="."]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 1258.0
+offset_bottom = 86.0
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="ShipInfo" type="HBoxContainer" parent="GUIGrid"]
+offset_right = 291.0
+offset_bottom = 84.0
+size_flags_horizontal = 3
+
+[node name="AbilityInfo" type="VBoxContainer" parent="GUIGrid/ShipInfo"]
+offset_right = 204.0
+offset_bottom = 84.0
+size_flags_horizontal = 3
+
+[node name="SpecialAbility" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
+offset_top = 2.0
+offset_right = 204.0
+offset_bottom = 16.0
+mouse_filter = 1
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+text = "Special Ability:"
+
+[node name="SecondaryAbility" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
+offset_top = 24.0
+offset_right = 204.0
+offset_bottom = 38.0
+mouse_filter = 1
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+text = "Special Ability:"
+
+[node name="PassiveAbility" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
+offset_top = 46.0
+offset_right = 204.0
+offset_bottom = 60.0
+mouse_filter = 1
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+text = "Passive Ability:"
+
+[node name="Drawbacks" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
+offset_top = 68.0
+offset_right = 204.0
+offset_bottom = 82.0
+mouse_filter = 1
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+text = "Drawbacks:"
+
+[node name="VSeparator" type="VSeparator" parent="GUIGrid/ShipInfo"]
+offset_left = 208.0
+offset_right = 212.0
+offset_bottom = 84.0
+theme_override_styles/separator = SubResource("2")
+
+[node name="ActionInfo" type="VBoxContainer" parent="GUIGrid/ShipInfo"]
+offset_left = 216.0
+offset_right = 291.0
+offset_bottom = 84.0
+size_flags_horizontal = 8
+
+[node name="ShipName" type="Label" parent="GUIGrid/ShipInfo/ActionInfo"]
+offset_right = 75.0
+offset_bottom = 14.0
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+
+[node name="ShipIcon" type="TextureRect" parent="GUIGrid/ShipInfo/ActionInfo"]
+modulate = Color(1, 1, 1, 0)
+offset_top = 18.0
+offset_right = 75.0
+offset_bottom = 35.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("6")
+stretch_mode = 3
+
+[node name="HSeparator" type="HSeparator" parent="GUIGrid/ShipInfo/ActionInfo"]
+offset_top = 39.0
+offset_right = 75.0
+offset_bottom = 43.0
+
+[node name="AP" type="Label" parent="GUIGrid/ShipInfo/ActionInfo"]
+offset_top = 47.0
+offset_right = 75.0
+offset_bottom = 61.0
+text = "AP:"
+horizontal_alignment = 1
+
+[node name="Spacer" type="TextureRect" parent="GUIGrid/ShipInfo/ActionInfo"]
+modulate = Color(1, 1, 1, 0)
+offset_top = 65.0
+offset_right = 75.0
+offset_bottom = 82.0
+size_flags_horizontal = 0
+texture = ExtResource("6")
+stretch_mode = 2
+
+[node name="VSeparator0" type="VSeparator" parent="GUIGrid"]
+offset_left = 296.0
+offset_right = 300.0
+offset_bottom = 84.0
+theme_override_styles/separator = SubResource("2")
+
+[node name="Actions" type="GridContainer" parent="GUIGrid"]
+offset_left = 323.0
+offset_top = 9.0
+offset_right = 579.0
+offset_bottom = 75.0
+size_flags_horizontal = 6
+size_flags_vertical = 4
+columns = 4
+
+[node name="Fire" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_right = 82.0
+offset_bottom = 31.0
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "Fire"
+icon = ExtResource("4")
+
+[node name="Special" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_left = 86.0
+offset_right = 174.0
+offset_bottom = 31.0
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "Special"
+icon = ExtResource("3")
+
+[node name="Forward" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_left = 178.0
+offset_right = 215.0
+offset_bottom = 31.0
+size_flags_horizontal = 0
+disabled = true
+icon = ExtResource("10")
+icon_alignment = 1
+
+[node name="Port" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_left = 219.0
+offset_right = 256.0
+offset_bottom = 31.0
+size_flags_horizontal = 0
+disabled = true
+icon = ExtResource("7")
+
+[node name="EndTurn" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_top = 35.0
+offset_right = 82.0
+offset_bottom = 66.0
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "End Turn"
+icon = ExtResource("5")
+
+[node name="Secondary" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_left = 86.0
+offset_top = 35.0
+offset_right = 174.0
+offset_bottom = 66.0
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+disabled = true
+text = "Secondary"
+icon = ExtResource("3")
+
+[node name="Reverse" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_left = 178.0
+offset_top = 35.0
+offset_right = 215.0
+offset_bottom = 66.0
+size_flags_horizontal = 0
+disabled = true
+icon = ExtResource("9")
+
+[node name="Starboard" type="Button" parent="GUIGrid/Actions" groups=["action_buttons"]]
+offset_left = 219.0
+offset_top = 35.0
+offset_right = 256.0
+offset_bottom = 66.0
+size_flags_horizontal = 0
+disabled = true
+icon = ExtResource("8")
+
+[node name="VSeparator1" type="VSeparator" parent="GUIGrid"]
+offset_left = 602.0
+offset_right = 606.0
+offset_bottom = 84.0
+theme_override_styles/separator = SubResource("2")
+
+[node name="TurnNumber" type="VBoxContainer" parent="GUIGrid"]
+offset_left = 611.0
+offset_right = 639.0
+offset_bottom = 84.0
+size_flags_horizontal = 0
+
+[node name="Turn" type="Label" parent="GUIGrid/TurnNumber"]
+offset_right = 28.0
+offset_bottom = 31.0
+text = "Turn
+"
+horizontal_alignment = 1
+
+[node name="TurnNumber" type="Label" parent="GUIGrid/TurnNumber"]
+offset_top = 35.0
+offset_right = 28.0
+offset_bottom = 49.0
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="GUIGrid"]
+offset_left = 644.0
+offset_right = 648.0
+offset_bottom = 84.0
+theme_override_styles/separator = SubResource("2")
+
+[node name="Spacer" type="VBoxContainer" parent="GUIGrid"]
+offset_left = 653.0
+offset_right = 653.0
+offset_bottom = 84.0
+size_flags_horizontal = 4
+
+[node name="YourFleet" type="VBoxContainer" parent="GUIGrid"]
+offset_left = 658.0
+offset_right = 950.0
+offset_bottom = 84.0
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="YourFleetText" type="Label" parent="GUIGrid/YourFleet"]
+offset_right = 292.0
+offset_bottom = 14.0
+text = "Your Fleet:"
+horizontal_alignment = 1
+
+[node name="YourFleetIcons" type="GridContainer" parent="GUIGrid/YourFleet"]
+offset_left = 146.0
+offset_top = 51.0
+offset_right = 146.0
+offset_bottom = 51.0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+columns = 3
+
+[node name="VSeparator3" type="VSeparator" parent="GUIGrid"]
+offset_left = 955.0
+offset_right = 959.0
+offset_bottom = 84.0
+theme_override_styles/separator = SubResource("2")
+
+[node name="OpponentFleet" type="VBoxContainer" parent="GUIGrid"]
+offset_left = 964.0
+offset_right = 1256.0
+offset_bottom = 84.0
+size_flags_horizontal = 3
+
+[node name="OpponentFleetText" type="Label" parent="GUIGrid/OpponentFleet"]
+offset_right = 292.0
+offset_bottom = 14.0
+text = "Opponent's Fleet:"
+horizontal_alignment = 1
+
+[node name="OpponentFleetIcons" type="GridContainer" parent="GUIGrid/OpponentFleet"]
+offset_left = 146.0
+offset_top = 51.0
+offset_right = 146.0
+offset_bottom = 51.0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+columns = 3

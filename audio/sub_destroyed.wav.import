@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/sub_destroyed.wav-9993fecc7307c429dd7a39e8655eb389.sample"
+type="AudioStreamWAV"
+uid="uid://eufcywrj7gjd"
+path="res://.godot/imported/sub_destroyed.wav-9993fecc7307c429dd7a39e8655eb389.sample"
 
 [deps]
 
 source_file="res://audio/sub_destroyed.wav"
-dest_files=[ "res://.import/sub_destroyed.wav-9993fecc7307c429dd7a39e8655eb389.sample" ]
+dest_files=["res://.godot/imported/sub_destroyed.wav-9993fecc7307c429dd7a39e8655eb389.sample"]
 
 [params]
 

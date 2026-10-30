@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/torpedo.wav-1f12bba21d100550fd31e0fe85b34ef5.sample"
+type="AudioStreamWAV"
+uid="uid://ddk7xv78e84ga"
+path="res://.godot/imported/torpedo.wav-1f12bba21d100550fd31e0fe85b34ef5.sample"
 
 [deps]
 
 source_file="res://audio/torpedo.wav"
-dest_files=[ "res://.import/torpedo.wav-1f12bba21d100550fd31e0fe85b34ef5.sample" ]
+dest_files=["res://.godot/imported/torpedo.wav-1f12bba21d100550fd31e0fe85b34ef5.sample"]
 
 [params]
 

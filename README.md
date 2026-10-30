@@ -26,7 +26,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Size: 2
 - Points Cost: 2
 - Special Ability: None
-- Passive Ability: Plus 50% move speed if starting turn near an island tile
+- Passive Ability: One extra hex of movement if starting turn next to an island tile
 - Drawbacks: Has a 75% chance of sinking if hit in either hex
 
 ##### Destroyer
@@ -52,14 +52,14 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Size: 3
 - Points Cost: 3
 - Special Ability: (EW Strike - 3 turns) Select a hex on opponent's board; prevents all units within two hexes of central hex from firing next turn and either resets or adds five to their special ability cooldowns, whichever is less
-- Passive Ability: Has a 50% chance of intercepting incoming attacks from destroyers, cruisers, and aircraft carriers on hexes within two hexes of itself, has a 25% chance of intercepting incoming Nuclear Strike
+- Passive Ability: Has a 50% chance of intercepting incoming attacks from destroyers, cruisers, and aircraft carriers on hexes within two hexes of itself, has a 25% chance of intercepting incoming Nuclear Strike (an intercepted Nuclear Strike has no effect)
 - Drawbacks: None
 
 ##### Supply Tender
 - Weapon: None
 - Size: 3
 - Points Cost: 3
-- Special Ability: (UNREP - 3 turns) Completely heal an adjacent ship
+- Special Ability: (UNREP - 3 turns) Completely heal an adjacent ship (not itself); restores a Coastal Battery's HP
 - Passive Ability: If damaged, heals one hex every ten turns
 - Drawbacks: Loses 50% move speed when damaged
 

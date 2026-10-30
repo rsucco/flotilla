@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://ships/sprites/carrier_hull.png" id="1"]
+[ext_resource type="PackedScene" path="res://ships/f35.tscn" id="2"]
+[ext_resource type="Script" path="res://ships/carrier.gd" id="3"]
+[ext_resource type="Script" path="res://ships/f35.gd" id="4"]
+
+[node name="Carrier" type="Sprite2D"]
+scale = Vector2(0.9, 1)
+texture = ExtResource("1")
+script = ExtResource("3")
+
+[node name="F35" parent="." instance=ExtResource("2")]
+position = Vector2(0, 60)
+script = ExtResource("4")

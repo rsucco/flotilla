@@ -1,0 +1,39 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ships/battleship.gd" id="1"]
+[ext_resource type="Texture2D" path="res://ships/sprites/battleship_hull.png" id="2"]
+[ext_resource type="Texture2D" path="res://ships/sprites/battleship_weapon.png" id="3"]
+
+[node name="Battleship" type="Sprite2D"]
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("2")
+offset = Vector2(0, 30)
+script = ExtResource("1")
+
+[node name="Turret0" type="Sprite2D" parent="." groups=["turrets"]]
+position = Vector2(0, -22)
+rotation = 1.5708
+scale = Vector2(0.7, 0.6)
+texture = ExtResource("3")
+offset = Vector2(0, -15)
+
+[node name="Turret1" type="Sprite2D" parent="." groups=["turrets"]]
+position = Vector2(0, -5)
+rotation = 1.5708
+scale = Vector2(0.7, 0.6)
+texture = ExtResource("3")
+offset = Vector2(0, -15)
+
+[node name="Turret2" type="Sprite2D" parent="." groups=["turrets"]]
+position = Vector2(0, 81)
+rotation = 1.5708
+scale = Vector2(0.7, 0.6)
+texture = ExtResource("3")
+offset = Vector2(0, -15)
+
+[node name="Turret3" type="Sprite2D" parent="." groups=["turrets"]]
+position = Vector2(0, 98)
+rotation = 1.5708
+scale = Vector2(0.7, 0.6)
+texture = ExtResource("3")
+offset = Vector2(0, -15)

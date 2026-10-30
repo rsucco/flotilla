@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/battleship.wav-f8ea8f751272dba61f6414d7a3c8dce9.sample"
+type="AudioStreamWAV"
+uid="uid://eqqlbbykcwlt"
+path="res://.godot/imported/battleship.wav-f8ea8f751272dba61f6414d7a3c8dce9.sample"
 
 [deps]
 
 source_file="res://audio/battleship.wav"
-dest_files=[ "res://.import/battleship.wav-f8ea8f751272dba61f6414d7a3c8dce9.sample" ]
+dest_files=["res://.godot/imported/battleship.wav-f8ea8f751272dba61f6414d7a3c8dce9.sample"]
 
 [params]
 

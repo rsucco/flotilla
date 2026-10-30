@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/artillery_rotate.wav-69091f37a7343b75ac64dd89f1b54c9c.sample"
+type="AudioStreamWAV"
+uid="uid://vic14j7byfri"
+path="res://.godot/imported/artillery_rotate.wav-69091f37a7343b75ac64dd89f1b54c9c.sample"
 
 [deps]
 
 source_file="res://audio/artillery_rotate.wav"
-dest_files=[ "res://.import/artillery_rotate.wav-69091f37a7343b75ac64dd89f1b54c9c.sample" ]
+dest_files=["res://.godot/imported/artillery_rotate.wav-69091f37a7343b75ac64dd89f1b54c9c.sample"]
 
 [params]
 

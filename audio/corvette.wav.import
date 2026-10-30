@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/corvette.wav-763d7eec2d36a7d3e974d3009ca99109.sample"
+type="AudioStreamWAV"
+uid="uid://df4bmr4efyy4i"
+path="res://.godot/imported/corvette.wav-763d7eec2d36a7d3e974d3009ca99109.sample"
 
 [deps]
 
 source_file="res://audio/corvette.wav"
-dest_files=[ "res://.import/corvette.wav-763d7eec2d36a7d3e974d3009ca99109.sample" ]
+dest_files=["res://.godot/imported/corvette.wav-763d7eec2d36a7d3e974d3009ca99109.sample"]
 
 [params]
 

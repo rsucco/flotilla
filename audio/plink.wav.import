@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/plink.wav-cecca5112e25cbe9d5cfbfddf912bffc.sample"
+type="AudioStreamWAV"
+uid="uid://tfar86lotnqf"
+path="res://.godot/imported/plink.wav-cecca5112e25cbe9d5cfbfddf912bffc.sample"
 
 [deps]
 
 source_file="res://audio/plink.wav"
-dest_files=[ "res://.import/plink.wav-cecca5112e25cbe9d5cfbfddf912bffc.sample" ]
+dest_files=["res://.godot/imported/plink.wav-cecca5112e25cbe9d5cfbfddf912bffc.sample"]
 
 [params]
 
