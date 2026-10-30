@@ -46,7 +46,7 @@ func _process(delta: float) -> void:
 		if bombing:
 			bombing = false
 			var missile: Missile = MISSILE_SCENE.instantiate()
-			ship.root.add_child(missile)
+			ship.spawn(missile)
 			missile.launch(path_follow.global_position, target_hex, 0.0, true)
 			await missile.done
 			done.emit()
@@ -61,7 +61,7 @@ func _process(delta: float) -> void:
 
 # Flies out to `target` (and on to `target2` for a recon pass) and back
 func fly_to(target: Vector2i, target2: Vector2i = Grid.OFF_GRID) -> void:
-	dest = to_local(ship.root.grid.get_hex_center(target))
+	dest = to_local(ship.grid.get_hex_center(target))
 	# Construct a nice pretty Bézier curve to define the flight path
 	var start_point := Vector2.ZERO
 	var takeoff_point := Vector2(0, -200)
@@ -72,7 +72,7 @@ func fly_to(target: Vector2i, target2: Vector2i = Grid.OFF_GRID) -> void:
 	curve.add_point(start_point)
 	curve.add_point(takeoff_point, Vector2.ZERO, ingress_point)
 	if target2 != Grid.OFF_GRID:
-		var dest2 := to_local(ship.root.grid.get_hex_center(target2))
+		var dest2 := to_local(ship.grid.get_hex_center(target2))
 		var egress_point2 := (
 			Vector2(250, 150) if target2.x > Grid.NO_MANS_LAND else Vector2(-250, 150)
 		)

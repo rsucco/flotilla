@@ -53,10 +53,10 @@ func fire(target: Vector2i) -> void:
 		revealed_buddy = buddy
 		log_event(hex, "Coastal Battery revealed by firing")
 	var sound := Sfx.play(self, TURRET_SOUND)
-	await aim_turret(turret, root.grid.get_hex_center(target), 1.0)
+	await aim_turret(turret, grid.get_hex_center(target), 1.0)
 	sound.queue_free()
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
-	root.add_child(projectile)
+	spawn(projectile)
 	projectile.launch(
 		turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), target
 	)

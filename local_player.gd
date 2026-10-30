@@ -35,8 +35,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Only pay attention to the mouse, and only on our turn (after any replay)
 	if root.player_up != player_num or root.swapping or not (event is InputEventMouse):
 		return
-	var on_hex := root.grid.get_hex_from_coords(event.position)
-	var side := root.grid.side_of(on_hex)
+	var on_hex := grid.get_hex_from_coords(event.position)
+	var side := grid.side_of(on_hex)
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if side == player_num:
@@ -241,7 +241,7 @@ func _starboard() -> void:
 
 
 func get_hover_hexes(hex: Vector2i) -> Array[Vector2i]:
-	var side := root.grid.side_of(hex)
+	var side := grid.side_of(hex)
 	# On our half, don't bother with area of effect
 	if side == player_num:
 		return [hex]
@@ -251,10 +251,10 @@ func get_hover_hexes(hex: Vector2i) -> Array[Vector2i]:
 	# Recon Flight covers the entire row
 	if aiming["recon"]:
 		var row: Array[Vector2i] = []
-		for x: int in root.grid.columns_of(side):
+		for x: int in grid.columns_of(side):
 			row.append(Vector2i(x, hex.y))
 		return row
-	var hexes := root.grid.get_all_hex_neighbors(hex, targeting_hex_range)
+	var hexes := grid.get_all_hex_neighbors(hex, targeting_hex_range)
 	hexes.append(hex)
 	return hexes
 
@@ -293,7 +293,7 @@ func place_ships(counts: Dictionary) -> void:
 			var ship: Ship = (
 				load("res://ships/" + ship_type.to_snake_case() + ".tscn").instantiate()
 			)
-			add_child(ship)
+			adopt(ship)
 			ship.place()
 			await ship.placed
 			ships.append(ship)
@@ -309,7 +309,7 @@ func get_ship_selection() -> Dictionary:
 		"Player " + str(player_num + 1) + ", choose your ships:"
 	)
 	add_child(dialog)
-	dialog.set_island_tiles(root.grid.get_num_island_tiles(player_num))
+	dialog.set_island_tiles(grid.get_num_island_tiles(player_num))
 	return await dialog.confirmed
 
 

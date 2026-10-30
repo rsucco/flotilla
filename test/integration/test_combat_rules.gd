@@ -19,7 +19,7 @@ func before_each() -> void:
 
 func spawn(player: Player, type: String, hex: Vector2i, dir: int = 0) -> Ship:
 	var ship: Ship = load("res://ships/" + type + ".tscn").instantiate()
-	player.add_child(ship)
+	player.adopt(ship)
 	ship.set_grid_position(hex, dir)
 	player.ships.append(ship)
 	return ship

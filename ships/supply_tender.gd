@@ -46,7 +46,7 @@ func new_turn() -> void:
 func adjacent_ships() -> Array[Ship]:
 	var found: Array[Ship] = []
 	for h in get_occupied_hexes():
-		for neighbor in root.grid.get_all_hex_neighbors(h):
+		for neighbor in grid.get_all_hex_neighbors(h):
 			var ship := player.get_ship_at_hex(neighbor)
 			if ship != null and ship != self and not found.has(ship):
 				found.append(ship)

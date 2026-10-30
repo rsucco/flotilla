@@ -26,8 +26,8 @@ func _ready() -> void:
 func new_turn() -> void:
 	super()
 	for h in get_occupied_hexes():
-		for neighbor in root.grid.get_all_hex_neighbors(h):
-			if root.grid.tile(neighbor).island:
+		for neighbor in grid.get_all_hex_neighbors(h):
+			if grid.tile(neighbor).island:
 				print("passive - littoral ops")
 				ap = 5
 				break
@@ -46,10 +46,10 @@ func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 
 func fire(target: Vector2i) -> void:
 	super(target)
-	await aim_turret(turret, root.grid.get_hex_center(target), 0.5)
+	await aim_turret(turret, grid.get_hex_center(target), 0.5)
 	var projectile: BattleshipProjectile = PROJECTILE_SCENE.instantiate()
 	projectile.scale = Vector2(0.5, 0.5)
-	root.add_child(projectile)
+	spawn(projectile)
 	projectile.launch(
 		turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), target, FIRE_SOUND
 	)

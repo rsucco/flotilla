@@ -63,7 +63,7 @@ func _process(delta: float) -> void:
 		turn_chassis((path_follow.position - position).angle() - PI / 2, 1.0)
 		if dropping_charge:
 			var projectile: Projectile = PROJECTILE_SCENE.instantiate()
-			ship.root.add_child(projectile)
+			ship.spawn(projectile)
 			projectile.launch(path_follow.global_position, target_hex)
 			await projectile.done
 		Sfx.play(self, DROP_SOUND)
@@ -90,8 +90,8 @@ func instant_recall() -> void:
 		return
 	if bombing:
 		var projectile: Projectile = PROJECTILE_SCENE.instantiate()
-		ship.root.add_child(projectile)
-		projectile.launch(ship.root.grid.get_hex_center(target_hex), target_hex)
+		ship.spawn(projectile)
+		projectile.launch(ship.grid.get_hex_center(target_hex), target_hex)
 		await projectile.done
 	done.emit()
 	audio_player.stop()
@@ -105,7 +105,7 @@ func instant_recall() -> void:
 
 func fly_to(target: Vector2i) -> void:
 	target_hex = target
-	dest = to_local(ship.root.grid.get_hex_center(target))
+	dest = to_local(ship.grid.get_hex_center(target))
 	var curve := Curve2D.new()
 	curve.add_point(chassis.position)
 	curve.add_point(dest)
@@ -116,7 +116,7 @@ func fly_to(target: Vector2i) -> void:
 # Flies a loop around `center` and back without dropping anything; returns
 # once landed
 func patrol(center: Vector2i) -> void:
-	var middle := to_local(ship.root.grid.get_hex_center(center))
+	var middle := to_local(ship.grid.get_hex_center(center))
 	# Bézier handles for a circle drawn with 8 points
 	var handle := PATROL_RADIUS * 4.0 / 3.0 * tan(PI / 16)
 	var curve := Curve2D.new()

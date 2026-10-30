@@ -50,13 +50,13 @@ func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 # Can't shoot at land. The default target is in no-man's-land, so the
 # button check (no target yet) only considers AP and fire actions.
 func can_fire(target: Vector2i = Vector2i(Grid.NO_MANS_LAND, 0)) -> bool:
-	return super(target) and not root.grid.tile(target).island
+	return super(target) and not grid.tile(target).island
 
 
 func fire(target: Vector2i) -> void:
 	super(target)
 	var torpedo: Torpedo = TORPEDO_SCENE.instantiate()
-	root.add_child(torpedo)
+	spawn(torpedo)
 	torpedo.launch(global_position - Vector2(0, 42).rotated(rotation), target, global_rotation)
 	await torpedo.done
 
@@ -65,7 +65,7 @@ func use_special(target: Vector2i) -> void:
 	super(target)
 	var nuke: Missile = NUKE_SCENE.instantiate()
 	nuke.scale = Vector2(2, 2)
-	root.add_child(nuke)
+	spawn(nuke)
 	nuke.launch(
 		global_position + Vector2(0, -25).rotated(rotation), target, global_rotation_degrees
 	)
@@ -76,5 +76,5 @@ func use_secondary(target: Vector2i) -> void:
 	super(target)
 	Sfx.play(self, SONAR_SOUND)
 	var pulse: SonarPulse = PULSE_SCENE.instantiate()
-	root.add_child(pulse)
-	await pulse.play(root.grid.get_hex_center(target))
+	spawn(pulse)
+	await pulse.play(grid.get_hex_center(target))

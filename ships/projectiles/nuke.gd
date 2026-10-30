@@ -9,7 +9,7 @@ func _ready() -> void:
 
 func explode(pos: Vector2) -> void:
 	# Intercepted by a cruiser: just the normal impact effect
-	var last_event := root.grid.tile(dest_hex).get_last_event()
+	var last_event := grid.tile(dest_hex).get_last_event()
 	if not last_event.is_empty() and last_event[1].begins_with("Miss (CIWS"):
 		await super(pos)
 		return

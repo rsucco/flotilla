@@ -21,6 +21,8 @@ var base_time_scale := 1.0
 # Ghost ships and everything they add to Root while playing
 var ghosts: Array[Ship] = []
 var spawned: Array[Node] = []
+# Set by Root once the board exists
+var grid: Grid
 # Shown only once over the defender's side, so the replay gives away the angle
 # of fire but not where the attacker's ships are
 var masked: Array[Node2D] = []
@@ -66,7 +68,7 @@ func has_actions() -> bool:
 func begin(ship: Ship, kind: String, target: Vector2i) -> void:
 	recording = null
 	# Only attacks on the opponent's side (not UNREP)
-	if root.grid.side_of(target) != 1 - ship.player.player_num:
+	if grid.side_of(target) != 1 - ship.player.player_num:
 		return
 	recording = Action.new()
 	recording.player = ship.player
@@ -103,7 +105,7 @@ func land() -> void:
 		if ship is CoastalBattery:
 			recording.hp_before[ship] = (ship as CoastalBattery).hp
 	for hex in _side_hexes(defender):
-		recording.history_before[hex] = root.grid.tile(hex).history.size()
+		recording.history_before[hex] = grid.tile(hex).history.size()
 
 
 # Call once the defender has resolved the attack
@@ -127,7 +129,7 @@ func end() -> void:
 			action.hit_ships.append(battery)
 	# Sounds for outcomes that leave no mark on the board
 	for hex in _side_hexes(defender):
-		var history := root.grid.tile(hex).history
+		var history := grid.tile(hex).history
 		for event: Array in history.slice(action.history_before[hex]):
 			if event[1] == "Miss (Blocked by Armor)":
 				action.sounds.append([defender.get_ship_at_hex(hex), Battleship.ARMOR_SOUND])
@@ -212,7 +214,7 @@ func _process(_delta: float) -> void:
 
 
 func _over(player: int, at: Vector2) -> bool:
-	return root.grid.side_of(root.grid.get_hex_from_coords(at)) == player
+	return grid.side_of(grid.get_hex_from_coords(at)) == player
 
 
 # The defender's mine going off under one of the attacker's ships
@@ -220,17 +222,18 @@ func _blast(hex: Vector2i) -> void:
 	var blast: Projectile = BLAST_SCENE.instantiate()
 	root.add_child(blast)
 	blast.root = root
+	blast.grid = grid
 	blast.dest_hex = hex
 	blast.texture = null
 	Sfx.play(blast, SH60.DROP_SOUND)
-	await blast.boom(root.grid.get_hex_center(hex), false)
+	await blast.boom(grid.get_hex_center(hex), false)
 	blast.queue_free()
 
 
 func _make_ghost(action: Action) -> Ship:
 	var ghost: Ship = load(action.scene).instantiate()
 	ghost.ghost = true
-	action.player.add_child(ghost)
+	action.player.adopt(ghost)
 	ghost.global_position = action.position
 	ghost.global_rotation = action.rotation
 	for turret: String in action.turrets:
@@ -350,7 +353,7 @@ func _set_fast(value: bool) -> void:
 
 func _side_hexes(player: Player) -> Array[Vector2i]:
 	var hexes: Array[Vector2i] = []
-	for x: int in root.grid.columns_of(player.player_num):
+	for x: int in grid.columns_of(player.player_num):
 		for y in Grid.ROWS:
 			hexes.append(Vector2i(x, y))
 	return hexes

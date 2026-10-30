@@ -33,7 +33,7 @@ func fire(target: Vector2i) -> void:
 	var turret := turrets[next_turret]
 	next_turret = (next_turret + 1) % turrets.size()
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
-	root.add_child(projectile)
+	spawn(projectile)
 	projectile.launch(
 		turret.global_position + Vector2(0, -20).rotated(turret.global_rotation), target
 	)
@@ -52,7 +52,7 @@ func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 func use_special(target: Vector2i) -> void:
 	super(target)
 	await point_turrets(target)
-	var targets := root.grid.get_all_hex_neighbors(target, special.aoe)
+	var targets := grid.get_all_hex_neighbors(target, special.aoe)
 	# The first and last turrets both shoot at the center hex
 	targets.push_front(target)
 	targets.append(target)
@@ -66,7 +66,7 @@ func use_special(target: Vector2i) -> void:
 		for barrel in 2:
 			var offset := Vector2(-5 if barrel == 0 else 5, -20).rotated(turret.global_rotation)
 			last = PROJECTILE_SCENE.instantiate()
-			root.add_child(last)
+			spawn(last)
 			last.launch(turret.global_position + offset, targets[i * 2 + barrel])
 		# Stagger fire times slightly
 		await get_tree().create_timer(0.075, false).timeout
@@ -76,7 +76,7 @@ func use_special(target: Vector2i) -> void:
 # Rotates all turrets toward the target together
 func point_turrets(target: Vector2i) -> void:
 	var sound := Sfx.play(self, TURRET_SOUND)
-	var center := root.grid.get_hex_center(target)
+	var center := grid.get_hex_center(target)
 	for turret in turrets.slice(0, -1):
 		aim_turret(turret, center, 1.0)
 	await aim_turret(turrets[-1], center, 1.0)

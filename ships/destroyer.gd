@@ -32,7 +32,7 @@ func fire(target: Vector2i) -> void:
 	sh60.instant_recall()
 	var missile: Missile = MISSILE_SCENE.instantiate()
 	missile.scale = Vector2(2, 2)
-	root.add_child(missile)
+	spawn(missile)
 	missile.launch(
 		global_position + Vector2(0, -25).rotated(rotation), target, global_rotation_degrees
 	)
@@ -51,6 +51,6 @@ func use_secondary(target: Vector2i) -> void:
 	if ghost:
 		# Replays don't give away where the mine went: just circle the middle
 		# of the opponent's side
-		await sh60.patrol(Vector2i(root.grid.columns_of(1 - player.player_num)[7], 7))
+		await sh60.patrol(Vector2i(grid.columns_of(1 - player.player_num)[7], 7))
 	else:
 		await sh60.mine(target)

@@ -10,6 +10,8 @@ const FIRE_TEXTURE := preload("res://ships/sprites/projectiles/fire.png")
 const SMOKE_TEXTURE := preload("res://ships/sprites/projectiles/smoke.png")
 
 var root: Root
+# Set by whoever fires it
+var grid: Grid
 var dest: Vector2
 var dest_hex: Vector2i
 var speed := 0.0
@@ -21,7 +23,7 @@ func launch(origin: Vector2, target: Vector2i) -> void:
 	root = get_parent()
 	global_position = origin
 	dest_hex = target
-	dest = root.grid.get_hex_center(dest_hex)
+	dest = grid.get_hex_center(dest_hex)
 	# The sprite's nose is +x
 	rotation = (dest - position).angle()
 	moving = true
@@ -31,7 +33,7 @@ func _process(delta: float) -> void:
 	if not moving:
 		return
 	position = position.move_toward(dest, speed * delta)
-	if root.grid.get_hex_from_coords(position) == dest_hex:
+	if grid.get_hex_from_coords(position) == dest_hex:
 		moving = false
 		done.emit()
 		position = dest
@@ -42,7 +44,7 @@ func _process(delta: float) -> void:
 # Plays the impact effect at `pos`; returns when it's finished
 func explode(pos: Vector2) -> void:
 	texture = null
-	var tile := root.grid.tile(dest_hex)
+	var tile := grid.tile(dest_hex)
 	var last_event := tile.get_last_event()
 	if last_event.is_empty():
 		return

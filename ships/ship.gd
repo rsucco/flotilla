@@ -46,6 +46,7 @@ var held := false
 var jammed := false
 var root: Root
 var player: Player
+var grid: Grid
 var movement_audio_player: AudioStreamPlayer2D
 
 
@@ -63,14 +64,14 @@ func _input(event: InputEvent) -> void:
 	if not placing:
 		return
 	if event is InputEventMouseMotion:
-		var mouse_hex := root.grid.get_hex_from_coords(event.position)
+		var mouse_hex := grid.get_hex_from_coords(event.position)
 		var hexes := _get_hexes_at(mouse_hex, direction)
 		var any_land := false
 		var occupied := false
 		for h in hexes:
 			if h == Grid.OFF_GRID:
 				continue
-			if root.grid.tile(h).island:
+			if grid.tile(h).island:
 				any_land = true
 			if root.get_ship_at_hex(h) != null:
 				occupied = true
@@ -81,7 +82,7 @@ func _input(event: InputEvent) -> void:
 			not hexes.has(Grid.OFF_GRID)
 			and not any_land
 			and not occupied
-			and root.grid.side_of(mouse_hex) == player.player_num
+			and grid.side_of(mouse_hex) == player.player_num
 		):
 			set_grid_position(mouse_hex, direction)
 			visible = true
@@ -101,7 +102,7 @@ func set_grid_position(new_hex: Vector2i, new_direction: int) -> void:
 	direction = new_direction
 	rotation_degrees = direction
 	hex = new_hex
-	position = root.grid.get_hex_center(hex)
+	position = grid.get_hex_center(hex)
 
 
 func get_occupied_hexes() -> Array[Vector2i]:
@@ -115,12 +116,12 @@ func _get_hexes_at(center: Vector2i, dir: int) -> Array[Vector2i]:
 	var hexes: Array[Vector2i] = []
 	var h := center
 	for _i in len_aft:
-		h = root.grid.get_hex_neighbor(h, dir + 180)
+		h = grid.get_hex_neighbor(h, dir + 180)
 		hexes.push_front(h)
 	hexes.append(center)
 	h = center
 	for _i in len_fore:
-		h = root.grid.get_hex_neighbor(h, dir)
+		h = grid.get_hex_neighbor(h, dir)
 		hexes.append(h)
 	return hexes
 
@@ -155,8 +156,15 @@ func place() -> void:
 	placing = true
 
 
+# Adds an effect (projectile, pulse...) to the board, giving projectiles the grid
+func spawn(effect: Node2D) -> void:
+	if effect is Projectile:
+		(effect as Projectile).grid = grid
+	root.add_child(effect)
+
+
 func log_event(h: Vector2i, event: String) -> void:
-	root.grid.tile(h).history.append([root.current_turn, event])
+	grid.tile(h).history.append([root.current_turn, event])
 
 
 func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
@@ -190,7 +198,7 @@ func _add_smoke(index: int) -> void:
 	smoke.color = Color.BLACK
 	smoke.amount = _get_size() ** 2 * 10
 	smoke.lifetime = 0.5
-	smoke.position.y -= root.grid.hex_size * (index - len_aft)
+	smoke.position.y -= grid.hex_size * (index - len_aft)
 	if len_fore == 0:
 		smoke.position.y -= 10
 	elif len_fore == 2:
@@ -264,7 +272,7 @@ func _animate_move(property: String, target: Variant, duration: float) -> void:
 func _is_clear(hexes: Array[Vector2i]) -> bool:
 	for h in hexes:
 		var other := root.get_ship_at_hex(h)
-		if root.grid.tile(h).island or (other != null and other != self):
+		if grid.tile(h).island or (other != null and other != self):
 			return false
 	return true
 
@@ -276,7 +284,7 @@ func can_move(reverse: bool = false) -> bool:
 		return false
 	if ap < 1 or (reverse and ap < 4):
 		return false
-	var new_hex := root.grid.get_hex_neighbor(hex, direction + (180 if reverse else 0))
+	var new_hex := grid.get_hex_neighbor(hex, direction + (180 if reverse else 0))
 	var hexes := _get_hexes_at(new_hex, direction)
 	return not hexes.has(Grid.OFF_GRID) and _is_clear(hexes)
 
@@ -302,17 +310,17 @@ func can_secondary() -> bool:
 
 
 func forward() -> void:
-	hex = root.grid.get_hex_neighbor(hex, direction)
+	hex = grid.get_hex_neighbor(hex, direction)
 	ap -= 1
 	check_for_mine()
-	await _animate_move("position", root.grid.get_hex_center(hex), 1.5)
+	await _animate_move("position", grid.get_hex_center(hex), 1.5)
 
 
 func reverse() -> void:
-	hex = root.grid.get_hex_neighbor(hex, direction + 180)
+	hex = grid.get_hex_neighbor(hex, direction + 180)
 	ap -= 4
 	check_for_mine()
-	await _animate_move("position", root.grid.get_hex_center(hex), 2.0)
+	await _animate_move("position", grid.get_hex_center(hex), 2.0)
 
 
 func port() -> void:
@@ -329,7 +337,7 @@ func starboard() -> void:
 
 func check_for_mine() -> void:
 	for h in get_occupied_hexes():
-		var tile := root.grid.tile(h)
+		var tile := grid.tile(h)
 		if tile.is_mined:
 			tile.is_mined = false
 			root.turn_replay.mine_blast(player, h)

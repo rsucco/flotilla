@@ -18,7 +18,7 @@ func before_each() -> void:
 
 func spawn(player: int, type: String, hex: Vector2i, dir: int = 0) -> Ship:
 	var ship: Ship = load("res://ships/" + type + ".tscn").instantiate()
-	game.players[player].add_child(ship)
+	game.players[player].adopt(ship)
 	ship.set_grid_position(hex, dir)
 	game.players[player].ships.append(ship)
 	return ship
@@ -87,6 +87,7 @@ func test_turret_takes_shortest_way_around() -> void:
 func test_missile_turns_to_face_target() -> void:
 	for shot: Array in [[Vector2i(5, 7), Vector2i(25, 2)], [Vector2i(25, 7), Vector2i(3, 12)]]:
 		var missile: Missile = MISSILE_SCENE.instantiate()
+		missile.grid = game.grid
 		game.add_child(missile)
 		missile.launch(game.grid.get_hex_center(shot[0]), shot[1])
 		await wait_until(func() -> bool: return missile.enroute, 3)
@@ -98,6 +99,7 @@ func test_missile_turns_to_face_target() -> void:
 
 func test_torpedo_points_along_its_path() -> void:
 	var torpedo: Torpedo = TORPEDO_SCENE.instantiate()
+	torpedo.grid = game.grid
 	game.add_child(torpedo)
 	torpedo.launch(game.grid.get_hex_center(Vector2i(5, 7)), Vector2i(25, 9))
 	await wait_seconds(1.0)
@@ -112,6 +114,7 @@ func test_torpedo_points_along_its_path() -> void:
 func test_shell_points_at_target() -> void:
 	for shot: Array in [[Vector2i(5, 7), Vector2i(25, 2)], [Vector2i(25, 7), Vector2i(3, 12)]]:
 		var shell: Projectile = SHELL_SCENE.instantiate()
+		shell.grid = game.grid
 		game.add_child(shell)
 		shell.launch(game.grid.get_hex_center(shot[0]), shot[1])
 		var dir := shell.global_position.direction_to(shell.dest)

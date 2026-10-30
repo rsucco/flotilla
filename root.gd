@@ -38,6 +38,10 @@ func _input(_event: InputEvent) -> void:
 
 func play_game() -> void:
 	grid = Grid.new()
+	for player in players:
+		player.grid = grid
+	$TileHistory.grid = grid
+	turn_replay.grid = grid
 	player_up = 0
 	var selections: Array = []
 	if not replay.is_empty():

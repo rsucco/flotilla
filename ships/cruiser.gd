@@ -34,7 +34,7 @@ func fire(target: Vector2i) -> void:
 	super(target)
 	var missile: Missile = MISSILE_SCENE.instantiate()
 	missile.scale = Vector2(2, 2)
-	root.add_child(missile)
+	spawn(missile)
 	var silo := Vector2(0, -24) if fore_silo else Vector2(0, 40)
 	fore_silo = not fore_silo
 	missile.launch(global_position + silo.rotated(rotation), target, global_rotation_degrees)
@@ -44,5 +44,5 @@ func fire(target: Vector2i) -> void:
 func use_special(target: Vector2i) -> void:
 	super(target)
 	var ew: EWStrike = EW_SCENE.instantiate()
-	root.add_child(ew)
-	await ew.play(root.grid.get_hex_center(target))
+	spawn(ew)
+	await ew.play(grid.get_hex_center(target))

@@ -13,7 +13,7 @@ var enroute := false
 # Follows its own path instead of moving straight, so no super()
 func _process(delta: float) -> void:
 	path_follow.progress += speed * delta
-	if enroute and root.grid.get_hex_from_coords(to_global(path_follow.position)) == dest_hex:
+	if enroute and grid.get_hex_from_coords(to_global(path_follow.position)) == dest_hex:
 		enroute = false
 		done.emit()
 		await explode(to_global(dest))
@@ -28,7 +28,7 @@ func launch(origin: Vector2, target: Vector2i, start_rotation: float = 0.0) -> v
 	rotation = start_rotation
 	global_position = origin
 	dest_hex = target
-	dest = to_local(root.grid.get_hex_center(dest_hex))
+	dest = to_local(grid.get_hex_center(dest_hex))
 	speed = 150.0
 	enroute = true
 
