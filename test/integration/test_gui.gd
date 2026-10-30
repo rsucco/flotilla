@@ -221,3 +221,27 @@ func test_history_is_stamped_with_the_turn() -> void:
 	await driver.act("cruiser", "Fire", Vector2i(28, 13))
 	assert_eq(game.grid.tile(Vector2i(28, 13)).history, [[1, "Miss"]] as Array[Array])
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_ships_out_of_ap_are_tinted_and_pips_show_ap() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	var battery := driver.ship_of(0, "coastal_battery")
+	var pips := game.gui.ap_pips
+	await driver.select("coastal_battery")
+	assert_eq([pips.ap, pips.total], [2, 2])
+	# Firing uses both of the battery's AP
+	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
+	assert_eq(battery.modulate, LocalPlayer.DONE_TINT, "tinted once out of AP")
+	assert_eq(driver.ship_of(0, "battleship").modulate, Color.WHITE, "others untinted")
+	await driver.select("coastal_battery")
+	assert_eq([pips.ap, pips.total], [0, 2])
+	await driver.end_turn()
+	await driver.swap()
+	await driver.end_turn()
+	await driver.swap()
+	assert_eq(battery.modulate, Color.WHITE, "untinted next turn")
+	get_node("/root/GutRunner/GutLayer").visible = true

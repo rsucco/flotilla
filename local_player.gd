@@ -7,6 +7,8 @@ signal ship_shown(ship: Ship)
 signal buttons_changed(enabled: Dictionary)
 
 const TILE_HIST_HOVER_TIME := 0.5
+# Ships with no AP left; opaque, since translucent means revealed
+const DONE_TINT := Color(0.55, 0.55, 0.55)
 const ACTION_BUTTONS: Array[String] = [
 	"Fire", "Special", "Secondary", "NextShip", "Forward", "Reverse", "Port", "Starboard"
 ]
@@ -347,6 +349,8 @@ func get_move() -> void:
 	ships_with_moves = ships_with_moves.filter(
 		func(s: Ship) -> bool: return ships.has(s) and s.ap > 0
 	)
+	for ship in ships:
+		ship.modulate = Color.WHITE if ship.ap > 0 else DONE_TINT
 	_select_ship(ships_with_moves[0])
 	awaiting_move = true
 
