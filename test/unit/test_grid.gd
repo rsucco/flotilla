@@ -59,3 +59,12 @@ func test_last_event_ignores_non_hit_events() -> void:
 	assert_eq(tile.get_last_event(), [1, "Hit"])
 	tile.history.append([2, "Mine laid"])
 	assert_eq(tile.get_last_event(), [])
+
+
+func test_every_side_has_at_least_three_islands() -> void:
+	# A side rolls fewer than three about one time in six
+	seed(4)
+	for _i in 100:
+		var board := Grid.new()
+		assert_gte(board.get_num_island_tiles(0), Grid.MIN_ISLANDS)
+		assert_gte(board.get_num_island_tiles(1), Grid.MIN_ISLANDS)

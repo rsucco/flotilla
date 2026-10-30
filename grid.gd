@@ -7,6 +7,8 @@ const ROWS := 15
 const NO_MANS_LAND := 15
 const OFF_GRID := Vector2i(-1, -1)
 const ISLAND_CHANCE := 0.02
+# Per side, so there's always somewhere for coastal batteries
+const MIN_ISLANDS := 3
 
 # Neighbor offsets for odd-q offset coordinates, indexed by column parity,
 # then by direction (0, 60, ..., 300 degrees)
@@ -46,6 +48,10 @@ func _init(size: float = 50.0) -> void:
 			else:
 				column.append(Tile.new(false, randf() < ISLAND_CHANCE))
 		tiles.append(column)
+	for player in 2:
+		var columns := columns_of(player)
+		while get_num_island_tiles(player) < MIN_ISLANDS:
+			tile(Vector2i(columns.pick_random(), randi() % ROWS)).island = true
 
 
 func tile(hex: Vector2i) -> Tile:

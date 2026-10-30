@@ -7,7 +7,7 @@ I first started this project back in 2022, doing all the programming myself. Ove
 Basic gameplay is similar to Battleship, with some exceptions:
 - Rather than a 10x10 rectangular grid, each player places their ships on a 15x15 hexagonal grid. Ships can be placed diagonally.
 - Rather than starting with one of each ship, each player is alloted a certain amount of points to purchase ships, and can choose their own fleet composition.
-- Some tiles are island tiles where ships are not allowed to go. Coastal batteries can be placed on these tiles.
+- Some tiles (at least three per side) are island tiles where ships are not allowed to go. Coastal batteries can be placed on these tiles.
 - Every ship is allowed to fire at least once per turn.
 - Every ship is allowed to move at least one tile or rotate at least 60° per turn, unless more than 50% damaged.
 - Most ships have a special ability that can be used after a cooldown period.
