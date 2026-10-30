@@ -69,7 +69,7 @@ func explode(pos: Vector2) -> void:
 	)
 	await tween.finished
 
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	fire.queue_free()
 	smoke.queue_free()
 	flash.queue_free()

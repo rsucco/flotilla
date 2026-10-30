@@ -71,6 +71,22 @@ func get_num_island_tiles(player: int) -> int:
 	return count
 
 
+func get_islands() -> Array[Vector2i]:
+	var islands: Array[Vector2i] = []
+	for x in COLUMNS:
+		for y in ROWS:
+			if tiles[x][y].island:
+				islands.append(Vector2i(x, y))
+	return islands
+
+
+# Replaces the random islands, e.g. to replay a board
+func set_islands(islands: Array[Vector2i]) -> void:
+	for x in COLUMNS:
+		for y in ROWS:
+			tiles[x][y].island = islands.has(Vector2i(x, y))
+
+
 # Returns the endpoints of every in-bounds walk of exactly `distance` steps.
 # Distance 1 is the six neighbors (excluding the hex itself); distance 2+
 # includes the hex itself and duplicates, so callers dedupe.

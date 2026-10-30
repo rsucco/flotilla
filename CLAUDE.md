@@ -25,6 +25,7 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 - Aim with `direction_to(target).angle()`, and mind which way the sprite points (turrets up, missiles left, shells and torpedoes right).
 - Engine callbacks (`_ready`, `_process`, `_input`) override the parent's; subclasses must call `super()`.
 - Prefer `CPUParticles2D` (works everywhere). Its defaults: `local_coords` is false and gravity is (0, 980).
+- `SceneTree.create_timer()` keeps running while the tree is paused unless you pass `process_always = false`. Game code passes `false` so effects freeze under the Esc menu.
 - Controls block the mouse by default (`MOUSE_FILTER_STOP`). Set `MOUSE_FILTER_IGNORE` on overlays and effects (e.g. the nuke flash), or they eat clicks meant for the board.
 - Create child nodes where they're attached (`_ready`, or the function that adds them), not as member defaults like `var p := AudioStreamPlayer2D.new()`. Instances that never attach them leak.
 - Web exports use `variant/thread_support=false` so they run without COOP/COEP headers. Don't add threads.

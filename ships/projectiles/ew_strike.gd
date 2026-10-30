@@ -13,7 +13,7 @@ func play(pos: Vector2) -> void:
 	Sfx.play(self, EW_SOUND)
 	position = pos
 	add_child(make_static())
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.5, false).timeout
 	queue_free()
 
 

@@ -69,7 +69,7 @@ func use_special(target: Vector2i) -> void:
 			root.add_child(last)
 			last.launch(turret.global_position + offset, targets[i * 2 + barrel])
 		# Stagger fire times slightly
-		await get_tree().create_timer(0.075).timeout
+		await get_tree().create_timer(0.075, false).timeout
 	await last.done
 
 

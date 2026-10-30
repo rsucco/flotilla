@@ -47,7 +47,7 @@ func launch(
 	else:
 		sound.stream = rotate_sound
 		sound.play()
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(0.5, false).timeout
 		var tween := create_tween()
 		(
 			tween

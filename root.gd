@@ -9,12 +9,19 @@ const HITMISS_TEXTURE := preload("res://gui/sprites/hitmiss.png")
 const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")
 const VICTORY_SCENE := preload("res://gui/victory.tscn")
 
+# "Replay This Game" keeps the board and both fleets across a scene reload
+static var replay := {}
+
 var grid: Grid
 var gui: GUI
 var players: Array[LocalPlayer] = []
 var player_up := 0
 var current_turn := 0
 var swapping := false
+# The board and fleets this game started with, once both players have chosen
+var setup := {}
+
+@onready var pause_menu: PauseMenu = $PauseMenu
 
 
 func _ready() -> void:
@@ -31,10 +38,18 @@ func _input(_event: InputEvent) -> void:
 func play_game() -> void:
 	grid = Grid.new()
 	player_up = 0
+	var selections: Array = []
+	if not replay.is_empty():
+		grid.set_islands(replay.islands)
+		selections = replay.selections
+		replay = {}
 	# Ship selection and placement
 	for player in players:
-		var selection := await player.get_ship_selection()
-		await player.place_ships(selection)
+		if selections.size() <= player.player_num:
+			selections.append(await player.get_ship_selection())
+		await player.place_ships(selections[player.player_num])
+	setup = {"islands": grid.get_islands(), "selections": selections}
+	pause_menu.can_replay = true
 	gui.update_fleets()
 	# Play until one player has no more ships
 	while not players[0].ships.is_empty() and not players[1].ships.is_empty():
@@ -68,6 +83,11 @@ func play_game() -> void:
 	var victory := VICTORY_SCENE.instantiate()
 	victory.update_winner("One" if players[0].ships.size() > players[1].ships.size() else "Two")
 	add_child(victory)
+
+
+func _on_pause_menu_replay_requested() -> void:
+	replay = setup
+	get_tree().reload_current_scene()
 
 
 func get_ship_at_hex(hex: Vector2i) -> Ship:

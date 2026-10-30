@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://gui/tile_history.tscn" id="2"]
 [ext_resource type="AudioStream" path="res://audio/game_music.ogg" id="3"]
 [ext_resource type="Script" path="res://root.gd" id="4"]
+[ext_resource type="PackedScene" path="res://gui/pause_menu.tscn" id="5"]
 
 [node name="Root" type="Node2D"]
 script = ExtResource("4")
@@ -21,3 +22,7 @@ visible = false
 stream = ExtResource("3")
 volume_db = -12.0
 autoplay = true
+
+[node name="PauseMenu" parent="." instance=ExtResource("5")]
+
+[connection signal="replay_requested" from="PauseMenu" to="." method="_on_pause_menu_replay_requested"]
