@@ -4,12 +4,18 @@ extends Control
 signal made_move
 
 const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
+# Abilities that can damage ships, which count toward the hit rate
+const DAMAGING_ABILITIES: Array[String] = ["Salvo", "Nuclear Strike", "ASW Strike"]
 
 var player_num: int
 var ships: Array[Ship] = []
 var temp_revealed_ships: Array[Ship] = []
 var selected_ship: Ship
 var root: Root
+# For the victory screen
+var fleet_size := 0
+var attacks := 0
+var hits := 0
 
 
 func _init(num: int) -> void:
@@ -52,6 +58,16 @@ func finish_turn() -> void:
 			revealed.queue_free()
 	temp_revealed_ships.clear()
 	selected_ship = null
+
+
+# Damage on our ships still afloat, to tell whether an attack hit
+func damage_taken() -> int:
+	var total := 0
+	for ship in ships:
+		total += ship.hit_hexes.count(true)
+		if ship is CoastalBattery:
+			total += 5 - (ship as CoastalBattery).hp
+	return total
 
 
 func get_ship_at_hex(hex: Vector2i) -> Ship:

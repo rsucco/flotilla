@@ -174,3 +174,30 @@ func test_end_turn_ends_the_whole_fleet_with_nothing_selected() -> void:
 	assert_eq(game.player_up, 1)
 	assert_true(driver.action_button("EndTurn").disabled, "disabled between turns")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_victory_shows_attack_stats() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	driver.ready_abilities(game.players[0])
+	# A hit, a miss, and a sonar ping that doesn't count
+	await driver.act("battleship", "Fire", GameDriver.spot(1, "destroyer"))
+	await driver.act("cruiser", "Fire", Vector2i(28, 13))
+	await driver.act("submarine", "Secondary", Vector2i(20, 10))
+	assert_eq(game.players[0].attacks, 2)
+	assert_eq(game.players[0].hits, 1)
+	for ship in game.players[1].ships.duplicate():
+		ship.sink()
+	await driver.end_turn()
+	var victory := await driver.find_dialog(game, "res://gui/victory.tscn")
+	var cells: Array = victory.get_node("VBoxContainer/Stats").get_children().map(
+		func(label: Label) -> String: return label.text
+	)
+	assert_eq(cells.slice(3, 6), ["Attacks", "2", "0"])
+	assert_eq(cells.slice(6, 9), ["Hit rate", "50%", "-"])
+	assert_eq(cells.slice(9, 12), ["Ships left", "8/8", "0/8"])
+	assert_eq(victory.get_node("VBoxContainer/Turns").text, "Turns: 1")
+	get_node("/root/GutRunner/GutLayer").visible = true

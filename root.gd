@@ -92,8 +92,9 @@ func play_game() -> void:
 			player_up = 1 - player_up
 
 	var victory := VICTORY_SCENE.instantiate()
-	victory.update_winner("One" if players[0].ships.size() > players[1].ships.size() else "Two")
+	victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
 	add_child(victory)
+	victory.show_stats(players, current_turn)
 
 
 func _on_pause_menu_replay_requested() -> void:

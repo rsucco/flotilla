@@ -179,11 +179,18 @@ func _attack(kind: String, hex: Vector2i) -> void:
 			await ship.use_secondary(hex)
 	_set_attack_buttons_disabled(false)
 	root.turn_replay.land()
+	var damage := opponent().damage_taken()
+	var afloat := opponent().ships.size()
 	if kind == "fire":
 		opponent().receive_fire(hex, ship)
 	else:
 		opponent().receive_special(hex, ship, kind == "secondary")
 	root.turn_replay.end()
+	var ability := ship.special if kind == "special" else ship.secondary
+	if kind == "fire" or ability.name in DAMAGING_ABILITIES:
+		attacks += 1
+		if opponent().damage_taken() > damage or opponent().ships.size() < afloat:
+			hits += 1
 	_finish_action()
 
 
@@ -290,6 +297,7 @@ func place_ships(counts: Dictionary) -> void:
 			ship.place()
 			await ship.placed
 			ships.append(ship)
+	fleet_size = ships.size()
 	# Hide ships from the next player
 	for ship in ships:
 		ship.visible = false
