@@ -20,8 +20,9 @@ var player_num: int
 var ships: Array[Ship] = []
 var temp_revealed_ships: Array[Ship] = []
 var selected_ship: Ship
-var root: Root
 var grid: Grid
+# Where our ships put projectiles and other effects
+var effects: Node2D
 # Set by Root once both players exist
 var opponent: Player
 # For the victory screen
@@ -32,11 +33,6 @@ var hits := 0
 
 func _init(num: int) -> void:
 	player_num = num
-
-
-# Subclasses must call super() first
-func _ready() -> void:
-	root = get_parent()
 
 
 func has_moves() -> bool:
@@ -80,7 +76,9 @@ func damage_taken() -> int:
 
 # Adds one of our ships (or a copy of an opponent's) with what it needs
 func adopt(ship: Ship) -> void:
+	ship.player = self
 	ship.grid = grid
+	ship.effects = effects
 	ship.sank.connect(_on_ship_sank.bind(ship))
 	ship.mine_hit.connect(mine_blast.emit)
 	add_child(ship)

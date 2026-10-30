@@ -6,6 +6,7 @@ extends Ship
 
 func _ready() -> void:
 	super()
+	f35.ship = self
 	len_fore = 2
 	len_aft = 2
 	ship_type = "carrier"

@@ -34,7 +34,7 @@ func explode(pos: Vector2) -> void:
 	fire.one_shot = true
 	fire.explosiveness = 1.0
 	fire.position = pos
-	root.add_child(fire)
+	add_sibling(fire)
 
 	var smoke := CPUParticles2D.new()
 	smoke.spread = 180.0
@@ -51,14 +51,14 @@ func explode(pos: Vector2) -> void:
 	smoke.one_shot = true
 	smoke.explosiveness = 1.0
 	smoke.position = pos
-	root.add_child(smoke)
+	add_sibling(smoke)
 
 	var flash := ColorRect.new()
 	flash.color = Color.WHITE
 	flash.size = get_viewport_rect().size
 	# The player can act again while it fades, so don't eat their clicks
 	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(flash)
+	add_sibling(flash)
 	flash.global_position = Vector2.ZERO
 	var tween := create_tween()
 	(

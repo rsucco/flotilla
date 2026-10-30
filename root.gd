@@ -15,6 +15,8 @@ static var replay := {}
 var grid: Grid
 var players: Array[LocalPlayer] = []
 var player_up := 0
+# Projectiles and other effects, drawn above the ships
+var effects: Node2D
 var current_turn := 0
 var swapping := false
 # The board and fleets this game started with, once both players have chosen
@@ -26,10 +28,14 @@ var setup := {}
 
 
 func _ready() -> void:
+	effects = Node2D.new()
+	effects.name = "Effects"
 	players = [LocalPlayer.new(0), LocalPlayer.new(1)]
 	players[0].opponent = players[1]
 	players[1].opponent = players[0]
 	for player in players:
+		player.effects = effects
+		player.tile_history = $TileHistory
 		add_child(player)
 		player.ship_shown.connect(gui.update_ship_info)
 		player.buttons_changed.connect(gui.set_buttons)
@@ -39,6 +45,8 @@ func _ready() -> void:
 		player.attack_resolved.connect(turn_replay.end)
 		player.mine_blast.connect(turn_replay.mine_blast.bind(player))
 	gui.action_pressed.connect(func(action: String) -> void: players[player_up].press(action))
+	add_child(effects)
+	turn_replay.effects = effects
 	play_game()
 
 

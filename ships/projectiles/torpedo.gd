@@ -23,7 +23,6 @@ func _process(delta: float) -> void:
 # `start_rotation` is in radians. Doesn't call super(): dest is in local
 # coordinates here because the torpedo follows a curved local path.
 func launch(origin: Vector2, target: Vector2i, start_rotation: float = 0.0) -> void:
-	root = get_parent()
 	Sfx.play(self, FIRE_SOUND)
 	rotation = start_rotation
 	global_position = origin

@@ -14,9 +14,10 @@ var reconning := false
 var target_hex: Vector2i
 var dest: Vector2
 var audio_player: AudioStreamPlayer2D
+# Set by the ship that carries it
+var ship: Ship
 var recon_audio_player: AudioStreamPlayer2D
 
-@onready var ship: Ship = get_parent()
 @onready var path: Path2D = $Path2D
 @onready var path_follow: PathFollow2D = $Path2D/PathFollow2D
 @onready var sprite: Sprite2D = $Path2D/PathFollow2D/Sprite2D

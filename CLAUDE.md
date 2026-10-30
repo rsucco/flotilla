@@ -7,7 +7,7 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 ## Current State
 - **Godot 4.7** project, Compatibility renderer (Web/mobile targets). Run/check it with `godot`.
 - Headless parse check: `godot --headless --path . --check-only -s res://<file>.gd`
-- Code follows the global style rules, except the coupling below (`fl-7ea`).
+- Code follows the global style rules, including call down, signal up (see Wiring below).
 - Local hot-seat multiplayer only.
 
 ## Architecture
@@ -15,11 +15,11 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 - **Rendering:** `Root._draw()` draws the whole board (hexes, hover, hit/miss markers, mines, labels), redrawn on every input event.
 - **Turn loop:** `Root.play_game()` is a single coroutine: ship selection → placement per player → loop of (swap dialog → `new_turn()` → `get_move()`/`await made_move` until no ship has AP) until a fleet is empty. Every ship action emits `made_move`. `Player` is the seam intended for future AI/network players.
 - **Combat resolution:** the *defending* `Player` resolves attacks in `receive_fire()` / `receive_special()` (matched on ability name). Ships override `hit()`, `fire()`, `use_special()`, `new_turn()` etc. for passives/drawbacks. `fire()`/`use_special()`/`use_secondary()` are coroutines that return when their animation is done (projectiles emit `done` on arrival, before the explosion); `LocalPlayer` awaits them, and the player can act again while explosions finish.
-- **Turn replay:** `TurnReplay` (`turn_replay.gd`) records each attack and replays it for the defender after the hot-seat swap. `LocalPlayer._attack()` calls `begin()` before the animation, `land()` just before `receive_*()`, and `end()` after it. Playback uses ghost ships (`Ship.ghost`): fresh instances posed where the attacker fired from, which run the real `fire()`/`use_*()` animations while the recorded damage is shown as each attack lands. Ships sunk during the turn are kept (`Ship.held`) until the replay has shown them sinking. Anything in `fire()`/`use_*()` beyond animation (e.g. the battery revealing itself, the mine drop) must skip itself for ghosts.
+- **Turn replay:** `TurnReplay` (`turn_replay.gd`) records each attack and replays it for the defender after the hot-seat swap. Players emit `attack_started` (before the animation), `attack_landed` (just before `receive_*()`) and `attack_resolved`, plus `mine_blast` when one of their ships sets off a mine; Root connects these to the replay's `begin()`/`land()`/`end()`/`mine_blast()`. Playback uses ghost ships (`Ship.ghost`): fresh instances posed where the attacker fired from, which run the real `fire()`/`use_*()` animations while the recorded damage is shown as each attack lands. Ships sunk during the turn are kept (`Ship.held`) until the replay has shown them sinking. Anything in `fire()`/`use_*()` beyond animation (e.g. the battery revealing itself, the mine drop) must skip itself for ghosts.
 - **Tile history:** each `Tile.history` entry is `[turn, "event string"]`. These strings are both the player-facing log and the data the renderer parses (e.g. `begins_with("Miss (")`) — changing wording changes behavior.
 - **`Grid.get_all_hex_neighbors(hex, n)`** returns endpoints of all n-step walks: n=1 excludes the center, n>=2 includes the center and duplicates. Callers dedupe manually.
 - **AP economy:** 4 AP default. Forward 1, rotate 2, reverse 4, fire/special/secondary 2 each; one fire charge per turn (carrier 2). Cooldowns start full and tick down at turn start.
-- **Coupling:** ships and players reach up the tree (`root = player.get_parent()`, `root.grid`, `root.gui`), and `GUI` registers itself via `root.gui = self`. Decoupling is `fl-7ea`.
+- **Wiring (call down, signal up):** nothing below Root reaches up the tree. Root creates the grid and hands it down, sets each player's `opponent`, `effects` and `tile_history`, keeps the turn on `grid.turn` (which stamps `grid.log_event()` entries), and connects signals: GUI `action_pressed` → active player's `press()`; player `ship_shown`/`buttons_changed`/`fleet_changed` → GUI; player attack signals → `TurnReplay`. `Player.adopt(ship)` is the only way to add a ship: it sets the ship's `player`, `grid` and `effects` and connects `sank`/`mine_hit`. Ships add projectiles and effects with `spawn()`, which puts them in Root's `Effects` layer (above the ships) and gives projectiles the grid; projectiles add their particles with `add_sibling()`. Aircraft get `ship` from the ship that carries them. `LocalPlayer.active` is true from the start of its turn (after any replay) to its end.
 - **Text size:** `theme.tres` (project theme) sets the default font size to 13. Smaller text uses per-node `theme_override_font_sizes/font_size`.
 
 ## Godot Notes
@@ -37,7 +37,7 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 - Files are `test_*.gd` and `extends GutTest`. Add a test for each README rule you implement or fix. Seed the RNG (`seed(n)`) in tests that depend on chance.
 - `test/game_driver.gd` plays the real game through mouse input and button presses (`test_full_game.gd`, `test_gui.gd`). Hide `/root/GutRunner/GutLayer` in tests that click the board, or GUT's own window eats the clicks. The driver waits a frame before each click, as real input would.
 - Run the suite after any game-logic change.
-- Lint/format: `gdformat $(git ls-files '*.gd' | grep -v ^addons/)` then `gdlint` on the same files; both must be clean. Config is in `gdlintrc` (`max-public-methods` raised to 30 for `Ship`; shrink it via `fl-7ea` rather than raising it further).
+- Lint/format: `gdformat $(git ls-files '*.gd' | grep -v ^addons/)` then `gdlint` on the same files; both must be clean. Config is in `gdlintrc` (`max-public-methods` raised to 30 for `Ship`; split `Ship` up rather than raising it further).
 - Visual checks: `test/screenshots/shots.gd` plays a scripted game in a window and saves screenshots of 16 states, to compare builds side by side. Usage is in the file's header. Run it, and any other script that needs real rendering, under `xvfb-run` as shown there, never in a visible window.
 
 ## Assets

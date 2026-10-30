@@ -21,14 +21,14 @@ var base_time_scale := 1.0
 # Ghost ships and everything they add to Root while playing
 var ghosts: Array[Ship] = []
 var spawned: Array[Node] = []
-# Set by Root once the board exists
+# Set by Root: the board, and where attacks add their effects
 var grid: Grid
+var effects: Node2D
 # Shown only once over the defender's side, so the replay gives away the angle
 # of fire but not where the attacker's ships are
 var masked: Array[Node2D] = []
 var masking := false
 
-@onready var root: Root = get_parent()
 @onready var speed: Button = $Bar/Row/Speed
 
 
@@ -149,7 +149,7 @@ func play() -> void:
 	$Bar/Row/Label.text = "Replay: Player " + str(actions[0].player.player_num + 1) + "'s turn"
 	visible = true
 	_rewind()
-	root.child_entered_tree.connect(_on_spawned)
+	effects.child_entered_tree.connect(_on_spawned)
 	# Deferred so we're already waiting if every attack finishes instantly
 	_run.call_deferred()
 	await finished
@@ -220,9 +220,8 @@ func _over(player: int, at: Vector2) -> bool:
 # The defender's mine going off under one of the attacker's ships
 func _blast(hex: Vector2i) -> void:
 	var blast: Projectile = BLAST_SCENE.instantiate()
-	root.add_child(blast)
-	blast.root = root
 	blast.grid = grid
+	effects.add_child(blast)
 	blast.dest_hex = hex
 	blast.texture = null
 	Sfx.play(blast, SH60.DROP_SOUND)
@@ -325,7 +324,7 @@ func _busy() -> bool:
 func _finish() -> void:
 	playing = false
 	Engine.time_scale = base_time_scale
-	root.child_entered_tree.disconnect(_on_spawned)
+	effects.child_entered_tree.disconnect(_on_spawned)
 	# If skipped, drop whatever is still in flight and jump to the end result
 	for node in spawned:
 		if is_instance_valid(node):

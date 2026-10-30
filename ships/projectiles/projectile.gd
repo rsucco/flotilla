@@ -9,7 +9,6 @@ const LAND_MISS_SOUND := preload("res://audio/land_miss.wav")
 const FIRE_TEXTURE := preload("res://ships/sprites/projectiles/fire.png")
 const SMOKE_TEXTURE := preload("res://ships/sprites/projectiles/smoke.png")
 
-var root: Root
 # Set by whoever fires it
 var grid: Grid
 var dest: Vector2
@@ -18,9 +17,8 @@ var speed := 0.0
 var moving := false
 
 
-# Call after adding to the tree under Root
+# Call after adding to the tree, with `grid` set
 func launch(origin: Vector2, target: Vector2i) -> void:
-	root = get_parent()
 	global_position = origin
 	dest_hex = target
 	dest = grid.get_hex_center(dest_hex)
@@ -75,7 +73,7 @@ func boom(pos: Vector2, land_miss: bool) -> void:
 	fire.one_shot = true
 	fire.explosiveness = 1.0
 	fire.position = pos
-	root.add_child(fire)
+	add_sibling(fire)
 
 	var smoke := CPUParticles2D.new()
 	smoke.spread = 180.0
@@ -92,7 +90,7 @@ func boom(pos: Vector2, land_miss: bool) -> void:
 	smoke.one_shot = true
 	smoke.explosiveness = 1.0
 	smoke.position = pos
-	root.add_child(smoke)
+	add_sibling(smoke)
 
 	await get_tree().create_timer(0.9, false).timeout
 	fire.queue_free()
@@ -120,7 +118,7 @@ func splash(pos: Vector2) -> void:
 	ripples.one_shot = true
 	ripples.explosiveness = 1.0
 	ripples.position = pos
-	root.add_child(ripples)
+	add_sibling(ripples)
 
 	await get_tree().create_timer(ripples.lifetime, false).timeout
 	ripples.queue_free()

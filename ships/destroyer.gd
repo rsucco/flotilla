@@ -16,6 +16,7 @@ const LAY_MINE_DESC := (
 
 func _ready() -> void:
 	super()
+	sh60.ship = self
 	len_fore = 1
 	len_aft = 1
 	ship_type = "destroyer"

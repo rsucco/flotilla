@@ -3,8 +3,6 @@ extends PanelContainer
 
 # Set by Root once the board exists
 var grid: Grid
-
-@onready var root: Root = get_parent()
 @onready var label: Label = $VBoxContainer/TileHistory
 
 
@@ -35,8 +33,6 @@ func show_history(hex: Vector2i, viewer: int) -> void:
 
 
 func fade_in() -> void:
-	# Draw on top of everything else
-	root.move_child(self, -1)
 	modulate = Color.TRANSPARENT
 	visible = true
 	create_tween().tween_property(self, "modulate", Color(1.0, 1.0, 1.0, 0.85), 0.3)

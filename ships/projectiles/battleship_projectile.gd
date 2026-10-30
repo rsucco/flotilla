@@ -28,4 +28,4 @@ func launch(
 	flash.explosiveness = 1.0
 	flash.global_position = global_position
 	flash.finished.connect(flash.queue_free)
-	root.add_child(flash)
+	add_sibling(flash)

@@ -47,16 +47,16 @@ var ghost := false
 var held := false
 # Set by EW Strike; blocks firing on the ship's next turn
 var jammed := false
-var root: Root
+# Set by the player that adopts the ship
 var player: Player
 var grid: Grid
+# Where projectiles and other effects go
+var effects: Node2D
 var movement_audio_player: AudioStreamPlayer2D
 
 
 # Subclasses must call super() first
 func _ready() -> void:
-	player = get_parent()
-	root = player.get_parent()
 	# Created here rather than as a member default so revealed copies that are
 	# freed before entering the tree don't leak it
 	movement_audio_player = AudioStreamPlayer2D.new()
@@ -76,7 +76,7 @@ func _input(event: InputEvent) -> void:
 				continue
 			if grid.tile(h).island:
 				any_land = true
-			if root.get_ship_at_hex(h) != null:
+			if player.get_ship_at_hex(h) != null:
 				occupied = true
 		# Coastal batteries go on land instead of water
 		if ship_type == "coastal_battery":
@@ -163,7 +163,7 @@ func place() -> void:
 func spawn(effect: Node2D) -> void:
 	if effect is Projectile:
 		(effect as Projectile).grid = grid
-	root.add_child(effect)
+	effects.add_child(effect)
 
 
 func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
@@ -269,7 +269,8 @@ func _animate_move(property: String, target: Variant, duration: float) -> void:
 # True if none of the hexes are land or occupied by another ship
 func _is_clear(hexes: Array[Vector2i]) -> bool:
 	for h in hexes:
-		var other := root.get_ship_at_hex(h)
+		# The opponent's ships are never on our side
+		var other := player.get_ship_at_hex(h)
 		if grid.tile(h).island or (other != null and other != self):
 			return false
 	return true

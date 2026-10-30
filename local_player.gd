@@ -22,6 +22,7 @@ var animation_playing := false
 var awaiting_move := false
 # From the start of our turn (after any replay) to its end
 var active := false
+# Set by Root
 var tile_history: TileHistory
 # Whether to watch the opponent's turn replay at the next swap
 var watch_replay := true
@@ -29,11 +30,6 @@ var watch_replay := true
 
 func _init(num: int) -> void:
 	super(num)
-
-
-func _ready() -> void:
-	super()
-	tile_history = root.get_node("TileHistory")
 
 
 func _unhandled_input(event: InputEvent) -> void:
