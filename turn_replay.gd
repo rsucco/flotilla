@@ -7,6 +7,8 @@ extends CanvasLayer
 # damage is shown as each attack lands instead of being resolved again.
 
 signal finished
+# A ship sunk last turn has just been shown going down
+signal sinking_shown
 
 # Waits this long at most for the last explosions and sinkings to finish
 const SETTLE_TIMEOUT := 6.0
@@ -161,6 +163,16 @@ func play() -> void:
 	await finished
 
 
+# `player`'s ships sunk last turn that the replay hasn't shown sinking yet
+func held_ships(player: Player) -> Array[Ship]:
+	var held: Array[Ship] = []
+	for action in actions:
+		for ship in action.sunk:
+			if is_instance_valid(ship) and ship.held and ship.player == player:
+				held.append(ship)
+	return held
+
+
 # Forgets the recorded turn, freeing ships kept only to be shown sinking
 func clear() -> void:
 	for action in actions:
@@ -308,6 +320,7 @@ func _apply(action: Action, animate: bool) -> void:
 # Frees the ship once its sound has finished too, which may be after the replay
 func _sink(ship: Ship) -> void:
 	ship.held = false
+	sinking_shown.emit()
 	await ship.sink_effect()
 	ship.queue_free()
 

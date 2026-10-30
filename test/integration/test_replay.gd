@@ -230,3 +230,19 @@ func test_sub_revealed_by_its_sonar_pulse() -> void:
 	assert_true(revealed_shown("submarine"), "shown as the pulse plays")
 	await driver.wait_until(replay_done, 20, "the replay")
 	assert_true(revealed_shown("submarine"), "still shown for the turn")
+
+
+func test_replay_shows_the_defenders_side_without_spoilers() -> void:
+	var sub := driver.ship_of(1, "submarine")
+	await driver.act("destroyer", "Special", sub.hex)
+	assert_eq(driver.fleet_count("OpponentFleet"), 7, "the attacker sees the sinking")
+	await driver.end_turn()
+	await driver.swap(true)
+	await wait_process_frames(2)
+	assert_true(game.turn_replay.playing, "replay started")
+	assert_eq(game.gui.ship_name.text, "", "no attacker's ship in the panel")
+	assert_true(driver.action_button("Fire").disabled, "no attacker's buttons")
+	assert_eq(driver.fleet_count("YourFleet"), 8, "defender's fleet, sub not sunk yet")
+	await driver.wait_until(func() -> bool: return not sub.held, 20, "the sinking")
+	assert_eq(driver.fleet_count("YourFleet"), 7, "counted once shown")
+	await driver.wait_until(replay_done, 20, "the replay")

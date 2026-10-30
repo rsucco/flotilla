@@ -335,6 +335,7 @@ func new_turn() -> void:
 
 func finish_turn() -> void:
 	super()
+	_select_ship(null)
 	active = false
 	for ship in ships:
 		ship.visible = false

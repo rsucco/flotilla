@@ -46,6 +46,7 @@ func _ready() -> void:
 		player.attack_landed.connect(turn_replay.land)
 		player.attack_resolved.connect(turn_replay.end)
 		player.mine_blast.connect(turn_replay.mine_blast.bind(player))
+	turn_replay.sinking_shown.connect(_update_fleets)
 	gui.action_pressed.connect(func(action: String) -> void: players[player_up].press(action))
 	add_child(effects)
 	turn_replay.effects = effects
@@ -106,6 +107,8 @@ func play_game() -> void:
 		# Wait for the hotseat players to swap seats, except on player 1's first turn
 		if current_turn != 1 or player_up == 1:
 			swapping = true
+			# From the next player's side from here on
+			_update_fleets()
 			var player := players[player_up]
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
@@ -144,7 +147,10 @@ func play_game() -> void:
 
 
 func _update_fleets() -> void:
-	gui.update_fleets(players[player_up].ships, players[1 - player_up].ships)
+	# Ships sunk last turn still count until the replay shows them sinking
+	var ours: Array[Ship] = players[player_up].ships.duplicate()
+	ours.append_array(turn_replay.held_ships(players[player_up]))
+	gui.update_fleets(ours, players[1 - player_up].ships)
 
 
 func _on_pause_menu_replay_requested() -> void:
