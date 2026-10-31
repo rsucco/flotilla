@@ -29,7 +29,7 @@ const TURN_RADIUS := 80.0
 const STEP := 6.0
 # Speeds in pixels per second: leaving the catapult, on final approach, and
 # taxiing on deck
-const LAUNCH_SPEED := 400.0
+const LAUNCH_SPEED := 470.0
 const APPROACH_SPEED := 190.0
 const TAXI_SPEED := 40.0
 # Climbing out to cruise, and the glide slope down to the deck
