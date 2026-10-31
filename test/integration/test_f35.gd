@@ -99,3 +99,28 @@ func test_second_strike_restarts_from_the_deck() -> void:
 	assert_eq(f35.path_follow.progress, 0.0, "skips the rest of the first sortie")
 	assert_true(f35.bombing, "on the second strike")
 	await wait_for_signal(f35.done, 20)
+
+
+func test_lands_through_the_pattern() -> void:
+	for heading in HEADINGS:
+		carrier.rotation_degrees = heading
+		f35.plan_strike(Vector2i(27, 12))
+		var points := track()
+		for fix: Vector2 in [F35.INITIAL, F35.BREAK, F35.DOWNWIND, F35.FINAL]:
+			var nearest: float = points.reduce(
+				func(best: float, p: Vector2) -> float: return minf(best, p.distance_to(fix)), INF
+			)
+			assert_lt(nearest, 1.0, str("passes ", fix, " at ", heading))
+
+
+func test_catapult_launch_and_arrested_landing() -> void:
+	f35.plan_strike(Vector2i(27, 12))
+	var length := f35.path.curve.get_baked_length()
+	assert_lt(f35._pace(1.0), F35.TAXI_SPEED, "starts from a standstill")
+	assert_almost_eq(f35._pace(F35.DECK_AHEAD - 0.01), F35.LAUNCH_SPEED, 1.0, "flying off the bow")
+	assert_almost_eq(f35._pace(f35.touchdown_at), F35.APPROACH_SPEED, 1.0, "approach speed")
+	assert_eq(f35._pace(f35.stopped_at - 0.5), F35.TAXI_SPEED, "stopped by the wire")
+	assert_eq(f35._pace(length - 1), F35.TAXI_SPEED, "taxis to the spot")
+	assert_eq(f35._altitude(F35.DECK_AHEAD), 0.0, "on deck until the bow")
+	assert_eq(f35._altitude(f35.trigger_at), 1.0, "at height for the strike")
+	assert_eq(f35._altitude(f35.touchdown_at), 0.0, "down at touchdown")

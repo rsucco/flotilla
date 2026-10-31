@@ -1,9 +1,11 @@
 class_name F35
 extends Node2D
 # Flies strikes and recon passes from its carrier. Paths are planned in the
-# carrier's frame (bow is up) as a chain of positions and headings joined by
-# fixed-radius turns: a catapult launch off the bow, onto the attack or recon
-# heading, and a landing from astern.
+# carrier's frame (bow is up, the jet's parking spot is the origin) as a chain
+# of positions and headings joined by fixed-radius turns: a catapult launch
+# off the bow, onto the attack or recon heading, then home through a carrier
+# landing pattern (up the starboard side, break to port, downwind, and a turn
+# onto final astern), a trap at the stern and a taxi back to the spot.
 
 signal done
 
@@ -11,16 +13,35 @@ const MISSILE_SCENE := preload("res://ships/projectiles/missile.tscn")
 const JET_SOUND := preload("res://audio/f35.ogg")
 const RECON_SOUND := preload("res://audio/recon.wav")
 const BOW := Vector2.UP
-# Catapult stroke and final approach, in pixels along the carrier's axis
-const LAUNCH_RUN := 120.0
-const APPROACH_RUN := 260.0
+# Where the deck ends, ahead of and behind the parking spot
+const DECK_AHEAD := 155.0
+const DECK_ASTERN := 34.0
+# The catapult stroke ends at the bow; then a straight climb-out
+const LAUNCH_RUN := 200.0
+# The landing pattern: initial up the starboard side, the break abeam the
+# bow, downwind on the port side, and final approach straight in from astern
+const INITIAL := Vector2(50, 120)
+const BREAK := Vector2(50, -170)
+const DOWNWIND := Vector2(-160, -170)
+const FINAL := Vector2(0, 150)
+# Touchdown just inside the stern, then the wire stops the jet within this
+const TRAP_RUN := 22.0
 # Strike missiles are released this far short of the target
 const STANDOFF := 170.0
 # Every turn's radius, and the spacing of the points along the path
 const TURN_RADIUS := 80.0
 const STEP := 6.0
-# Slowest speed during launch and landing, as a fraction of cruising speed
-const MIN_PACE := 0.3
+# Speeds in pixels per second: leaving the catapult, on final approach, and
+# taxiing on deck
+const LAUNCH_SPEED := 180.0
+const APPROACH_SPEED := 140.0
+const TAXI_SPEED := 30.0
+# Climbing out to cruise, and the glide slope down to the deck
+const CLIMB_RUN := 160.0
+const GLIDE_RUN := 220.0
+# Airborne, the jet is drawn bigger with its shadow cast this far away
+const ALTITUDE_SCALE := 1.35
+const SHADOW_OFFSET := Vector2(10, 14)
 
 var speed := 0.0
 var flying := false
@@ -29,8 +50,12 @@ var reconning := false
 var target_hex: Vector2i
 # Path offsets where the missile is released, or the recon pass starts
 var trigger_at := 0.0
+# Path offsets of touchdown and of the wire bringing the jet to a stop
+var touchdown_at := 0.0
+var stopped_at := 0.0
 var audio_player: AudioStreamPlayer2D
 var recon_audio_player: AudioStreamPlayer2D
+var shadow: Sprite2D
 # Set by the ship that carries it
 var ship: Ship
 
@@ -46,16 +71,20 @@ func _ready() -> void:
 	recon_audio_player = AudioStreamPlayer2D.new()
 	recon_audio_player.stream = RECON_SOUND
 	add_child(recon_audio_player)
+	shadow = Sprite2D.new()
+	shadow.texture = sprite.texture
+	shadow.modulate = Color(0, 0, 0, 0.35)
+	path_follow.add_child(shadow)
+	path_follow.move_child(shadow, 0)
+	_show_altitude(0.0)
 
 
 func _process(delta: float) -> void:
 	if not flying:
 		return
 	var length := path.curve.get_baked_length()
-	# Accelerate off the catapult and slow down on final approach
-	var launch := clampf(path_follow.progress / LAUNCH_RUN, MIN_PACE, 1.0)
-	var landing := clampf((length - path_follow.progress) / APPROACH_RUN, MIN_PACE, 1.0)
-	path_follow.progress += speed * minf(launch, landing) * delta
+	path_follow.progress += _pace(path_follow.progress) * delta
+	_show_altitude(_altitude(path_follow.progress))
 	# Start the camera sounds just before the recon pass
 	if reconning and path_follow.progress > trigger_at - 100 and not recon_audio_player.playing:
 		recon_audio_player.play()
@@ -74,6 +103,7 @@ func _process(delta: float) -> void:
 		flying = false
 		audio_player.stop()
 		path_follow.progress = 0
+		_show_altitude(0.0)
 
 
 # Returns once the missile has hit. A new sortie restarts from the deck even
@@ -133,6 +163,36 @@ func plan_recon(target: Vector2i) -> void:
 	_land(curve, pass_end, along)
 
 
+# How fast to fly at `at` along the path
+func _pace(at: float) -> float:
+	if at < DECK_AHEAD:
+		# Catapult: constant hard acceleration from a standstill
+		return LAUNCH_SPEED * sqrt(maxf(at, 1.0) / DECK_AHEAD)
+	if at >= stopped_at:
+		return TAXI_SPEED
+	if at >= touchdown_at:
+		# Arrested: decelerates hard to a stop
+		return maxf(APPROACH_SPEED * sqrt((stopped_at - at) / TRAP_RUN), TAXI_SPEED)
+	var cruise := lerpf(LAUNCH_SPEED, speed, minf((at - DECK_AHEAD) / CLIMB_RUN, 1.0))
+	# Slow to approach speed through the final turn
+	return lerpf(APPROACH_SPEED, cruise, clampf((touchdown_at - at) / (GLIDE_RUN * 2), 0, 1))
+
+
+# 0 on deck to 1 at cruising height
+func _altitude(at: float) -> float:
+	var climb := (at - DECK_AHEAD) / CLIMB_RUN
+	var glide := (touchdown_at - at) / GLIDE_RUN
+	return clampf(minf(climb, glide), 0.0, 1.0)
+
+
+func _show_altitude(height: float) -> void:
+	sprite.scale = Vector2.ONE * lerpf(1.0, ALTITUDE_SCALE, height)
+	# The shadow falls the same way on screen whichever way the jet faces
+	shadow.global_position = sprite.global_position + SHADOW_OFFSET * height
+	shadow.global_rotation = sprite.global_rotation
+	shadow.visible = height > 0.0
+
+
 # A new path starting with the catapult run off the bow
 func _launch() -> Curve2D:
 	var curve := Curve2D.new()
@@ -142,11 +202,21 @@ func _launch() -> Curve2D:
 	return curve
 
 
-# Turns onto final approach astern and lands toward the bow
+# Flies the landing pattern, traps at the stern and taxis back to the spot
 func _land(curve: Curve2D, from: Vector2, heading: Vector2) -> void:
-	var final := -BOW * APPROACH_RUN
-	_connect(curve, from, heading, final, BOW)
-	_straight(curve, final, Vector2.ZERO)
+	_connect(curve, from, heading, INITIAL, BOW)
+	_straight(curve, INITIAL, BREAK)
+	_connect(curve, BREAK, BOW, DOWNWIND, -BOW)
+	var abeam := Vector2(DOWNWIND.x, FINAL.y)
+	_straight(curve, DOWNWIND, abeam)
+	_connect(curve, abeam, -BOW, FINAL, BOW)
+	var touchdown := -BOW * (DECK_ASTERN - 4)
+	var stop := touchdown + BOW * TRAP_RUN
+	_straight(curve, FINAL, touchdown)
+	touchdown_at = curve.get_baked_length()
+	_straight(curve, touchdown, stop)
+	stopped_at = curve.get_baked_length()
+	_straight(curve, stop, Vector2.ZERO)
 
 
 # Adds the shortest route from `from` (flying `heading`) to `to`, arriving
