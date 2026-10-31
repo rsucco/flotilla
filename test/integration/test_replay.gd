@@ -246,3 +246,15 @@ func test_replay_shows_the_defenders_side_without_spoilers() -> void:
 	await driver.wait_until(func() -> bool: return not sub.held, 20, "the sinking")
 	assert_eq(driver.fleet_count("YourFleet"), 7, "counted once shown")
 	await driver.wait_until(replay_done, 20, "the replay")
+
+
+func test_lay_mine_loop_has_no_sharp_turns() -> void:
+	var heli: SH60 = driver.ship_of(0, "destroyer").get_node("SH60")
+	heli.patrol(Vector2i(23, 7))
+	var points := heli.path.curve.get_baked_points()
+	var sharpest := 0.0
+	for i in range(1, points.size() - 1):
+		var before := points[i] - points[i - 1]
+		var after := points[i + 1] - points[i]
+		sharpest = maxf(sharpest, absf(before.angle_to(after)))
+	assert_lt(rad_to_deg(sharpest), 20.0)

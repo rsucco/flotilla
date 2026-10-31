@@ -118,14 +118,22 @@ func fly_to(target: Vector2i) -> void:
 # once landed
 func patrol(center: Vector2i) -> void:
 	var middle := to_local(ship.grid.get_hex_center(center))
-	# Bézier handles for a circle drawn with 8 points
+	# Join the circle heading the way we're flying, and leave it on the far
+	# side heading home: one and a half laps, clockwise
+	var start := chassis.position.direction_to(middle).angle() - PI / 2
+	# Bézier handle length for a circle drawn with 8 points per lap
 	var handle := PATROL_RADIUS * 4.0 / 3.0 * tan(PI / 16)
 	var curve := Curve2D.new()
 	curve.add_point(chassis.position)
-	for i in 9:
-		var spoke := Vector2.RIGHT.rotated(TAU * i / 8)
-		var tangent := spoke.orthogonal() * handle
-		curve.add_point(middle + spoke * PATROL_RADIUS, -tangent, tangent)
+	for i in 13:
+		var angle := start + TAU * i / 8
+		var spoke := Vector2.from_angle(angle)
+		# Direction of travel, clockwise on screen
+		var ahead := Vector2.from_angle(angle + PI / 2)
+		# Longer handles where the legs join, for a wide banking turn
+		var back := ahead * (PATROL_RADIUS if i == 0 else handle)
+		var out := ahead * (PATROL_RADIUS if i == 12 else handle)
+		curve.add_point(middle + spoke * PATROL_RADIUS, -back, out)
 	curve.add_point(chassis.position)
 	_take_off(curve)
 	patrolling = true
