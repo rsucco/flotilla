@@ -24,6 +24,7 @@ func _ready() -> void:
 	drawback = Drawback.new("Stationary", "Cannot move, reveals itself when firing")
 	hit_sound = preload("res://audio/land_hit.wav")
 	sink_sound = preload("res://audio/battery_destroyed.wav")
+	sink_volume_db = 0.0
 
 
 # Batteries track HP instead of hexes, so any lost HP counts as damage

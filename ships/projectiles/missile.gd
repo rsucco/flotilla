@@ -20,6 +20,8 @@ const SOUND_FADE := 0.4
 const RELEASE_KILL := 180.0
 const RELEASE_TRACERS := 60.0
 const TRACER_SPEED := 700.0
+# The CIWS recording is much louder than the other effects
+const CIWS_VOLUME_DB := -8.0
 
 var rotate_sound: AudioStream = preload("res://audio/missile_rotate.wav")
 var enroute := false
@@ -48,6 +50,7 @@ func _process(delta: float) -> void:
 		if ciws_sound == null and to_go < maxf(speed, 1.0) * (lead + SOUND_LEAD):
 			ciws_sound = Sfx.play(get_parent(), INTERCEPT_SOUND)
 			ciws_sound.position = gun_at
+			ciws_sound.volume_db = CIWS_VOLUME_DB
 			engaged.emit()
 		if tracers == null and to_go < maxf(speed, 1.0) * lead:
 			_open_fire()

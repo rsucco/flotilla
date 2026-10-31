@@ -4,6 +4,8 @@ extends Ship
 const PROJECTILE_SCENE := preload("res://ships/projectiles/battleship_projectile.tscn")
 const TURRET_SOUND := preload("res://audio/artillery_rotate.wav")
 const ARMOR_SOUND := preload("res://audio/plink.wav")
+# Each of the salvo's eight shots, so together they're not overpowering
+const SALVO_VOLUME_DB := -6.0
 const SALVO_DESC := (
 	"Shoot one central hex and damage whatever it contains as well as all of its "
 	+ "immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly"
@@ -65,10 +67,15 @@ func use_special(target: Vector2i) -> void:
 		var turret := turrets[i]
 		for barrel in 2:
 			var offset := Vector2(-5 if barrel == 0 else 5, -20).rotated(turret.global_rotation)
-			var shell: Projectile = PROJECTILE_SCENE.instantiate()
+			var shell: BattleshipProjectile = PROJECTILE_SCENE.instantiate()
 			shell.held = true
 			spawn(shell)
-			shell.launch(turret.global_position + offset, targets[i * 2 + barrel])
+			shell.launch(
+				turret.global_position + offset,
+				targets[i * 2 + barrel],
+				BattleshipProjectile.DEFAULT_FIRE_SOUND,
+				SALVO_VOLUME_DB
+			)
 			shells.append(shell)
 		# Stagger fire times slightly
 		await get_tree().create_timer(0.075, false).timeout

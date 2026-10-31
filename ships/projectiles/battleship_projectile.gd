@@ -5,10 +5,13 @@ const DEFAULT_FIRE_SOUND := preload("res://audio/battleship.wav")
 
 
 func launch(
-	origin: Vector2, target: Vector2i, fire_sound: AudioStream = DEFAULT_FIRE_SOUND
+	origin: Vector2,
+	target: Vector2i,
+	fire_sound: AudioStream = DEFAULT_FIRE_SOUND,
+	volume_db: float = 0.0
 ) -> void:
 	super(origin, target)
-	Sfx.play(self, fire_sound)
+	Sfx.play(self, fire_sound).volume_db = volume_db
 	speed = 400.0
 	# Muzzle flash, blown along the line of fire
 	var flash := CPUParticles2D.new()

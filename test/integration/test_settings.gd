@@ -118,3 +118,19 @@ func test_hud_menu_button_opens_the_pause_menu() -> void:
 	assert_true(game.pause_menu.visible)
 	assert_eq(pressed, [] as Array[String], "not sent to the player as an action")
 	game.pause_menu.close()
+
+
+func _sink_volume(type: String) -> float:
+	var ship: Ship = add_child_autofree(load("res://ships/" + type + ".tscn").instantiate())
+	ship.sink_effect()
+	for child in ship.get_children():
+		if child is AudioStreamPlayer2D and child.stream == ship.sink_sound:
+			return child.volume_db
+	return NAN
+
+
+# The sinking recordings are quieter than the rest, except the battery's
+func test_sinking_sounds_are_turned_up() -> void:
+	assert_eq(_sink_volume("cruiser"), 4.0)
+	assert_eq(_sink_volume("submarine"), 4.0)
+	assert_eq(_sink_volume("coastal_battery"), 0.0)

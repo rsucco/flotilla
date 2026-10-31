@@ -120,7 +120,9 @@ func test_ciws_fires_just_before_the_kill_and_briefly_after() -> void:
 	assert_between(lead, 0.2, 0.6, "opens fire just before the kill")
 	await wait_seconds(Missile.FIRE_AFTER + 0.1)
 	assert_false(tracers.emitting, "stops soon after")
-	assert_true(is_instance_valid(sound) and sound.volume_db == 0.0, "still heard")
+	assert_true(
+		is_instance_valid(sound) and sound.volume_db == Missile.CIWS_VOLUME_DB, "still heard"
+	)
 	await wait_seconds(Missile.SOUND_AFTER + Missile.SOUND_FADE)
 	assert_false(is_instance_valid(sound), "then fades out")
 

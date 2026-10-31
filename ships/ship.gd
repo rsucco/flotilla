@@ -20,6 +20,8 @@ const UNPLACED := Vector2i(-10, -10)
 
 var hit_sound: AudioStream = preload("res://audio/water_hit1.wav")
 var sink_sound: AudioStream = preload("res://audio/ship_destroyed.wav")
+# The sinking recordings are quieter than the other effects
+var sink_volume_db := 4.0
 var move_sound: AudioStream
 var hex := UNPLACED
 var direction := 0
@@ -232,6 +234,7 @@ func sink() -> void:
 # Fades out with the sinking sound; returns when both are done
 func sink_effect() -> void:
 	var sound := Sfx.play(self, sink_sound)
+	sound.volume_db = sink_volume_db
 	# Make visible to the opponent while it sinks
 	visible = true
 	var tween := create_tween()
