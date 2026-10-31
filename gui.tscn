@@ -70,7 +70,7 @@ mouse_filter = 1
 size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("1")
 theme_override_font_sizes/font_size = 10
-text = "Special Ability:"
+text = "Secondary Ability:"
 
 [node name="PassiveAbility" type="Label" parent="GUIGrid/ShipInfo/AbilityInfo"]
 offset_top = 46.0

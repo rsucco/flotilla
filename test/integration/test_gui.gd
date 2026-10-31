@@ -320,3 +320,10 @@ func test_fleet_panels_show_hits() -> void:
 	await wait_process_frames(2)
 	assert_true(marked(game, "YourFleet", "Destroyer"), "shown after")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_hud_labels_name_each_ability_before_a_ship_is_shown() -> void:
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var info := game.gui.get_node("GUIGrid/ShipInfo/AbilityInfo")
+	assert_eq(info.get_node("SpecialAbility").text, "Special Ability:")
+	assert_eq(info.get_node("SecondaryAbility").text, "Secondary Ability:")
