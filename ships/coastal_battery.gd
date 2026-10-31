@@ -18,6 +18,7 @@ func _ready() -> void:
 	ship_type = "coastal_battery"
 	hit_hexes = [false]
 	ship_name = "Coastal Battery"
+	sunk_event = "Destroyed"
 	weapon = "Big Gun"
 	passive = PassiveAbility.new("Fortified", "Must be hit five times to destroy")
 	drawback = Drawback.new("Stationary", "Cannot move, reveals itself when firing")

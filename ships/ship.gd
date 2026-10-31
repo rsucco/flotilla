@@ -41,6 +41,8 @@ var placing := false
 var moves_queued := 0
 var revealed_buddy: Ship
 var sunk := false
+# How sinking is logged in tile history
+var sunk_event := "Sunk"
 # A stand-in that replays this ship's attacks for the opponent (TurnReplay)
 var ghost := false
 # Kept (hidden) after sinking until the opponent's turn replay has shown it
@@ -218,7 +220,7 @@ func sink() -> void:
 	if is_instance_valid(revealed_buddy):
 		revealed_buddy.queue_free()
 	for h in get_occupied_hexes():
-		grid.log_event(h, "Sunk, " + ship_name)
+		grid.log_event(h, sunk_event + ", " + ship_name)
 	sank.emit()
 	await sink_effect()
 	if not held:

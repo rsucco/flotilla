@@ -92,6 +92,15 @@ func test_salvo_sinks_damaged_battery() -> void:
 	assert_true(battery.sunk)
 
 
+func test_destroyed_battery_logged_as_destroyed() -> void:
+	var battery := spawn_battery(p1, Vector2i(22, 7))
+	battery.hp = 1
+	battery.hit(battery.hex, battery)
+	var tile := game.grid.tile(battery.hex)
+	assert_eq(tile.history[-1][1], "Destroyed, Coastal Battery")
+	assert_eq(tile.get_last_event()[1], "Sunk", "marked like a sinking")
+
+
 func test_salvo_on_undamaged_battery_is_normal_hit() -> void:
 	var battery := spawn_battery(p1, Vector2i(22, 7))
 	p1.receive_special(Vector2i(22, 7), spawn(p0, "battleship", Vector2i(5, 7)))
