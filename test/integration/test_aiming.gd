@@ -5,6 +5,7 @@ const ROOT_SCENE := preload("res://root.tscn")
 const MISSILE_SCENE := preload("res://ships/projectiles/missile.tscn")
 const TORPEDO_SCENE := preload("res://ships/projectiles/torpedo.tscn")
 const SHELL_SCENE := preload("res://ships/projectiles/battleship_projectile.tscn")
+const Timed := preload("res://test/timed.gd")
 
 var game: Root
 
@@ -56,7 +57,7 @@ func assert_turret_faces(turret: Node2D, target: Vector2i) -> void:
 func test_battleship_turrets_face_target() -> void:
 	var ship: Battleship = spawn(0, "battleship", Vector2i(5, 7))
 	for target in [Vector2i(22, 2), Vector2i(29, 13)]:
-		await ship.point_turrets(target)
+		await Timed.finish(ship.point_turrets.bind(target))
 		for turret in ship.turrets:
 			assert_turret_faces(turret, target)
 

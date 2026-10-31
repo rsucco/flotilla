@@ -2,6 +2,7 @@ extends GutTest
 # Ship rules from the README, exercised against the real game scene
 
 const ROOT_SCENE := preload("res://root.tscn")
+const Timed := preload("res://test/timed.gd")
 
 var game: Root
 var p0: LocalPlayer
@@ -118,7 +119,7 @@ func test_salvo_miss_splashes_every_shell() -> void:
 	var battleship := spawn(p0, "battleship", Vector2i(5, 7))
 	battleship.ap = 2
 	# Resolved right after the animation, as LocalPlayer does
-	await battleship.use_special(Vector2i(22, 7))
+	await Timed.finish(battleship.use_special.bind(Vector2i(22, 7)))
 	p1.receive_special(Vector2i(22, 7), battleship)
 	await wait_seconds(0.5)
 	# Four turrets, two barrels each
@@ -177,7 +178,7 @@ func test_battery_sinks_cleanly() -> void:
 	# Its sink sound ends before the fade does, freeing the sound player first
 	var battery := spawn_battery(p0, Vector2i(5, 7))
 	battery.held = true
-	await battery.sink_effect()
+	await Timed.finish(battery.sink_effect)
 	assert_false(battery.visible)
 
 

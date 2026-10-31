@@ -3,6 +3,7 @@ extends GutTest
 
 const ROOT_SCENE := preload("res://root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
+const Timed := preload("res://test/timed.gd")
 const HEADINGS: Array[int] = [0, 60, 120, 180, 240, 300]
 
 var carrier: Carrier
@@ -93,7 +94,7 @@ func test_recon_pass_flies_straight_along_the_row() -> void:
 
 func test_second_strike_restarts_from_the_deck() -> void:
 	Engine.time_scale = 4.0
-	await f35.bomb(Vector2i(20, 5))
+	await Timed.finish(f35.bomb.bind(Vector2i(20, 5)))
 	assert_true(f35.flying, "still heading home after the hit")
 	f35.bomb(Vector2i(22, 9))
 	assert_eq(f35.path_follow.progress, 0.0, "skips the rest of the first sortie")
