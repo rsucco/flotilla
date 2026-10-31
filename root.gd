@@ -49,6 +49,7 @@ func _ready() -> void:
 		player.mine_blast.connect(turn_replay.mine_blast.bind(player))
 	turn_replay.sinking_shown.connect(_update_fleets)
 	gui.action_pressed.connect(func(action: String) -> void: players[player_up].press(action))
+	gui.menu_pressed.connect(pause_menu.open)
 	add_child(effects)
 	turn_replay.effects = effects
 	play_game()

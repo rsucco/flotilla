@@ -5,6 +5,9 @@ extends CanvasLayer
 
 signal replay_requested
 
+const HOW_TO_PLAY_SCENE := preload("res://gui/how_to_play.tscn")
+const SETTINGS_SCENE := preload("res://gui/settings.tscn")
+
 # Set once both fleets are placed; there's nothing to replay before that
 var can_replay := false:
 	set(value):
@@ -12,6 +15,7 @@ var can_replay := false:
 		replay.disabled = not value
 var pending: Callable
 
+@onready var panel: Control = $Panel
 @onready var main: Control = $Panel/Main
 @onready var confirm: Control = $Panel/Confirm
 @onready var replay: Button = $Panel/Main/Replay
@@ -61,6 +65,22 @@ func _on_new_game_pressed() -> void:
 
 func _on_replay_pressed() -> void:
 	ask(func() -> void: replay_requested.emit())
+
+
+func _on_how_to_play_pressed() -> void:
+	_show_overlay(HOW_TO_PLAY_SCENE)
+
+
+func _on_settings_pressed() -> void:
+	_show_overlay(SETTINGS_SCENE)
+
+
+# In place of the menu, which comes back when the overlay closes itself
+func _show_overlay(scene: PackedScene) -> void:
+	var overlay := scene.instantiate()
+	panel.visible = false
+	overlay.tree_exited.connect(func() -> void: panel.visible = true)
+	add_child(overlay)
 
 
 func _on_title_pressed() -> void:

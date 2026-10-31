@@ -48,6 +48,14 @@ text = "New Game"
 layout_mode = 2
 text = "Replay This Game"
 
+[node name="HowToPlay" type="Button" parent="Panel/Main"]
+layout_mode = 2
+text = "How to Play"
+
+[node name="Settings" type="Button" parent="Panel/Main"]
+layout_mode = 2
+text = "Settings"
+
 [node name="Title" type="Button" parent="Panel/Main"]
 layout_mode = 2
 text = "Title Screen"
@@ -83,6 +91,8 @@ text = "No"
 [connection signal="pressed" from="Panel/Main/Resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="Panel/Main/NewGame" to="." method="_on_new_game_pressed"]
 [connection signal="pressed" from="Panel/Main/Replay" to="." method="_on_replay_pressed"]
+[connection signal="pressed" from="Panel/Main/HowToPlay" to="." method="_on_how_to_play_pressed"]
+[connection signal="pressed" from="Panel/Main/Settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="Panel/Main/Title" to="." method="_on_title_pressed"]
 [connection signal="pressed" from="Panel/Main/Quit" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="Panel/Confirm/Buttons/Yes" to="." method="_on_yes_pressed"]

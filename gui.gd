@@ -3,6 +3,7 @@ extends PanelContainer
 
 # A button was pressed, by its node name (Fire, NextShip, EndTurn...)
 signal action_pressed(action: String)
+signal menu_pressed
 
 const BUTTON_TEMPLATE := preload("res://gui/sprites/buttons/button_template.png")
 
@@ -23,7 +24,9 @@ func _ready() -> void:
 	for ship_type in Ship.SHIP_TYPES:
 		ship_icons[ship_type] = load("res://gui/sprites/" + ship_type + "_icon.png")
 	for button: Button in find_children("*", "Button"):
-		button.pressed.connect(func() -> void: action_pressed.emit(button.name))
+		if button.name != "Menu":
+			button.pressed.connect(func() -> void: action_pressed.emit(button.name))
+	$GUIGrid/Menu.pressed.connect(menu_pressed.emit)
 
 
 # Button name -> whether it can be pressed; buttons not listed are unchanged
