@@ -18,6 +18,8 @@ var speed := 0.0
 var moving := false
 # Set by volleys that resolve all at once, so no shell reads its tile early
 var held := false
+# Set once the impact effect is over and only its sound is left
+var fading := false
 
 
 # Call after adding to the tree, with `grid` set
@@ -105,6 +107,7 @@ func boom(pos: Vector2, land_miss: bool) -> void:
 	await get_tree().create_timer(0.9, false).timeout
 	fire.queue_free()
 	smoke.queue_free()
+	fading = true
 	if is_instance_valid(sound) and sound.playing:
 		await sound.finished
 
@@ -132,5 +135,6 @@ func splash(pos: Vector2) -> void:
 
 	await get_tree().create_timer(ripples.lifetime, false).timeout
 	ripples.queue_free()
+	fading = true
 	if is_instance_valid(sound) and sound.playing:
 		await sound.finished

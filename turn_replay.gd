@@ -208,13 +208,15 @@ func _run() -> void:
 		if not playing:
 			return
 		_apply(action, true)
-	# Let the last explosions, sinkings and aircraft finish
+	# Let the last explosions, sinkings and aircraft finish; their sounds play
+	# on into the turn
 	var waited := 0.0
 	while playing and _busy() and waited < SETTLE_TIMEOUT:
 		waited += get_process_delta_time()
 		await get_tree().process_frame
+	# Anything still showing after the timeout is stuck, so clear it as a skip would
 	if playing:
-		_finish()
+		_finish(_busy())
 
 
 func _process(_delta: float) -> void:
@@ -337,29 +339,37 @@ func _busy() -> bool:
 			if is_instance_valid(ship) and ship.visible:
 				return true
 	for node in spawned:
-		if is_instance_valid(node) and not node.is_queued_for_deletion():
+		if is_instance_valid(node) and not node.is_queued_for_deletion() and _showing(node):
 			return true
 	for ghost in ghosts:
 		for child in ghost.get_children():
 			if (child is SH60 or child is F35) and child.flying:
 				return true
-			if child is AudioStreamPlayer2D and child.playing:
-				return true
 	return false
 
 
-func _finish() -> void:
+# False once all that's left of it is sound
+func _showing(node: Node) -> bool:
+	return not (node is AudioStreamPlayer2D or (node is Projectile and node.fading))
+
+
+func _finish(skipped: bool) -> void:
 	playing = false
 	Engine.time_scale = base_time_scale
 	effects.child_entered_tree.disconnect(_on_spawned)
-	# If skipped, drop whatever is still in flight and jump to the end result
-	for node in spawned:
-		if is_instance_valid(node):
-			node.queue_free()
+	# If skipped, drop whatever is still in flight and jump to the end result.
+	# Otherwise only sounds are left, and they free themselves when done.
+	if skipped:
+		for node in spawned:
+			if is_instance_valid(node):
+				node.queue_free()
 	spawned.clear()
 	masked.clear()
 	for ghost in ghosts:
-		ghost.queue_free()
+		if skipped:
+			ghost.queue_free()
+		else:
+			_free_when_quiet(ghost)
 	ghosts.clear()
 	while next_action < actions.size():
 		_apply(actions[next_action], false)
@@ -369,6 +379,15 @@ func _finish() -> void:
 				ship.visible = false
 	visible = false
 	finished.emit()
+
+
+func _free_when_quiet(ghost: Ship) -> void:
+	var left := 0.0
+	for child in ghost.get_children():
+		if child is AudioStreamPlayer2D and child.playing:
+			var sound := child as AudioStreamPlayer2D
+			left = maxf(left, sound.stream.get_length() - sound.get_playback_position())
+	get_tree().create_timer(left, false).timeout.connect(ghost.queue_free)
 
 
 func _set_fast(value: bool) -> void:
@@ -399,4 +418,4 @@ func _on_speed_pressed() -> void:
 
 func _on_skip_pressed() -> void:
 	if playing:
-		_finish()
+		_finish(true)

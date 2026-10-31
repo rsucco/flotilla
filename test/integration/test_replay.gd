@@ -190,6 +190,21 @@ func test_hidden_muzzle_flash_is_freed() -> void:
 	await driver.wait_until(replay_done, 20, "the replay")
 
 
+func test_replay_ends_with_the_visuals_and_sounds_play_on() -> void:
+	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
+	await driver.end_turn()
+	await driver.swap(true)
+	await driver.wait_until(func() -> bool: return first_shell() != null, 20, "the shell")
+	var shell := first_shell()
+	await driver.wait_until(replay_done, 20, "the replay")
+	# Audio isn't sped up by the tests' time scale, so the splash outlasts the
+	# replay by far
+	assert_true(is_instance_valid(shell), "the shell's splash sound still playing")
+	assert_true(shell.fading, "but nothing of it to see")
+	var ref: WeakRef = weakref(shell)
+	await driver.wait_until(func() -> bool: return ref.get_ref() == null, 5, "the sound to end")
+
+
 func test_battery_shells_always_shown() -> void:
 	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
 	await driver.end_turn()
