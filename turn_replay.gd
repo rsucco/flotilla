@@ -406,10 +406,19 @@ func _side_hexes(player: Player) -> Array[Vector2i]:
 
 func _on_spawned(node: Node) -> void:
 	spawned.append(node)
+	if node is Missile:
+		(node as Missile).engaged.connect(_on_ciws_engaged.bind(node))
 	if masking and node is Node2D:
 		masked.append(node)
 		# Hidden until _process has checked where it is
 		node.visible = false
+
+
+# The defender's cruiser shooting `missile` down is seen doing it
+func _on_ciws_engaged(missile: Missile) -> void:
+	for ship in actions[0].player.opponent.ships:
+		if ship is Cruiser and ship.global_position.is_equal_approx(missile.ciws_at):
+			(ship as Cruiser).track(missile)
 
 
 func _on_speed_pressed() -> void:

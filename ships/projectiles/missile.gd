@@ -1,6 +1,9 @@
 class_name Missile
 extends Projectile
 
+# The CIWS has started on it (heard, not yet seen)
+signal engaged
+
 const FIRE_SOUND := preload("res://audio/missile.wav")
 const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
 const MAX_SPEED := 500.0
@@ -45,6 +48,7 @@ func _process(delta: float) -> void:
 		if ciws_sound == null and to_go < maxf(speed, 1.0) * (lead + SOUND_LEAD):
 			ciws_sound = Sfx.play(get_parent(), INTERCEPT_SOUND)
 			ciws_sound.position = gun_at
+			engaged.emit()
 		if tracers == null and to_go < maxf(speed, 1.0) * lead:
 			_open_fire()
 		if to_go <= 0:

@@ -12,9 +12,15 @@ const MISSILE_DEFENSE_DESC := (
 	"50% chance of intercepting incoming missile attacks within two hexes (chance is "
 	+ "reduced to 25% for incoming nuclear strike)"
 )
+# How fast the CIWS mount turns, in radians per second
+const CIWS_SLEW := TAU
 
 # Alternates between the fore and aft missile silos
 var fore_silo := true
+# The missile the CIWS is shooting at, if any
+var tracking: Missile
+
+@onready var ciws: Sprite2D = $CIWS
 
 
 func _ready() -> void:
@@ -28,6 +34,21 @@ func _ready() -> void:
 	special = SpecialAbility.new(3, "EW Strike", EW_STRIKE_DESC, 2)
 	passive = PassiveAbility.new("Missile Defense", MISSILE_DEFENSE_DESC)
 	move_sound = preload("res://audio/smallship.ogg")
+
+
+# Follows the missile until it's been shot down, then turns back to the bow
+func _process(delta: float) -> void:
+	var aim := 0.0
+	if is_instance_valid(tracking) and not tracking.fading:
+		# The mount's sprite points up (-y)
+		aim = ciws.global_position.direction_to(tracking.global_position).angle() + PI / 2
+		aim = wrapf(aim - global_rotation, -PI, PI)
+	ciws.rotation = rotate_toward(ciws.rotation, aim, CIWS_SLEW * delta)
+
+
+# Shown in the defender's replay: the CIWS turning to shoot `missile` down
+func track(missile: Missile) -> void:
+	tracking = missile
 
 
 func fire(target: Vector2i) -> void:

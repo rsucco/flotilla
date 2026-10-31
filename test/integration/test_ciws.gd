@@ -140,6 +140,45 @@ func test_ciws_fires_from_the_cruiser_in_the_replay() -> void:
 	await wait_for_signal(missile.done, 5)
 
 
+# Global angle the mount's sprite (pointing up) has when aimed at `at`
+func _aim(cruiser: Cruiser, at: Vector2) -> float:
+	return cruiser.ciws.global_position.direction_to(at).angle() + PI / 2
+
+
+func test_ciws_mount_tracks_the_missile_then_returns_to_the_bow() -> void:
+	var cruiser: Cruiser = spawn(p1, "cruiser", Vector2i(24, 7), 1)
+	var missile := _intercepted_missile()
+	missile.ciws_at = cruiser.global_position
+	missile.ciws_shown = true
+	missile.launch(game.grid.get_hex_center(Vector2i(5, 7)), Vector2i(24, 9), 0.0, true)
+	cruiser.track(missile)
+	await wait_for_signal(missile.done, 5)
+	await wait_process_frames(2)
+	var off := angle_difference(
+		cruiser.ciws.global_rotation, _aim(cruiser, missile.global_position)
+	)
+	assert_almost_eq(off, 0.0, 0.05, "on the missile at the kill")
+	await wait_until(func() -> bool: return missile.fading, 5)
+	await wait_seconds(0.6)
+	assert_almost_eq(cruiser.ciws.rotation, 0.0, 0.001, "back to the bow")
+
+
+func test_replay_shows_the_intercepting_cruisers_ciws() -> void:
+	var cruiser: Cruiser = spawn(p1, "cruiser", Vector2i(24, 7))
+	var other: Cruiser = spawn(p1, "cruiser", Vector2i(24, 2))
+	var destroyer := spawn(p0, "destroyer", Vector2i(5, 7))
+	destroyer.intercepted = true
+	destroyer.ciws_at = cruiser.global_position
+	game.turn_replay.begin(destroyer, "fire", Vector2i(24, 9))
+	game.turn_replay.land()
+	game.turn_replay.end()
+	game.turn_replay.play()
+	await wait_until(func() -> bool: return cruiser.tracking != null, 10)
+	assert_true(cruiser.tracking.ciws_shown, "the replayed missile")
+	assert_null(other.tracking, "only the one shooting it down")
+	await wait_until(func() -> bool: return not game.turn_replay.playing, 10)
+
+
 func test_intercepting_cruiser_recorded_for_the_replay() -> void:
 	seed(1)
 	var cruiser := spawn(p1, "cruiser", Vector2i(24, 7))
