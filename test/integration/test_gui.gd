@@ -274,6 +274,16 @@ func test_fleet_panels_show_hits() -> void:
 	var list: VBoxContainer = autofree(entry._make_custom_tooltip(entry.tooltip_text))
 	assert_eq(list.get_child_count(), 2)
 	assert_eq(entry._hits(target), [false, true, false] as Array[bool], "center hex hit")
+	# Tapping shows the same list, for touch screens
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.pressed = true
+	entry._gui_input(tap)
+	var popup: PopupPanel = entry.get_child(-1)
+	assert_true(popup.visible, "tap opens the list")
+	assert_eq(popup.get_child(0).get_child_count(), 2, "same list as the hover")
+	assert_lt(popup.position.y, int(entry.get_global_rect().position.y), "above the entry")
+	popup.hide()
 	# The defender doesn't see it until the replay has
 	await driver.end_turn()
 	await driver.swap(true)

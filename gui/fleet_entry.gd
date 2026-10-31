@@ -1,7 +1,8 @@
 class_name FleetEntry
 extends HBoxContainer
 # One ship type in a fleet panel: its icon and count, the count in red if any
-# of them is damaged. Hovering it lists each ship of that type with its hit hexes.
+# of them is damaged. Hovering it lists each ship of that type with its hit hexes;
+# so does tapping it, for touch screens, which have no hover.
 
 const HIT_COLOR := Color(1.0, 0.25, 0.25)
 
@@ -22,6 +23,22 @@ func _ready() -> void:
 	if show_damage and ships.any(func(s: Ship) -> bool: return _hits(s).has(true)):
 		count.modulate = HIT_COLOR
 	add_child(count)
+
+
+func _gui_input(event: InputEvent) -> void:
+	var tap := event as InputEventMouseButton
+	if tap == null or not tap.pressed or tap.button_index != MOUSE_BUTTON_LEFT:
+		return
+	# Styled like the tooltip; closes on the next click anywhere
+	var popup := PopupPanel.new()
+	popup.theme_type_variation = "TooltipPanel"
+	popup.add_child(_make_custom_tooltip(tooltip_text))
+	popup.popup_hide.connect(popup.queue_free)
+	add_child(popup)
+	popup.reset_size()
+	# Above the entry, since the fleet panels are at the bottom of the screen
+	var rect := get_global_rect()
+	popup.popup(Rect2i(Vector2i(rect.position) - Vector2i(0, popup.size.y), popup.size))
 
 
 func _make_custom_tooltip(for_text: String) -> Object:
