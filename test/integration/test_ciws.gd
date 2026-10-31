@@ -3,6 +3,7 @@ extends GutTest
 
 const ROOT_SCENE := preload("res://root.tscn")
 const MISSILE_SCENE := preload("res://ships/projectiles/missile.tscn")
+const Timed := preload("res://test/timed.gd")
 
 var game: Root
 var p0: LocalPlayer
@@ -77,23 +78,29 @@ func test_intercepted_missile_shot_down_over_no_mans_land() -> void:
 			if node is Missile:
 				missiles.append(node)
 	)
+	var cruiser := spawn(p1, "cruiser", Vector2i(25, 2))
 	var destroyer := spawn(p0, "destroyer", Vector2i(5, 7))
 	destroyer.ap = 2
 	destroyer.fire_remaining = 1
 	destroyer.intercepted = true
-	await destroyer.fire(Vector2i(24, 9))
-	var at := game.grid.get_hex_from_coords(missiles[0].position)
+	destroyer.ciws_at = cruiser.global_position
+	await Timed.finish(destroyer.fire.bind(Vector2i(24, 9)))
+	var missile := missiles[0]
+	var at := game.grid.get_hex_from_coords(missile.position)
 	assert_eq(at.x, Grid.NO_MANS_LAND, "dies over no-man's-land")
-	assert_not_null(missiles[0].tracers, "CIWS fired")
-	var edge_x := missiles[0].tracers.position.x
-	assert_between(edge_x, missiles[0].position.x, game.grid.get_hex_center(Vector2i(16, 0)).x)
+	assert_not_null(missile.tracers, "CIWS fired")
+	var edge_x := missile.tracers.position.x
+	assert_between(edge_x, missile.position.x, game.grid.get_hex_center(Vector2i(16, 0)).x)
+	var bearing := game.effects.to_local(cruiser.global_position).direction_to(missile.kill_at)
+	assert_almost_eq(missile.tracers.direction, bearing, Vector2.ONE * 0.01, "from the cruiser")
 	await wait_seconds(2.5)
 
 
-func _intercepted_missile() -> Missile:
+func _intercepted_missile(cruiser_at: Vector2i = Vector2i(24, 7)) -> Missile:
 	var missile: Missile = MISSILE_SCENE.instantiate()
 	missile.grid = game.grid
 	missile.intercepted = true
+	missile.ciws_at = game.grid.get_hex_center(cruiser_at)
 	game.effects.add_child(missile)
 	return missile
 
@@ -115,6 +122,7 @@ func test_ciws_fires_from_the_cruiser_in_the_replay() -> void:
 	var cruiser := spawn(p1, "cruiser", Vector2i(24, 7))
 	var missile := _intercepted_missile()
 	missile.ciws_at = cruiser.global_position
+	missile.ciws_shown = true
 	missile.launch(game.grid.get_hex_center(Vector2i(5, 7)), Vector2i(24, 9), 0.0, true)
 	assert_almost_eq(missile.gun_at, game.effects.to_local(cruiser.global_position), Vector2.ONE)
 	assert_eq(
@@ -133,6 +141,7 @@ func test_intercepting_cruiser_recorded_for_the_replay() -> void:
 	while not p1.roll_intercept(destroyer, "fire", Vector2i(24, 9)):
 		pass
 	destroyer.intercepted = true
+	destroyer.ciws_at = p1.interceptor.global_position
 	game.turn_replay.begin(destroyer, "fire", Vector2i(24, 9))
 	assert_eq(game.turn_replay.recording.props["ciws_at"], cruiser.global_position)
 
@@ -142,4 +151,11 @@ func test_missile_released_past_no_mans_land_dies_soon_after() -> void:
 	var release := game.grid.get_hex_center(Vector2i(18, 7))
 	missile.launch(release, Vector2i(26, 7), 0.0, true)
 	assert_almost_eq(missile.kill_at.distance_to(release), Missile.RELEASE_KILL, 0.1)
+	var cruiser := game.grid.get_hex_center(Vector2i(24, 7))
+	assert_almost_eq(
+		missile.gun_at,
+		missile.kill_at.move_toward(cruiser, Missile.RELEASE_KILL),
+		Vector2.ONE,
+		"just the last stretch, from the cruiser's bearing"
+	)
 	await wait_seconds(2.5)

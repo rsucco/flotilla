@@ -67,6 +67,7 @@ func use_special(target: Vector2i) -> void:
 	nuke.scale = Vector2(2, 2)
 	nuke.intercepted = intercepted
 	nuke.ciws_at = ciws_at
+	nuke.ciws_shown = ghost
 	spawn(nuke)
 	nuke.launch(
 		global_position + Vector2(0, -25).rotated(rotation), target, global_rotation_degrees

@@ -87,13 +87,11 @@ func begin(ship: Ship, kind: String, target: Vector2i) -> void:
 	for child in ship.get_children():
 		if child.name.begins_with("Turret"):
 			recording.turrets[child.name] = (child as Node2D).rotation
-	# Which turret or silo fires next, and whether it's shot down
-	for prop in ["next_turret", "fore_silo", "intercepted"]:
+	# Which turret or silo fires next, and whether (and by which cruiser) it's
+	# shot down
+	for prop in ["next_turret", "fore_silo", "intercepted", "ciws_at"]:
 		if prop in ship:
 			recording.props[prop] = ship.get(prop)
-	# The defender knows where their own cruiser is
-	if ship.intercepted:
-		recording.props["ciws_at"] = ship.player.opponent.interceptor.global_position
 
 
 # Call when the attacker moves onto one of the defender's mines

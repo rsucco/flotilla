@@ -18,8 +18,10 @@ var enroute := false
 var exhaust: CPUParticles2D
 # Set by the firing ship: shot down by the defender's CIWS on the way in
 var intercepted := false
-# Set by the firing ship: where the tracers come from, if not no-man's-land
+# Set by the firing ship: where the cruiser shooting it down is, and whether to
+# show its fire all the way (to the defender, in the replay)
 var ciws_at := Vector2.INF
+var ciws_shown := false
 var launched_from: Vector2
 var kill_at: Vector2
 var gun_at: Vector2
@@ -96,23 +98,25 @@ func launch(
 	sound.queue_free()
 
 
-# Where the missile dies: over the middle of no-man's-land, so the kill point
-# says nothing about where the cruiser is, or just after release when already
-# past it
+# Where the missile dies: over the middle of no-man's-land, or just after
+# release when already past it. The tracers come from the cruiser's bearing,
+# but only show from where they cross into no-man's-land (or for the last
+# stretch, past it), unless the defender is watching.
 func _plan_shootdown() -> void:
 	launched_from = position
 	var defender := grid.side_of(dest_hex)
 	var nml_x := grid.get_hex_center(Vector2i(Grid.NO_MANS_LAND, 0)).x
+	var cruiser: Vector2 = get_parent().to_local(ciws_at)
 	if grid.side_of(grid.get_hex_from_coords(position)) == defender:
 		kill_at = position + position.direction_to(dest) * RELEASE_KILL
+		gun_at = kill_at.move_toward(cruiser, RELEASE_KILL)
 	else:
 		kill_at = position.lerp(dest, (nml_x - position.x) / (dest.x - position.x))
-	# The defender's edge of no-man's-land, level with the kill point, or the
-	# cruiser itself when the defender is watching
-	var edge := Vector2i(Grid.NO_MANS_LAND + (1 if defender == 1 else -1), 0)
-	gun_at = Vector2((grid.get_hex_center(edge).x + nml_x) / 2, kill_at.y)
-	if ciws_at.is_finite():
-		gun_at = get_parent().to_local(ciws_at)
+		var edge := Vector2i(Grid.NO_MANS_LAND + (1 if defender == 1 else -1), 0)
+		var edge_x := (grid.get_hex_center(edge).x + nml_x) / 2
+		gun_at = kill_at.lerp(cruiser, (edge_x - kill_at.x) / (cruiser.x - kill_at.x))
+	if ciws_shown:
+		gun_at = cruiser
 
 
 func _open_fire() -> void:

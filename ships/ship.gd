@@ -51,8 +51,7 @@ var held := false
 var jammed := false
 # Set as each attack starts: whether the opponent's cruisers will shoot it down
 var intercepted := false
-# Where the CIWS fire comes from, for a ghost replaying its shot to the
-# defender; otherwise it comes from no-man's-land
+# Where the cruiser shooting it down is
 var ciws_at := Vector2.INF
 # Set by the player that adopts the ship
 var player: Player

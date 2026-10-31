@@ -36,6 +36,7 @@ func fire(target: Vector2i) -> void:
 	missile.scale = Vector2(2, 2)
 	missile.intercepted = intercepted
 	missile.ciws_at = ciws_at
+	missile.ciws_shown = ghost
 	spawn(missile)
 	var silo := Vector2(0, -24) if fore_silo else Vector2(0, 40)
 	fore_silo = not fore_silo
