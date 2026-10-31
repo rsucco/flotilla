@@ -30,6 +30,8 @@ var attacks := 0
 var hits := 0
 # Whether our cruisers will shoot down the attack being made on us
 var intercepting := false
+# The cruiser that made the last intercept
+var interceptor: Ship
 
 
 func _init(num: int) -> void:
@@ -152,6 +154,7 @@ func cruiser_intercepts(hex: Vector2i, chance: float) -> bool:
 			if randf() >= chance:
 				return false
 			print("passive - missile defense")
+			interceptor = cruiser
 			return true
 	return false
 

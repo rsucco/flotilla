@@ -34,6 +34,7 @@ func fire(target: Vector2i) -> void:
 	var missile: Missile = MISSILE_SCENE.instantiate()
 	missile.scale = Vector2(2, 2)
 	missile.intercepted = intercepted
+	missile.ciws_at = ciws_at
 	spawn(missile)
 	missile.launch(
 		global_position + Vector2(0, -25).rotated(rotation), target, global_rotation_degrees

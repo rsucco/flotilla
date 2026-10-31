@@ -4,9 +4,12 @@ extends Projectile
 const FIRE_SOUND := preload("res://audio/missile.wav")
 const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
 const MAX_SPEED := 500.0
-# CIWS opens fire this far short of the kill point. A missile released on the
+# CIWS opens fire this many seconds before the kill and keeps firing this
+# long after it, then the sound fades out. A missile released on the
 # defender's side (by an F-35) is killed this far past the release point.
-const TRACER_LEAD := 180.0
+const FIRE_LEAD := 0.35
+const FIRE_AFTER := 0.15
+const SOUND_FADE := 0.25
 const RELEASE_KILL := 60.0
 const TRACER_SPEED := 700.0
 
@@ -15,9 +18,13 @@ var enroute := false
 var exhaust: CPUParticles2D
 # Set by the firing ship: shot down by the defender's CIWS on the way in
 var intercepted := false
+# Set by the firing ship: where the tracers come from, if not no-man's-land
+var ciws_at := Vector2.INF
 var launched_from: Vector2
 var kill_at: Vector2
+var gun_at: Vector2
 var tracers: CPUParticles2D
+var ciws_sound: AudioStreamPlayer2D
 
 
 func _process(delta: float) -> void:
@@ -26,7 +33,9 @@ func _process(delta: float) -> void:
 		speed += 500 * delta
 	if intercepted and moving:
 		var to_go := launched_from.distance_to(kill_at) - launched_from.distance_to(position)
-		if tracers == null and to_go < TRACER_LEAD:
+		# Early enough for the first tracers to reach the missile, too
+		var lead := FIRE_LEAD + gun_at.distance_to(kill_at) / TRACER_SPEED
+		if tracers == null and to_go < maxf(speed, 1.0) * lead:
 			_open_fire()
 		if to_go <= 0:
 			_shoot_down()
@@ -98,33 +107,30 @@ func _plan_shootdown() -> void:
 		kill_at = position + position.direction_to(dest) * RELEASE_KILL
 	else:
 		kill_at = position.lerp(dest, (nml_x - position.x) / (dest.x - position.x))
-
-
-# Tracers from the defender's edge of no-man's-land, level with the kill point
-func _open_fire() -> void:
-	var defender := grid.side_of(dest_hex)
+	# The defender's edge of no-man's-land, level with the kill point, or the
+	# cruiser itself when the defender is watching
 	var edge := Vector2i(Grid.NO_MANS_LAND + (1 if defender == 1 else -1), 0)
-	var from := Vector2(
-		(grid.get_hex_center(edge).x + grid.get_hex_center(Vector2i(Grid.NO_MANS_LAND, 0)).x) / 2,
-		kill_at.y
-	)
+	gun_at = Vector2((grid.get_hex_center(edge).x + nml_x) / 2, kill_at.y)
+	if ciws_at.is_finite():
+		gun_at = get_parent().to_local(ciws_at)
+
+
+func _open_fire() -> void:
 	tracers = CPUParticles2D.new()
-	tracers.position = from
-	tracers.direction = from.direction_to(kill_at) if from != kill_at else Vector2.LEFT
+	tracers.position = gun_at
+	tracers.direction = gun_at.direction_to(kill_at) if gun_at != kill_at else Vector2.LEFT
 	tracers.spread = 3.0
 	tracers.gravity = Vector2.ZERO
 	tracers.initial_velocity_min = TRACER_SPEED
 	tracers.initial_velocity_max = TRACER_SPEED
 	# Long enough to fly on past the missile
-	tracers.lifetime = (from.distance_to(kill_at) + 80) / TRACER_SPEED
+	tracers.lifetime = (gun_at.distance_to(kill_at) + 80) / TRACER_SPEED
 	tracers.amount = 24
 	tracers.color = Color(1.0, 0.85, 0.4)
 	tracers.scale_amount_min = 2.0
 	tracers.scale_amount_max = 2.0
 	add_sibling(tracers)
-	Sfx.play(tracers, INTERCEPT_SOUND)
-	# Outlives the missile, until its sound is done
-	get_tree().create_timer(INTERCEPT_SOUND.get_length(), false).timeout.connect(tracers.queue_free)
+	ciws_sound = Sfx.play(tracers, INTERCEPT_SOUND)
 
 
 func _shoot_down() -> void:
@@ -134,9 +140,23 @@ func _shoot_down() -> void:
 	done.emit()
 	texture = null
 	exhaust.queue_free()
-	tracers.emitting = false
+	_cease_fire(tracers, ciws_sound)
 	await boom(kill_at, true)
 	queue_free()
+
+
+# A short burst past the kill, then the sound fades. Not tied to the missile,
+# which is freed first. A skipped replay may free the tracers at any point.
+static func _cease_fire(gun: CPUParticles2D, sound: AudioStreamPlayer2D) -> void:
+	await gun.get_tree().create_timer(FIRE_AFTER, false).timeout
+	if not is_instance_valid(gun):
+		return
+	gun.emitting = false
+	var fade := gun.create_tween()
+	fade.tween_property(sound, "volume_db", -40.0, SOUND_FADE)
+	# Then let the last tracers fly out
+	fade.tween_interval(gun.lifetime)
+	fade.tween_callback(gun.queue_free)
 
 
 func explode(pos: Vector2) -> void:

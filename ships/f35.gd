@@ -89,6 +89,7 @@ func _process(delta: float) -> void:
 			bombing = false
 			var missile: Missile = MISSILE_SCENE.instantiate()
 			missile.intercepted = ship.intercepted
+			missile.ciws_at = ship.ciws_at
 			ship.spawn(missile)
 			missile.launch(path_follow.global_position, target_hex, 0.0, true)
 			# Not awaited here: that would suspend _process with the jet's state

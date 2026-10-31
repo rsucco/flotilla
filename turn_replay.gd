@@ -91,6 +91,9 @@ func begin(ship: Ship, kind: String, target: Vector2i) -> void:
 	for prop in ["next_turret", "fore_silo", "intercepted"]:
 		if prop in ship:
 			recording.props[prop] = ship.get(prop)
+	# The defender knows where their own cruiser is
+	if ship.intercepted:
+		recording.props["ciws_at"] = ship.player.opponent.interceptor.global_position
 
 
 # Call when the attacker moves onto one of the defender's mines
