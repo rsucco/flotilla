@@ -30,7 +30,7 @@ var ship: Ship
 
 
 func _ready() -> void:
-	audio_player = AudioStreamPlayer2D.new()
+	audio_player = Sfx.new_player()
 	audio_player.stream = ROTOR_SOUND
 	add_child(audio_player)
 

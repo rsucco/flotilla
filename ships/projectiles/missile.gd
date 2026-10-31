@@ -68,7 +68,7 @@ func launch(
 	exhaust.position.x += 1.5
 	add_child(exhaust)
 
-	var sound := AudioStreamPlayer2D.new()
+	var sound := Sfx.new_player()
 	add_child(sound)
 	var heading := (position - dest).angle()
 	if instafire:

@@ -65,7 +65,7 @@ var movement_audio_player: AudioStreamPlayer2D
 func _ready() -> void:
 	# Created here rather than as a member default so revealed copies that are
 	# freed before entering the tree don't leak it
-	movement_audio_player = AudioStreamPlayer2D.new()
+	movement_audio_player = Sfx.new_player()
 	add_child(movement_audio_player)
 
 

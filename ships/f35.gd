@@ -61,10 +61,10 @@ var ship: Ship
 
 
 func _ready() -> void:
-	audio_player = AudioStreamPlayer2D.new()
+	audio_player = Sfx.new_player()
 	audio_player.stream = JET_SOUND
 	add_child(audio_player)
-	recon_audio_player = AudioStreamPlayer2D.new()
+	recon_audio_player = Sfx.new_player()
 	recon_audio_player.stream = RECON_SOUND
 	add_child(recon_audio_player)
 	shadow = Sprite2D.new()

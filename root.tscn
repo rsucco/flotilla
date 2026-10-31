@@ -23,6 +23,7 @@ visible = false
 stream = ExtResource("3")
 volume_db = -12.0
 autoplay = true
+bus = &"Music"
 
 [node name="TurnReplay" parent="." instance=ExtResource("6")]
 
