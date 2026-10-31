@@ -190,6 +190,11 @@ func _run() -> void:
 			for ship in action.revealed:
 				if is_instance_valid(ship):
 					action.player.opponent.show_revealed(ship)
+					# The battery is seen turning to fire
+					if ship is CoastalBattery and action.kind == "fire":
+						var battery := ship as CoastalBattery
+						battery.turret.rotation = action.turrets["Turret"]
+						battery.aim_turret(battery.turret, grid.get_hex_center(action.target), 1.0)
 			# No hiding where shots come from once the ship has given itself away
 			masking = action.revealed.is_empty()
 			match action.kind:

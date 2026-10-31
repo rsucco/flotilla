@@ -217,8 +217,13 @@ func test_battery_revealed_as_it_fires() -> void:
 	await wait_process_frames(2)
 	assert_true(game.turn_replay.playing, "replay started")
 	assert_true(revealed_shown("coastal_battery"), "shown before the shell lands")
+	var battery: CoastalBattery = driver.ship_of(0, "coastal_battery")
+	var aimed := battery.turret.rotation
+	var copy: CoastalBattery = game.players[1].temp_revealed_ships[0]
+	assert_ne(copy.turret.rotation, aimed, "starts where it was before firing")
 	await driver.wait_until(replay_done, 20, "the replay")
 	assert_true(revealed_shown("coastal_battery"), "still shown for the turn")
+	assert_almost_eq(copy.turret.rotation, aimed, 0.01, "turned to fire")
 
 
 func test_sub_revealed_by_its_sonar_pulse() -> void:

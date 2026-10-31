@@ -56,6 +56,9 @@ func fire(target: Vector2i) -> void:
 	var sound := Sfx.play(self, TURRET_SOUND)
 	await aim_turret(turret, grid.get_hex_center(target), 1.0)
 	sound.queue_free()
+	# The opponent sees it as it was when it fired
+	if is_instance_valid(revealed_buddy) and not ghost:
+		(revealed_buddy.get_node("Turret") as Node2D).rotation = turret.rotation
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
 	spawn(projectile)
 	projectile.launch(
