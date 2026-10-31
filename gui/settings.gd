@@ -17,8 +17,10 @@ func _ready() -> void:
 			func(value: float) -> void: Settings.set_volume(bus, value)
 		)
 	# Hear the new level on letting go
-	sliders[&"Effects"].drag_ended.connect(func(_changed: bool) -> void: $Sample.play())
-	fullscreen.visible = not OS.has_feature("mobile")
+	for bus: StringName in [&"Master", &"Effects"]:
+		sliders[bus].drag_ended.connect(func(_changed: bool) -> void: $Sample.play())
+	# Fullscreen is all there is
+	%Video.visible = not OS.has_feature("mobile")
 	fullscreen.button_pressed = Settings.is_fullscreen()
 	fullscreen.toggled.connect(Settings.set_fullscreen)
 

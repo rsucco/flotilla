@@ -71,6 +71,15 @@ func test_sliders_change_volume_live_and_closing_saves() -> void:
 	assert_almost_eq(file.get_value("volume", &"Music"), 0.5, 0.001)
 
 
+func test_letting_go_of_master_or_effects_plays_the_sample() -> void:
+	var page: Control = add_child_autofree(SETTINGS_SCENE.instantiate())
+	var sample: AudioStreamPlayer = page.get_node("Sample")
+	for bus: StringName in [&"Music", &"Master", &"Effects"]:
+		sample.stop()
+		page.get_node("%" + bus).drag_ended.emit(true)
+		assert_eq(sample.playing, bus != &"Music", bus)
+
+
 func test_fullscreen_toggle_is_saved() -> void:
 	var page: Control = add_child_autofree(SETTINGS_SCENE.instantiate())
 	var toggle: CheckButton = page.get_node("%Fullscreen")
