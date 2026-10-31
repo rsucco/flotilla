@@ -25,7 +25,7 @@ func show_stats(players: Array, turns: int) -> void:
 
 
 func _on_Quit_pressed() -> void:
-	get_tree().quit()
+	Sfx.quit(get_tree())
 
 
 func _on_Title_pressed() -> void:

@@ -8,6 +8,9 @@ func _ready() -> void:
 	# Once per run, as the game starts
 	if Settings.config == null:
 		Settings.load_settings()
+		# The window's close button quits cleanly too
+		get_tree().auto_accept_quit = false
+		get_tree().root.close_requested.connect(Sfx.quit.bind(get_tree()))
 
 
 func _on_Hotseat_pressed() -> void:
@@ -24,4 +27,4 @@ func _on_settings_pressed() -> void:
 
 
 func _on_Exit_pressed() -> void:
-	get_tree().quit()
+	Sfx.quit(get_tree())

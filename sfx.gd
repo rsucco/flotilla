@@ -20,3 +20,12 @@ static func play(parent: Node, stream: AudioStream) -> AudioStreamPlayer2D:
 	parent.add_child(player)
 	player.play()
 	return player
+
+
+# Quits once every sound has stopped. Godot frees a stopped sound a moment
+# later, on the audio thread, and quitting before then leaks it.
+static func quit(tree: SceneTree) -> void:
+	if is_instance_valid(tree.current_scene):
+		tree.current_scene.queue_free()
+	await tree.create_timer(0.1).timeout
+	tree.quit()
