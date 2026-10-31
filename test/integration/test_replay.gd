@@ -169,6 +169,27 @@ func test_shells_hidden_until_they_cross_over() -> void:
 	assert_true(first_shell().visible, "shown over the defender's side")
 
 
+# Hidden particles don't run, so any freed on `finished` would stay behind and
+# hold the replay open until SETTLE_TIMEOUT
+func test_hidden_muzzle_flash_is_freed() -> void:
+	await driver.act("battleship", "Fire", GameDriver.spot(1, "destroyer"))
+	await driver.end_turn()
+	await driver.swap(true)
+	await driver.wait_until(
+		func() -> bool: return game.turn_replay.next_action > 0, 20, "the shot to land"
+	)
+	# Past the explosion's particles too
+	var waited := 0.0
+	while waited < 1.5:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	var particles := game.turn_replay.spawned.filter(
+		func(node: Variant) -> bool: return is_instance_valid(node) and node is CPUParticles2D
+	)
+	assert_eq(particles, [], "all particles gone")
+	await driver.wait_until(replay_done, 20, "the replay")
+
+
 func test_battery_shells_always_shown() -> void:
 	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
 	await driver.end_turn()

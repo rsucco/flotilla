@@ -27,5 +27,7 @@ func launch(
 	flash.one_shot = true
 	flash.explosiveness = 1.0
 	flash.global_position = global_position
-	flash.finished.connect(flash.queue_free)
 	add_sibling(flash)
+	# Not on `finished`: hidden particles (e.g. on the attacker's side in a
+	# replay) don't run, so they never finish
+	get_tree().create_timer(flash.lifetime, false).timeout.connect(flash.queue_free)
