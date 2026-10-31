@@ -15,7 +15,7 @@ const SONAR_PULSE_DESC := (
 )
 const CRUSHING_DEPTHS_DESC := (
 	"Sinks instantly when hit in center hex by surface unit, or when hit in any hex by "
-	+ "ASW Strike, mine, or another sub"
+	+ "ASW Strike, mine, or another sub; cannot shoot at island tiles except with Nuclear Strike"
 )
 
 
