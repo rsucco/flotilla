@@ -8,7 +8,7 @@ signal buttons_changed(enabled: Dictionary)
 
 const TILE_HIST_HOVER_TIME := 0.5
 # Ships with no AP left; opaque, since translucent means revealed
-const DONE_TINT := Color(0.55, 0.55, 0.55)
+const DONE_TINT := Color(0.7, 0.7, 0.7)
 const ACTION_BUTTONS: Array[String] = [
 	"Fire", "Special", "Secondary", "NextShip", "Forward", "Reverse", "Port", "Starboard"
 ]
