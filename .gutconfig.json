@@ -4,5 +4,6 @@
 	"prefix": "test_",
 	"suffix": ".gd",
 	"should_exit": true,
+	"post_run_script": "res://test/post_run.gd",
 	"log_level": 1
 }

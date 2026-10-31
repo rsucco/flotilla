@@ -33,7 +33,7 @@ Turn-based naval strategy game (Battleship meets XCOM) on hex grids. Players buy
 - Web exports use `variant/thread_support=false` so they run without COOP/COEP headers. Don't add threads.
 
 ## Testing
-- GUT 9.7.1 (vendored in `addons/gut/`, configured by `.gutconfig.json`). Run all tests headless: `godot --headless --path . -s addons/gut/gut_cmdln.gd` (exits 1 on failure). Engine errors and `push_error` fail the running test.
+- GUT 9.7.1 (vendored in `addons/gut/`, configured by `.gutconfig.json`). Run all tests headless: `godot --headless --path . -s addons/gut/gut_cmdln.gd` (exits 1 on failure). Engine errors and `push_error` fail the running test. GUT skips a test script that fails to parse and still passes, so `test/post_run.gd` (the post-run hook) fails the run instead: if it reports "Could not load", fix that script.
 - `test/unit/`: pure logic (`Grid`, `Tile`). `test/integration/`: rules exercised against an instantiated `root.tscn`.
 - Files are `test_*.gd` and `extends GutTest`. Add a test for each README rule you implement or fix. Seed the RNG (`seed(n)`) in tests that depend on chance.
 - `test/game_driver.gd` plays the real game through mouse input and button presses (`test_full_game.gd`, `test_gui.gd`). Hide `/root/GutRunner/GutLayer` in tests that click the board, or GUT's own window eats the clicks. The driver waits a frame before each click, as real input would.
