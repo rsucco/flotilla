@@ -21,7 +21,8 @@ var current_turn := 0
 var swapping := false
 # The board and fleets this game started with, once both players have chosen
 var setup := {}
-# Testing cheat (debug builds): V shows both fleets
+# Testing cheats (debug builds): V shows both fleets, C readies every ability
+# of the player whose turn it is
 var reveal_all := false
 
 @onready var gui: GUI = $GUI
@@ -61,7 +62,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not OS.is_debug_build() or not event is InputEventKey:
 		return
 	var key := event as InputEventKey
-	if key.pressed and not key.echo and key.physical_keycode == KEY_V:
+	if not key.pressed or key.echo:
+		return
+	if key.physical_keycode == KEY_C and players[player_up].active:
+		players[player_up].ready_abilities()
+	elif key.physical_keycode == KEY_V:
 		reveal_all = not reveal_all
 		if not reveal_all:
 			for player in players:

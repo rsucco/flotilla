@@ -334,6 +334,16 @@ func new_turn() -> void:
 	active = true
 
 
+# Testing cheat (Root's C key): every ability of ours ready now
+func ready_abilities() -> void:
+	for ship in ships:
+		ship.special.cooldown_current = 0
+		ship.secondary.cooldown_current = 0
+	if selected_ship != null and not animation_playing:
+		_update_buttons(selected_ship)
+		ship_shown.emit(selected_ship)
+
+
 func finish_turn() -> void:
 	super()
 	_select_ship(null)
