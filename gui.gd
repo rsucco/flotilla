@@ -15,7 +15,6 @@ var ship_icons := {}
 @onready var ship_name: Label = $GUIGrid/ShipInfo/ActionInfo/ShipName
 @onready var ship_icon: TextureRect = $GUIGrid/ShipInfo/ActionInfo/ShipIcon
 @onready var ap_label: Label = $GUIGrid/ShipInfo/ActionInfo/AP
-@onready var ap_pips: APPips = $GUIGrid/ShipInfo/ActionInfo/APPips
 @onready var special_button: Button = $GUIGrid/Actions/Special
 @onready var secondary_button: Button = $GUIGrid/Actions/Secondary
 
@@ -43,7 +42,6 @@ func update_ship_info(ship: Ship) -> void:
 		ship_name.tooltip_text = ""
 		ship_icon.modulate = Color.TRANSPARENT
 		ap_label.text = "AP:     "
-		ap_pips.show_ap(0, 0)
 		update_ability(special_button, special_info, "Special", null)
 		update_ability(secondary_button, secondary_info, "Secondary", null)
 		return
@@ -58,7 +56,6 @@ func update_ship_info(ship: Ship) -> void:
 	ship_icon.texture = ship_icons[ship.ship_type]
 	ship_icon.modulate = Color.WHITE
 	ap_label.text = "AP: " + str(ship.ap) + "/" + str(ship.default_ap)
-	ap_pips.show_ap(ship.ap, ship.default_ap)
 
 
 # Shows an ability's name, cooldown, and icon; null clears it

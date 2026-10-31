@@ -2,7 +2,6 @@
 
 [ext_resource type="FontVariation" path="res://font.tres" id="1"]
 [ext_resource type="Script" path="res://gui.gd" id="2"]
-[ext_resource type="Script" path="res://gui/ap_pips.gd" id="ap_pips"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/button_template.png" id="3"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/fire.png" id="4"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/end_turn.png" id="5"]
@@ -134,11 +133,10 @@ offset_bottom = 61.0
 text = "AP:"
 horizontal_alignment = 1
 
-[node name="APPips" type="Control" parent="GUIGrid/ShipInfo/ActionInfo"]
+[node name="Spacer" type="Control" parent="GUIGrid/ShipInfo/ActionInfo"]
 custom_minimum_size = Vector2(0, 17)
 layout_mode = 2
 mouse_filter = 2
-script = ExtResource("ap_pips")
 
 [node name="VSeparator0" type="VSeparator" parent="GUIGrid"]
 offset_left = 296.0

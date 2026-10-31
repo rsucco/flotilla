@@ -230,16 +230,15 @@ func test_ships_out_of_ap_are_tinted_and_pips_show_ap() -> void:
 	driver.prepare_board()
 	await driver.start_game()
 	var battery := driver.ship_of(0, "coastal_battery")
-	var pips := game.gui.ap_pips
-	await driver.select("coastal_battery")
-	assert_eq([pips.ap, pips.total], [2, 2])
+	var pips: APPips = game.players[0].pips
+	assert_true(pips.visible, "pips shown on our turn")
+	assert_eq(pips.ships, game.players[0].ships, "one row of pips per ship")
 	# Firing uses both of the battery's AP
 	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
 	assert_eq(battery.modulate, LocalPlayer.DONE_TINT, "tinted once out of AP")
 	assert_eq(driver.ship_of(0, "battleship").modulate, Color.WHITE, "others untinted")
-	await driver.select("coastal_battery")
-	assert_eq([pips.ap, pips.total], [0, 2])
 	await driver.end_turn()
+	assert_false(pips.visible, "hidden once our turn ends")
 	await driver.swap()
 	await driver.end_turn()
 	await driver.swap()

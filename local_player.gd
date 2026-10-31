@@ -28,10 +28,20 @@ var active := false
 var tile_history: TileHistory
 # Whether to watch the opponent's turn replay at the next swap
 var watch_replay := true
+var pips: APPips
 
 
 func _init(num: int) -> void:
 	super(num)
+
+
+func _ready() -> void:
+	pips = APPips.new()
+	pips.ships = ships
+	# Above the ships
+	pips.z_index = 2
+	pips.visible = false
+	add_child(pips)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -332,6 +342,7 @@ func new_turn() -> void:
 	_select_ship(ships_with_moves[0])
 	on_hex_time = 0
 	active = true
+	pips.visible = true
 
 
 # Testing cheat (Root's C key): every ability of ours ready now
@@ -348,6 +359,7 @@ func finish_turn() -> void:
 	super()
 	_select_ship(null)
 	active = false
+	pips.visible = false
 	for ship in ships:
 		ship.visible = false
 	# Its history is about the opponent's fleet
