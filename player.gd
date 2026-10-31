@@ -12,7 +12,6 @@ signal attack_resolved
 # One of our ships set off an opponent's mine at `hex`
 signal mine_blast(hex: Vector2i)
 
-const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
 # Abilities that can damage ships, which count toward the hit rate
 const DAMAGING_ABILITIES: Array[String] = ["Salvo", "Nuclear Strike", "ASW Strike"]
 
@@ -29,6 +28,8 @@ var opponent: Player
 var fleet_size := 0
 var attacks := 0
 var hits := 0
+# Whether our cruisers will shoot down the attack being made on us
+var intercepting := false
 
 
 func _init(num: int) -> void:
@@ -121,16 +122,29 @@ func receive_fire(hex: Vector2i, from_ship: Ship) -> Ship:
 	if target == null:
 		grid.log_event(hex, "Miss")
 		return null
-	# Missile-based weapons (cruisers, destroyers, carriers) can be intercepted
-	if from_ship.ship_type in ["destroyer", "cruiser", "carrier"] and cruiser_intercepts(hex, 0.5):
+	if intercepting:
+		intercepting = false
 		grid.log_event(hex, "Miss (CIWS intercepted hit)")
 		return null
 	target.hit(hex, from_ship)
 	return target
 
 
-# Passive - Missile Defense: rolls to intercept an attack on `hex` if one of
-# our cruisers is within two hexes. Multiple cruisers don't stack.
+# Passive - Missile Defense: decides as an attack starts whether our cruisers
+# will shoot it down, so the missile can be seen dying on its way in. Missiles
+# (from destroyers, cruisers and carriers) on a ship can be intercepted, and
+# so can a Nuclear Strike.
+func roll_intercept(from_ship: Ship, kind: String, hex: Vector2i) -> bool:
+	intercepting = false
+	if kind == "fire" and from_ship.ship_type in ["destroyer", "cruiser", "carrier"]:
+		intercepting = get_ship_at_hex(hex) != null and cruiser_intercepts(hex, 0.5)
+	elif kind == "special" and from_ship.special.name == "Nuclear Strike":
+		intercepting = cruiser_intercepts(hex, 0.25)
+	return intercepting
+
+
+# Rolls to intercept an attack on `hex` if one of our cruisers is within two
+# hexes. Multiple cruisers don't stack.
 func cruiser_intercepts(hex: Vector2i, chance: float) -> bool:
 	for h in grid.get_all_hex_neighbors(hex, 2):
 		var cruiser := get_ship_at_hex(h)
@@ -138,7 +152,6 @@ func cruiser_intercepts(hex: Vector2i, chance: float) -> bool:
 			if randf() >= chance:
 				return false
 			print("passive - missile defense")
-			Sfx.play(self, INTERCEPT_SOUND)
 			return true
 	return false
 
@@ -183,7 +196,8 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 			# Destroys anything it hits dead-on (including coastal batteries);
 			# otherwise hits normally in the area of effect. An intercept
 			# cancels the whole strike.
-			if cruiser_intercepts(hex, 0.25):
+			if intercepting:
+				intercepting = false
 				grid.log_event(hex, "Miss (CIWS intercepted Nuclear Strike)")
 				return
 			var checked: Array[Vector2i] = []

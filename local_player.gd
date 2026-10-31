@@ -170,6 +170,7 @@ func _attack(kind: String, hex: Vector2i) -> void:
 	var ship := selected_ship
 	animation_playing = true
 	_set_attack_buttons_disabled(true)
+	ship.intercepted = opponent.roll_intercept(ship, kind, hex)
 	attack_started.emit(ship, kind, hex)
 	match kind:
 		"fire":

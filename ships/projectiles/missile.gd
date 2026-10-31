@@ -2,17 +2,34 @@ class_name Missile
 extends Projectile
 
 const FIRE_SOUND := preload("res://audio/missile.wav")
+const INTERCEPT_SOUND := preload("res://audio/ciws.wav")
 const MAX_SPEED := 500.0
+# CIWS opens fire this far short of the kill point. A missile released on the
+# defender's side (by an F-35) is killed this far past the release point.
+const TRACER_LEAD := 180.0
+const RELEASE_KILL := 60.0
+const TRACER_SPEED := 700.0
 
 var rotate_sound: AudioStream = preload("res://audio/missile_rotate.wav")
 var enroute := false
 var exhaust: CPUParticles2D
+# Set by the firing ship: shot down by the defender's CIWS on the way in
+var intercepted := false
+var launched_from: Vector2
+var kill_at: Vector2
+var tracers: CPUParticles2D
 
 
 func _process(delta: float) -> void:
 	super(delta)
 	if enroute and speed < MAX_SPEED:
 		speed += 500 * delta
+	if intercepted and moving:
+		var to_go := launched_from.distance_to(kill_at) - launched_from.distance_to(position)
+		if tracers == null and to_go < TRACER_LEAD:
+			_open_fire()
+		if to_go <= 0:
+			_shoot_down()
 
 
 # Turns toward the target (unless instafire) before accelerating
@@ -20,6 +37,8 @@ func launch(
 	origin: Vector2, target: Vector2i, start_degrees: float = 0.0, instafire: bool = false
 ) -> void:
 	super(origin, target)
+	if intercepted:
+		_plan_shootdown()
 	global_rotation_degrees = start_degrees
 	speed = 0.0
 	exhaust = CPUParticles2D.new()
@@ -66,6 +85,58 @@ func launch(
 	enroute = true
 	await sound.finished
 	sound.queue_free()
+
+
+# Where the missile dies: over the middle of no-man's-land, so the kill point
+# says nothing about where the cruiser is, or just after release when already
+# past it
+func _plan_shootdown() -> void:
+	launched_from = position
+	var defender := grid.side_of(dest_hex)
+	var nml_x := grid.get_hex_center(Vector2i(Grid.NO_MANS_LAND, 0)).x
+	if grid.side_of(grid.get_hex_from_coords(position)) == defender:
+		kill_at = position + position.direction_to(dest) * RELEASE_KILL
+	else:
+		kill_at = position.lerp(dest, (nml_x - position.x) / (dest.x - position.x))
+
+
+# Tracers from the defender's edge of no-man's-land, level with the kill point
+func _open_fire() -> void:
+	var defender := grid.side_of(dest_hex)
+	var edge := Vector2i(Grid.NO_MANS_LAND + (1 if defender == 1 else -1), 0)
+	var from := Vector2(
+		(grid.get_hex_center(edge).x + grid.get_hex_center(Vector2i(Grid.NO_MANS_LAND, 0)).x) / 2,
+		kill_at.y
+	)
+	tracers = CPUParticles2D.new()
+	tracers.position = from
+	tracers.direction = from.direction_to(kill_at) if from != kill_at else Vector2.LEFT
+	tracers.spread = 3.0
+	tracers.gravity = Vector2.ZERO
+	tracers.initial_velocity_min = TRACER_SPEED
+	tracers.initial_velocity_max = TRACER_SPEED
+	# Long enough to fly on past the missile
+	tracers.lifetime = (from.distance_to(kill_at) + 80) / TRACER_SPEED
+	tracers.amount = 24
+	tracers.color = Color(1.0, 0.85, 0.4)
+	tracers.scale_amount_min = 2.0
+	tracers.scale_amount_max = 2.0
+	add_sibling(tracers)
+	Sfx.play(tracers, INTERCEPT_SOUND)
+	# Outlives the missile, until its sound is done
+	get_tree().create_timer(INTERCEPT_SOUND.get_length(), false).timeout.connect(tracers.queue_free)
+
+
+func _shoot_down() -> void:
+	moving = false
+	enroute = false
+	position = kill_at
+	done.emit()
+	texture = null
+	exhaust.queue_free()
+	tracers.emitting = false
+	await boom(kill_at, true)
+	queue_free()
 
 
 func explode(pos: Vector2) -> void:

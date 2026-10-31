@@ -47,6 +47,8 @@ var ghost := false
 var held := false
 # Set by EW Strike; blocks firing on the ship's next turn
 var jammed := false
+# Set as each attack starts: whether the opponent's cruisers will shoot it down
+var intercepted := false
 # Set by the player that adopts the ship
 var player: Player
 var grid: Grid

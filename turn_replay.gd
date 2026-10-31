@@ -26,8 +26,8 @@ var spawned: Array[Node] = []
 # Set by Root: the board, and where attacks add their effects
 var grid: Grid
 var effects: Node2D
-# Shown only once over the defender's side, so the replay gives away the angle
-# of fire but not where the attacker's ships are
+# Hidden over the attacker's side, so the replay gives away the angle of fire
+# but not where the attacker's ships are
 var masked: Array[Node2D] = []
 var masking := false
 
@@ -87,8 +87,8 @@ func begin(ship: Ship, kind: String, target: Vector2i) -> void:
 	for child in ship.get_children():
 		if child.name.begins_with("Turret"):
 			recording.turrets[child.name] = (child as Node2D).rotation
-	# Which turret or silo fires next
-	for prop in ["next_turret", "fore_silo"]:
+	# Which turret or silo fires next, and whether it's shot down
+	for prop in ["next_turret", "fore_silo", "intercepted"]:
 		if prop in ship:
 			recording.props[prop] = ship.get(prop)
 
@@ -140,8 +140,6 @@ func end() -> void:
 		for event: Array in history.slice(action.history_before[hex]):
 			if event[1] == "Miss (Blocked by Armor)":
 				action.sounds.append([defender.get_ship_at_hex(hex), Battleship.ARMOR_SOUND])
-			elif event[1].begins_with("Miss (CIWS"):
-				action.sounds.append([defender, Player.INTERCEPT_SOUND])
 	action.revealed = defender.temp_revealed_ships.slice(action.revealed_before)
 	actions.append(action)
 
@@ -225,7 +223,8 @@ func _process(_delta: float) -> void:
 				if node is Torpedo
 				else node.global_position
 			)
-			node.visible = _over(defender, at)
+			# Shown over no-man's-land too, where missiles are shot down
+			node.visible = not _over(1 - defender, at)
 	for ghost in ghosts:
 		if ghost is CoastalBattery:
 			continue
