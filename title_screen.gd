@@ -11,6 +11,7 @@ func _ready() -> void:
 
 
 func _on_Hotseat_pressed() -> void:
+	Root.title_music_at = $Music.get_playback_position()
 	get_tree().change_scene_to_file("res://root.tscn")
 
 

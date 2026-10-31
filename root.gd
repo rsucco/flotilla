@@ -8,9 +8,12 @@ const MINE_TEXTURE := preload("res://ships/sprites/projectiles/mine.png")
 const HITMISS_TEXTURE := preload("res://gui/sprites/hitmiss.png")
 const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")
 const VICTORY_SCENE := preload("res://gui/victory.tscn")
+const MUSIC_FADE := 2.0
 
 # "Replay This Game" keeps the board and both fleets across a scene reload
 static var replay := {}
+# Where the title screen's music was, so it carries on through setup
+static var title_music_at := 0.0
 
 var grid: Grid
 var players: Array[LocalPlayer] = []
@@ -52,6 +55,9 @@ func _ready() -> void:
 	gui.menu_pressed.connect(pause_menu.open)
 	add_child(effects)
 	turn_replay.effects = effects
+	$TitleMusic.play(title_music_at)
+	# New Game and replays start it from the top
+	title_music_at = 0.0
 	play_game()
 
 
@@ -104,6 +110,7 @@ func play_game() -> void:
 	setup = {"islands": grid.get_islands(), "selections": selections}
 	pause_menu.can_replay = true
 	_update_fleets()
+	_start_battle_music()
 	# Play until one player has no more ships
 	while not players[0].ships.is_empty() and not players[1].ships.is_empty():
 		# Increment the turn counter at the start of player 1's turn
@@ -152,6 +159,19 @@ func play_game() -> void:
 	victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
 	add_child(victory)
 	victory.show_stats(players, current_turn)
+
+
+# Crossfades from the title music to the battle music as the first turn starts
+func _start_battle_music() -> void:
+	var title: AudioStreamPlayer = $TitleMusic
+	var battle: AudioStreamPlayer = $Music
+	var volume := battle.volume_db
+	battle.volume_db = -60.0
+	battle.play()
+	var fade := create_tween().set_parallel()
+	fade.tween_property(battle, "volume_db", volume, MUSIC_FADE)
+	fade.tween_property(title, "volume_db", -60.0, MUSIC_FADE)
+	fade.chain().tween_callback(title.stop)
 
 
 func _update_fleets() -> void:

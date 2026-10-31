@@ -337,3 +337,20 @@ func test_ship_selection_centred_on_screen() -> void:
 	await wait_process_frames(2)
 	var centre := dialog.get_viewport_rect().size / 2
 	assert_almost_eq(dialog.get_global_rect().get_center(), centre, Vector2.ONE)
+
+
+func test_title_music_carries_on_through_setup_then_crossfades() -> void:
+	Root.title_music_at = 5.0
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	assert_eq(Root.title_music_at, 0.0, "the next game's setup starts it from the top")
+	var title: AudioStreamPlayer = game.get_node("TitleMusic")
+	var battle: AudioStreamPlayer = game.get_node("Music")
+	assert_true(title.playing, "title music during ship selection")
+	assert_false(battle.playing)
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	assert_true(battle.playing, "battle music from turn 1")
+	await wait_seconds(Root.MUSIC_FADE + 0.2)
+	assert_false(title.playing, "title music faded out")
+	assert_almost_eq(battle.volume_db, -12.0, 0.01)

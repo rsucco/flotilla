@@ -39,6 +39,7 @@ func esc() -> void:
 func test_music_and_effects_have_their_own_buses() -> void:
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
 	assert_eq(game.get_node("Music").bus, &"Music")
+	assert_eq(game.get_node("TitleMusic").bus, &"Music")
 	var title: Node = add_child_autofree(TITLE_SCENE.instantiate())
 	assert_eq(title.get_node("Music").bus, &"Music")
 	var sound := Sfx.play(game, Missile.FIRE_SOUND)
