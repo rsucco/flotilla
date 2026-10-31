@@ -133,6 +133,8 @@ func play_game() -> void:
 		while players[player_up].has_moves():
 			players[player_up].get_move()
 			await players[player_up].made_move
+			# For hits and repairs, which don't change the fleet
+			_update_fleets()
 			# Make sure only the active player receives button signals
 			players[player_up].disconnect_buttons()
 		players[player_up].finish_turn()
@@ -150,7 +152,8 @@ func _update_fleets() -> void:
 	# Ships sunk last turn still count until the replay shows them sinking
 	var ours: Array[Ship] = players[player_up].ships.duplicate()
 	ours.append_array(turn_replay.held_ships(players[player_up]))
-	gui.update_fleets(ours, players[1 - player_up].ships)
+	# Our damage is part of what the replay shows
+	gui.update_fleets(ours, players[1 - player_up].ships, not swapping)
 
 
 func _on_pause_menu_replay_requested() -> void:

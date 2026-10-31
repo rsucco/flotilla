@@ -89,24 +89,22 @@ func update_turn(turn: int) -> void:
 	$GUIGrid/TurnNumber/TurnNumber.text = str(turn)
 
 
-func update_fleets(ours: Array[Ship], theirs: Array[Ship]) -> void:
-	fill_fleet($GUIGrid/YourFleet/YourFleetIcons, ours)
-	fill_fleet($GUIGrid/OpponentFleet/OpponentFleetIcons, theirs)
+# With `our_damage` false, our hits stay hidden (until the replay has shown them)
+func update_fleets(ours: Array[Ship], theirs: Array[Ship], our_damage: bool = true) -> void:
+	fill_fleet($GUIGrid/YourFleet/YourFleetIcons, ours, our_damage)
+	fill_fleet($GUIGrid/OpponentFleet/OpponentFleetIcons, theirs, true)
 
 
-# Replaces a container's contents with an icon and count per ship type
-func fill_fleet(container: Container, ships: Array[Ship]) -> void:
+# Replaces a container's contents with an entry per ship type
+func fill_fleet(container: Container, ships: Array[Ship], show_damage: bool) -> void:
 	for child in container.get_children():
 		child.queue_free()
 	for ship_type in Ship.SHIP_TYPES:
-		var count := ships.filter(func(s: Ship) -> bool: return s.ship_type == ship_type).size()
-		if count == 0:
+		var of_type := ships.filter(func(s: Ship) -> bool: return s.ship_type == ship_type)
+		if of_type.is_empty():
 			continue
-		var icon := TextureRect.new()
-		icon.texture = ship_icons[ship_type]
-		var label := Label.new()
-		label.text = "x" + str(count)
-		var row := HBoxContainer.new()
-		row.add_child(icon)
-		row.add_child(label)
-		container.add_child(row)
+		var entry := FleetEntry.new()
+		entry.ships = of_type
+		entry.icon = ship_icons[ship_type]
+		entry.show_damage = show_damage
+		container.add_child(entry)

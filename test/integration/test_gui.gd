@@ -245,3 +245,42 @@ func test_ships_out_of_ap_are_tinted_and_pips_show_ap() -> void:
 	await driver.swap()
 	assert_eq(battery.modulate, Color.WHITE, "untinted next turn")
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+# Whether a fleet panel marks `ship_name` as damaged (its count in red)
+func marked(game: Root, panel: String, ship_name: String) -> bool:
+	return fleet_entry(game, panel, ship_name).get_child(1).modulate == FleetEntry.HIT_COLOR
+
+
+func fleet_entry(game: Root, panel: String, ship_name: String) -> FleetEntry:
+	var icons := game.gui.get_node("GUIGrid/" + panel + "/" + panel + "Icons")
+	for entry: FleetEntry in icons.get_children():
+		if not entry.is_queued_for_deletion() and entry.tooltip_text == ship_name:
+			return entry
+	return null
+
+
+func test_fleet_panels_show_hits() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	var target := driver.ship_of(1, "destroyer")
+	assert_false(marked(game, "OpponentFleet", "Destroyer"), "unmarked")
+	await driver.act("battleship", "Fire", target.hex)
+	var entry := fleet_entry(game, "OpponentFleet", "Destroyer")
+	assert_true(marked(game, "OpponentFleet", "Destroyer"), "marked once hit")
+	# The hover list: a title, then each destroyer with its hit hexes
+	var list: VBoxContainer = autofree(entry._make_custom_tooltip(entry.tooltip_text))
+	assert_eq(list.get_child_count(), 2)
+	assert_eq(entry._hits(target), [false, true, false] as Array[bool], "center hex hit")
+	# The defender doesn't see it until the replay has
+	await driver.end_turn()
+	await driver.swap(true)
+	await wait_process_frames(2)
+	assert_false(marked(game, "YourFleet", "Destroyer"), "hidden in replay")
+	await driver.wait_until(func() -> bool: return not game.turn_replay.playing, 20, "replay")
+	await wait_process_frames(2)
+	assert_true(marked(game, "YourFleet", "Destroyer"), "shown after")
+	get_node("/root/GutRunner/GutLayer").visible = true
