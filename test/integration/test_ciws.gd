@@ -108,14 +108,21 @@ func _intercepted_missile(cruiser_at: Vector2i = Vector2i(24, 7)) -> Missile:
 func test_ciws_fires_just_before_the_kill_and_briefly_after() -> void:
 	var missile := _intercepted_missile()
 	missile.launch(game.grid.get_hex_center(Vector2i(5, 7)), Vector2i(24, 9), 0.0, true)
+	await wait_until(func() -> bool: return missile.ciws_sound != null, 5)
+	var heard := Time.get_ticks_msec()
+	var sound := missile.ciws_sound
 	await wait_until(func() -> bool: return missile.tracers != null, 5)
 	var opened := Time.get_ticks_msec()
 	var tracers := missile.tracers
+	assert_between((opened - heard) / 1000.0, 0.15, 0.5, "heard a little before it's seen")
 	await wait_for_signal(missile.done, 5)
 	var lead := (Time.get_ticks_msec() - opened) / 1000.0
 	assert_between(lead, 0.2, 0.6, "opens fire just before the kill")
 	await wait_seconds(Missile.FIRE_AFTER + 0.1)
 	assert_false(tracers.emitting, "stops soon after")
+	assert_true(is_instance_valid(sound) and sound.volume_db == 0.0, "still heard")
+	await wait_seconds(Missile.SOUND_AFTER + Missile.SOUND_FADE)
+	assert_false(is_instance_valid(sound), "then fades out")
 
 
 func test_ciws_fires_from_the_cruiser_in_the_replay() -> void:
@@ -149,13 +156,30 @@ func test_intercepting_cruiser_recorded_for_the_replay() -> void:
 func test_missile_released_past_no_mans_land_dies_soon_after() -> void:
 	var missile := _intercepted_missile()
 	var release := game.grid.get_hex_center(Vector2i(18, 7))
-	missile.launch(release, Vector2i(26, 7), 0.0, true)
+	missile.launch(release, Vector2i(29, 7), 0.0, true)
 	assert_almost_eq(missile.kill_at.distance_to(release), Missile.RELEASE_KILL, 0.1)
 	var cruiser := game.grid.get_hex_center(Vector2i(24, 7))
 	assert_almost_eq(
 		missile.gun_at,
-		missile.kill_at.move_toward(cruiser, Missile.RELEASE_KILL),
+		missile.kill_at.move_toward(cruiser, Missile.RELEASE_TRACERS),
 		Vector2.ONE,
 		"just the last stretch, from the cruiser's bearing"
 	)
 	await wait_seconds(2.5)
+
+
+func test_missile_released_close_to_its_target_dies_halfway() -> void:
+	var missile := _intercepted_missile()
+	var release := game.grid.get_hex_center(Vector2i(18, 7))
+	var target := game.grid.get_hex_center(Vector2i(20, 7))
+	missile.launch(release, Vector2i(20, 7), 0.0, true)
+	assert_almost_eq(missile.kill_at, release.lerp(target, 0.5), Vector2.ONE)
+	await wait_seconds(2.0)
+
+
+func test_missile_released_over_no_mans_land_dies_on_the_way_in() -> void:
+	var missile := _intercepted_missile()
+	var release := game.grid.get_hex_center(Vector2i(Grid.NO_MANS_LAND, 7))
+	missile.launch(release, Vector2i(29, 7), 0.0, true)
+	assert_almost_eq(missile.kill_at.distance_to(release), Missile.RELEASE_KILL, 0.1)
+	await wait_seconds(2.0)

@@ -23,7 +23,7 @@ const FINAL := Vector2(0, 150)
 # Touchdown just inside the stern, then the wire stops the jet within this
 const TRAP_RUN := 22.0
 # Strike missiles are released this far short of the target
-const STANDOFF := 170.0
+const STANDOFF := 300.0
 # Every turn's radius, and the spacing of the points along the path
 const TURN_RADIUS := 80.0
 const STEP := 6.0
