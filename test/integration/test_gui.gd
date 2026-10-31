@@ -327,3 +327,13 @@ func test_hud_labels_name_each_ability_before_a_ship_is_shown() -> void:
 	var info := game.gui.get_node("GUIGrid/ShipInfo/AbilityInfo")
 	assert_eq(info.get_node("SpecialAbility").text, "Special Ability:")
 	assert_eq(info.get_node("SecondaryAbility").text, "Secondary Ability:")
+
+
+func test_ship_selection_centred_on_screen() -> void:
+	# Added to a player, as in a game: a plain Node, so no anchors to go by
+	var holder: Node = add_child_autofree(Node.new())
+	var dialog: Control = SELECTION_SCENE.instantiate()
+	holder.add_child(dialog)
+	await wait_process_frames(2)
+	var centre := dialog.get_viewport_rect().size / 2
+	assert_almost_eq(dialog.get_global_rect().get_center(), centre, Vector2.ONE)

@@ -29,6 +29,8 @@ var details := {}
 
 
 func _ready() -> void:
+	# Our parent (the player) isn't a Control, so anchors can't centre us
+	resized.connect(func() -> void: position = (get_viewport_rect().size - size) / 2)
 	for ship_type: String in POINT_VALUES:
 		selected_count[ship_type] = 0
 		label(ship_type).text += " (" + str(POINT_VALUES[ship_type]) + " Points)"
