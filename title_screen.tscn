@@ -52,6 +52,10 @@ offset_right = 138.0
 offset_bottom = 44.0
 text = "Hotseat Multiplayer"
 
+[node name="HowToPlay" type="Button" parent="TextureRect/PanelContainer/Buttons"]
+layout_mode = 2
+text = "How to Play"
+
 [node name="LAN" type="Button" parent="TextureRect/PanelContainer/Buttons"]
 offset_top = 48.0
 offset_right = 138.0
@@ -85,4 +89,5 @@ volume_db = -9.996
 autoplay = true
 
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Hotseat" to="." method="_on_Hotseat_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/Buttons/HowToPlay" to="." method="_on_how_to_play_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Exit" to="." method="_on_Exit_pressed"]

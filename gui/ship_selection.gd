@@ -22,6 +22,8 @@ var selected_count := {}
 var island_tiles := 0
 var used_points := 0
 var pending: Callable
+# Each ship type's details, read from the ship itself
+var details := {}
 
 @onready var grid: GridContainer = $VBoxContainer/SelectionGrid
 
@@ -30,6 +32,62 @@ func _ready() -> void:
 	for ship_type: String in POINT_VALUES:
 		selected_count[ship_type] = 0
 		label(ship_type).text += " (" + str(POINT_VALUES[ship_type]) + " Points)"
+		details[ship_type] = _describe(ship_type)
+		# Tapping too, since touch screens have no hover
+		var card: Control = grid.get_node(ship_type)
+		card.mouse_entered.connect(_show_details.bind(ship_type))
+		card.gui_input.connect(
+			func(event: InputEvent) -> void:
+				if event is InputEventMouseButton and event.pressed:
+					_show_details(ship_type)
+		)
+
+
+# The ship's size, weapon, abilities, passive and drawback
+func _describe(ship_type: String) -> String:
+	var ship: Ship = load("res://ships/" + ship_type.to_snake_case() + ".tscn").instantiate()
+	# The ships fill in their details on _ready
+	ship.visible = false
+	add_child(ship)
+	var size := ship.hit_hexes.size()
+	var lines: Array[String] = [
+		str(
+			ship.ship_name,
+			": ",
+			size,
+			" hex" if size == 1 else " hexes",
+			", ",
+			ship.default_ap,
+			" AP"
+		),
+		"Weapon: " + ship.weapon,
+	]
+	for kind: String in ["Special", "Secondary"]:
+		var ability := ship.special if kind == "Special" else ship.secondary
+		if ability.name != "None":
+			lines.append(
+				(
+					str(
+						kind,
+						": ",
+						ability.name,
+						" (",
+						ability.cooldown_interval,
+						"-turn cooldown) - "
+					)
+					+ ability.desc
+				)
+			)
+	for extra: Array in [["Passive", ship.passive], ["Drawback", ship.drawback]]:
+		if extra[1].name != "None":
+			lines.append(str(extra[0], ": ", extra[1].name, " - ", extra[1].desc))
+	remove_child(ship)
+	ship.free()
+	return "\n".join(lines)
+
+
+func _show_details(ship_type: String) -> void:
+	$VBoxContainer/Info.text = details[ship_type]
 
 
 func slider(ship_type: String) -> HSlider:

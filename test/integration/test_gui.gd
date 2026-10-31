@@ -27,6 +27,33 @@ func test_classic_fleet_skips_battery_without_islands() -> void:
 	assert_eq(slider(dialog, "Carrier").value, 1.0)
 
 
+func test_ship_selection_shows_ship_details() -> void:
+	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
+	var info: Label = dialog.get_node("VBoxContainer/Info")
+	dialog.get_node("VBoxContainer/SelectionGrid/Destroyer").mouse_entered.emit()
+	assert_string_contains(info.text, "Destroyer: 3 hexes, 4 AP")
+	assert_string_contains(info.text, "Special: ASW Strike (2-turn cooldown)")
+	assert_string_contains(info.text, "Secondary: Lay Mine (3-turn cooldown)")
+	assert_false(info.text.contains("Passive"), "no passive to list")
+	# Tapping works too
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.pressed = true
+	dialog.get_node("VBoxContainer/SelectionGrid/CoastalBattery").gui_input.emit(tap)
+	assert_string_contains(info.text, "Coastal Battery: 1 hex, 2 AP")
+	assert_string_contains(info.text, "Drawback: Stationary")
+
+
+func test_how_to_play_opens_from_the_title_screen() -> void:
+	var title: Node = add_child_autofree(load("res://title_screen.tscn").instantiate())
+	title.get_node("TextureRect/PanelContainer/Buttons/HowToPlay").pressed.emit()
+	var how: Node = title.get_node("TextureRect/HowToPlay")
+	assert_string_contains(how.get_node("Margin/VBoxContainer/Scroll/Rules").text, "action points")
+	how.get_node("Margin/VBoxContainer/Back").pressed.emit()
+	await wait_process_frames(1)
+	assert_false(is_instance_valid(how), "Back closes it")
+
+
 func test_fleet_panel_follows_turn_swap() -> void:
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
 	var driver := GameDriver.new(game)

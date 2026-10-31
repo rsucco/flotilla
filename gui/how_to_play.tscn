@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gui/how_to_play.gd" id="1"]
+[ext_resource type="StyleBox" path="res://gui/popup.tres" id="2"]
+[ext_resource type="FontFile" path="res://opensans.ttf" id="3"]
+
+[node name="HowToPlay" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 240.0
+offset_top = 60.0
+offset_right = -240.0
+offset_bottom = -60.0
+theme_override_styles/panel = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 16
+text = "How to Play"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Rules" type="RichTextLabel" parent="Margin/VBoxContainer/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+fit_content = true
+text = "[b]Goal[/b]
+Sink the other player's whole fleet. Each side's fleet is hidden from the other.
+
+[b]Setup[/b]
+Each player spends 25 points on ships, then places them on their own side of the board: left or right of the dark middle column (no-man's-land). Ships can face any of six directions. Islands (orange) block ships; Coastal Batteries can only go on islands. Hover over or tap a ship in ship selection for its details.
+
+[b]Turns[/b]
+Players take turns on the same device; hand it over when the swap screen appears. You can watch a replay of the other player's attacks before your turn.
+Each ship gets 4 action points (AP) a turn: forward 1, rotate 60° 2, reverse 4, and fire, special or secondary 2 each. A ship fires once a turn (the carrier twice). The dots above a ship are its AP left; ships with none turn grey. Next Ship picks the next ship that can still act, and End Turn ends your turn for the whole fleet.
+
+[b]Abilities[/b]
+Specials and secondaries have a cooldown in turns, shown on their button. They start the game cooling down and count down at the start of each of your turns. Passives (and drawbacks) always apply.
+
+[b]Damage[/b]
+Board markers: red is a hit, white a miss, black a ship sunk or destroyed, and half and half a hit that was stopped (armor, or a cruiser shooting it down). Hover over a hex for its history. Ships more than half damaged can't move. Hover over or tap an entry in the fleet panels to see each ship's damage.
+
+[b]Revealing[/b]
+Some actions show ships to the other player for a turn, drawn faded: Sonar Pulse, Recon Flight, and a Coastal Battery firing.
+
+[b]Menu[/b]
+Esc opens the menu: resume, start a new game, replay this game with the same fleets, or return to the title screen."
+
+[node name="Back" type="Button" parent="Margin/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Back"
+
+[connection signal="pressed" from="Margin/VBoxContainer/Back" to="." method="_on_back_pressed"]

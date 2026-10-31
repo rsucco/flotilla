@@ -17,9 +17,9 @@
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 320.0
-offset_top = 200.0
+offset_top = 120.0
 offset_right = -320.0
-offset_bottom = -231.0
+offset_bottom = -120.0
 theme_override_styles/panel = ExtResource("10")
 script = ExtResource("4")
 
@@ -404,6 +404,14 @@ offset_right = 210.0
 offset_bottom = 72.0
 text = "0/25"
 horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 156)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 10
+text = "Hover over or tap a ship for its details."
+autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="VBoxContainer"]
 offset_top = 347.0
