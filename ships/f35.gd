@@ -3,9 +3,9 @@ extends Node2D
 # Flies strikes and recon passes from its carrier. Paths are planned in the
 # carrier's frame (bow is up, the jet's parking spot is the origin) as a chain
 # of positions and headings joined by fixed-radius turns: a catapult launch
-# off the bow, onto the attack or recon heading, then home through a carrier
-# landing pattern (up the starboard side, break to port, downwind, and a turn
-# onto final astern), a trap at the stern and a taxi back to the spot.
+# off the bow, onto the attack or recon heading, then the most direct way
+# home onto a short final astern, a trap at the stern and a taxi back to the
+# spot.
 
 signal done
 
@@ -18,11 +18,7 @@ const DECK_AHEAD := 155.0
 const DECK_ASTERN := 34.0
 # The catapult stroke ends at the bow; then a straight climb-out
 const LAUNCH_RUN := 200.0
-# The landing pattern: initial up the starboard side, the break abeam the
-# bow, downwind on the port side, and final approach straight in from astern
-const INITIAL := Vector2(50, 120)
-const BREAK := Vector2(50, -170)
-const DOWNWIND := Vector2(-160, -170)
+# Where the final approach starts, straight in from astern
 const FINAL := Vector2(0, 150)
 # Touchdown just inside the stern, then the wire stops the jet within this
 const TRAP_RUN := 22.0
@@ -33,9 +29,9 @@ const TURN_RADIUS := 80.0
 const STEP := 6.0
 # Speeds in pixels per second: leaving the catapult, on final approach, and
 # taxiing on deck
-const LAUNCH_SPEED := 180.0
-const APPROACH_SPEED := 140.0
-const TAXI_SPEED := 30.0
+const LAUNCH_SPEED := 400.0
+const APPROACH_SPEED := 190.0
+const TAXI_SPEED := 40.0
 # Climbing out to cruise, and the glide slope down to the deck
 const CLIMB_RUN := 160.0
 const GLIDE_RUN := 220.0
@@ -112,7 +108,7 @@ func _process(delta: float) -> void:
 func bomb(target: Vector2i) -> void:
 	target_hex = target
 	plan_strike(target)
-	speed = 250.0
+	speed = 420.0
 	_take_off()
 	bombing = true
 	await done
@@ -121,7 +117,7 @@ func bomb(target: Vector2i) -> void:
 # Flies the length of the target's row; returns once the pass has started
 func recon(target: Vector2i) -> void:
 	plan_recon(target)
-	speed = 350.0
+	speed = 550.0
 	_take_off()
 	reconning = true
 	await done
@@ -203,14 +199,9 @@ func _launch() -> Curve2D:
 	return curve
 
 
-# Flies the landing pattern, traps at the stern and taxis back to the spot
+# Heads straight for final, traps at the stern and taxis back to the spot
 func _land(curve: Curve2D, from: Vector2, heading: Vector2) -> void:
-	_connect(curve, from, heading, INITIAL, BOW)
-	_straight(curve, INITIAL, BREAK)
-	_connect(curve, BREAK, BOW, DOWNWIND, -BOW)
-	var abeam := Vector2(DOWNWIND.x, FINAL.y)
-	_straight(curve, DOWNWIND, abeam)
-	_connect(curve, abeam, -BOW, FINAL, BOW)
+	_connect(curve, from, heading, FINAL, BOW)
 	var touchdown := -BOW * (DECK_ASTERN - 4)
 	var stop := touchdown + BOW * TRAP_RUN
 	_straight(curve, FINAL, touchdown)

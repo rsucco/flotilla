@@ -4,7 +4,7 @@ extends Node2D
 signal done
 signal landed
 
-const SPEED := 150.0
+const SPEED := 240.0
 const IDLE_ROTOR_SPEED := 3.0
 const FLYING_ROTOR_SPEED := 35.0
 const PROJECTILE_SCENE := preload("res://ships/projectiles/projectile.tscn")
@@ -48,7 +48,7 @@ func _process(delta: float) -> void:
 
 	# Spin up before moving
 	if rotor_speed < FLYING_ROTOR_SPEED:
-		rotor_speed += delta * 30
+		rotor_speed += delta * 60
 	else:
 		path_follow.progress += SPEED * delta
 		if patrolling:

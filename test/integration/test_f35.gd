@@ -101,16 +101,20 @@ func test_second_strike_restarts_from_the_deck() -> void:
 	await wait_for_signal(f35.done, 20)
 
 
-func test_lands_through_the_pattern() -> void:
+func test_flies_straight_home_onto_final() -> void:
 	for heading in HEADINGS:
 		carrier.rotation_degrees = heading
 		f35.plan_strike(Vector2i(27, 12))
 		var points := track()
-		for fix: Vector2 in [F35.INITIAL, F35.BREAK, F35.DOWNWIND, F35.FINAL]:
-			var nearest: float = points.reduce(
-				func(best: float, p: Vector2) -> float: return minf(best, p.distance_to(fix)), INF
-			)
-			assert_lt(nearest, 1.0, str("passes ", fix, " at ", heading))
+		var nearest: float = points.reduce(
+			func(best: float, p: Vector2) -> float: return minf(best, p.distance_to(F35.FINAL)), INF
+		)
+		assert_lt(nearest, 1.0, str("passes the start of final at ", heading))
+		# No longer than going straight there plus one full turn
+		var release := f35.path.curve.sample_baked(f35.trigger_at)
+		var home := f35.touchdown_at - f35.trigger_at
+		var direct := release.distance_to(F35.FINAL) + F35.FINAL.length()
+		assert_lt(home, direct + TAU * F35.TURN_RADIUS, str("direct at ", heading))
 
 
 func test_catapult_launch_and_arrested_landing() -> void:
