@@ -247,11 +247,14 @@ func _place(ship: Ship) -> void:
 func get_ship_selection() -> Dictionary:
 	var dialog: Control = preload("res://gui/ship_selection.tscn").instantiate()
 	dialog.get_node("VBoxContainer/Label").text = (
-		"Player " + str(player_num + 1) + ", choose your ships:"
+		"Player " + str(player_num + 1) + ", choose your navy and ships:"
 	)
+	dialog.taken = opponent.navy
 	add_child(dialog)
 	dialog.set_island_tiles(grid.get_num_island_tiles(player_num))
-	return await dialog.confirmed
+	var counts: Dictionary = await dialog.confirmed
+	navy = dialog.navy
+	return counts
 
 
 func new_turn() -> void:

@@ -215,7 +215,8 @@ func test_end_turn_ends_the_whole_fleet_with_nothing_selected() -> void:
 	driver.press(driver.action_button("EndTurn"))
 	var swap := await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
 	assert_eq(game.player_up, 1)
-	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2")
+	var navy: String = Navies.ALL[game.players[1].navy].name
+	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to " + navy, "by their navy")
 	assert_true(driver.action_button("EndTurn").disabled, "disabled between turns")
 	get_node("/root/GutRunner/GutLayer").visible = true
 
@@ -294,6 +295,20 @@ func fleet_entry(game: Root, panel: String, ship_name: String) -> FleetEntry:
 	return null
 
 
+func test_the_opponents_navy_cant_be_chosen() -> void:
+	for i in 10:
+		var dialog: Control = SELECTION_SCENE.instantiate()
+		dialog.taken = "uk"
+		add_child_autofree(dialog)
+		assert_true((dialog.get_node("VBoxContainer/Navies/uk") as Button).disabled)
+		assert_true(Navies.ALL.has(dialog.navy) and dialog.navy != "uk", "starts on a free one")
+		(dialog.get_node("VBoxContainer/Navies/japan") as Button).button_pressed = true
+		assert_eq(dialog.navy, "japan")
+		assert_eq(
+			dialog.get_node("VBoxContainer/NavyName").text, "Japan Maritime Self-Defense Force"
+		)
+
+
 func test_fleet_panels_show_hits() -> void:
 	get_node("/root/GutRunner/GutLayer").visible = false
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
@@ -308,7 +323,10 @@ func test_fleet_panels_show_hits() -> void:
 	# The hover list: a title, then each destroyer by name with its hit hexes
 	var list: VBoxContainer = autofree(entry._make_custom_tooltip(entry.tooltip_text))
 	assert_eq(list.get_child_count(), 2)
-	assert_eq((list.get_child(1).get_child(1) as Label).text, "Destroyer I", "named")
+	var called := (list.get_child(1).get_child(1) as Label).text
+	assert_eq(called, target.title, "named")
+	var names: Array = Navies.ALL[game.players[1].navy].ships.Destroyer
+	assert_true(names.any(func(n: String) -> bool: return called.ends_with(n)), "by its navy")
 	assert_eq(entry._hits(target), [false, true, false] as Array[bool], "center hex hit")
 	# Tapping shows the same list, for touch screens
 	var tap := InputEventMouseButton.new()

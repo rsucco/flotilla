@@ -92,4 +92,5 @@ func test_full_game() -> void:
 	var victory := await driver.find_dialog(game, "res://gui/victory.tscn")
 	assert_not_null(victory)
 	if victory:
-		assert_eq(victory.get_node("VBoxContainer/Label").text, "Player 1 wins!")
+		var navy := game.players[0].navy_name()
+		assert_eq(victory.get_node("VBoxContainer/Label").text, navy + " wins!")

@@ -131,10 +131,22 @@ func test_batteries_only_with_islands_to_put_them_on() -> void:
 	grid.tile(Vector2i(20, 3)).island = true
 	var ai := AIPlayer.new(1)
 	ai.grid = grid
+	ai.opponent = p0
 	add_child_autofree(ai)
 	for i in 20:
 		var fleet := ai.get_ship_selection()
 		assert_lte(fleet.get("CoastalBattery", 0), 1, str(fleet))
+
+
+func test_the_ai_takes_another_navy() -> void:
+	var ai := AIPlayer.new(1)
+	ai.grid = grid
+	ai.opponent = p0
+	add_child_autofree(ai)
+	p0.navy = "uk"
+	for i in 20:
+		ai.get_ship_selection()
+		assert_true(Navies.ALL.has(ai.navy) and ai.navy != "uk", ai.navy)
 
 
 func test_ships_move_off_where_they_were_seen() -> void:

@@ -33,6 +33,14 @@ theme_override_font_sizes/font_size = 16
 text = "Select your ships:"
 horizontal_alignment = 1
 
+[node name="Navies" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="NavyName" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+
 [node name="Body" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16

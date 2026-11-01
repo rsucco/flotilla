@@ -68,6 +68,29 @@ func test_ships_named_in_turn_and_logged_by_name() -> void:
 	assert_eq(history[-1][1], "Hit, HMS Exeter (Cruiser, No effect)")
 
 
+func test_ships_named_from_their_navy_once_each() -> void:
+	p0.navy = "japan"
+	var titles: Array[String] = []
+	for type: String in ["cruiser", "destroyer", "corvette", "coastal_battery"]:
+		for i in 5:
+			titles.append(spawn(p0, type, Vector2i(i, 2)).title)
+	for title in titles.slice(0, 15):
+		assert_string_starts_with(title, "JS ")
+	assert_eq(
+		titles.slice(15),
+		[
+			"Coastal Battery I",
+			"Coastal Battery II",
+			"Coastal Battery III",
+			"Coastal Battery IV",
+			"Coastal Battery V"
+		],
+		"batteries are numbered"
+	)
+	for title in titles:
+		assert_eq(titles.count(title), 1, title + " only once")
+
+
 func test_batteries_go_on_land() -> void:
 	var battery := unplaced(p0, "coastal_battery")
 	assert_false(battery.can_place(Vector2i(3, 3), 0), "not on water")

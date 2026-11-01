@@ -14,10 +14,12 @@ signal mine_blast(hex: Vector2i)
 
 # Abilities that can damage ships, which count toward the hit rate
 const DAMAGING_ABILITIES: Array[String] = ["Salvo", "Nuclear Strike", "ASW Strike"]
-# Ships without a name of their own are numbered by type (up to five of each)
+# Ships without a name from our navy are numbered by type (up to five of each)
 const NUMERALS: Array[String] = ["I", "II", "III", "IV", "V"]
 
 var player_num: int
+# Which of Navies.ALL we command, chosen with our fleet
+var navy := ""
 var ships: Array[Ship] = []
 var temp_revealed_ships: Array[Ship] = []
 var selected_ship: Ship
@@ -81,6 +83,11 @@ func show_revealed(ship: Ship) -> void:
 		adopt(ship)
 	ship.visible = true
 	ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
+
+
+# What to call us: our navy's name
+func navy_name() -> String:
+	return Navies.ALL[navy].name if not navy.is_empty() else "Player " + str(player_num + 1)
 
 
 # Gives up, ending the turn (and the game)
@@ -233,8 +240,14 @@ func adopt(ship: Ship) -> void:
 	ship.mine_hit.connect(mine_blast.emit)
 	add_child(ship)
 	if ship.title.is_empty():
-		var alike := ships.filter(func(s: Ship) -> bool: return s.ship_name == ship.ship_name)
-		ship.title = ship.ship_name + " " + NUMERALS[alike.size()]
+		var taken: Array[String] = []
+		taken.assign(ships.map(func(s: Ship) -> String: return s.title))
+		if not navy.is_empty():
+			ship.title = Navies.ship_title(navy, ship.ship_name, taken)
+		# Batteries (and any ship without a navy, in tests) are just numbered
+		if ship.title.is_empty():
+			var alike := ships.filter(func(s: Ship) -> bool: return s.ship_name == ship.ship_name)
+			ship.title = ship.ship_name + " " + NUMERALS[alike.size()]
 
 
 func _on_ship_sank(ship: Ship) -> void:

@@ -179,7 +179,7 @@ func play_game() -> void:
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
 			# Who's up, which a loaded game otherwise leaves unsaid
-			swapper.set_heading("Pass to Player %d" % (player_up + 1))
+			swapper.set_heading("Pass to " + player.navy_name())
 			var replayable: bool = turn_replay.has_actions() and not carrying_on
 			swapper.offer_replay(replayable, player.watch_replay)
 			var watch: bool = await swapper.swap_done
@@ -230,8 +230,7 @@ func play_game() -> void:
 	SaveGame.delete(SaveGame.AUTOSAVE)
 	SaveGame.mark_finished(game_id)
 	var victory := VICTORY_SCENE.instantiate()
-	if not hot_seat:
-		victory.names.assign(["You", "The AI"])
+	victory.names.assign([players[0].navy_name() if hot_seat else "You", players[1].navy_name()])
 	if players[player_up].conceded:
 		victory.update_winner(2 - player_up, player_up + 1)
 	else:
@@ -243,9 +242,11 @@ func play_game() -> void:
 # Ship selection and placement for both players
 func _set_up() -> void:
 	var selections: Array = []
+	var navies: Array = []
 	if not replay.is_empty():
 		grid.set_islands(replay.islands)
 		selections = replay.selections
+		navies = replay.navies
 		replay = {}
 	for player in players:
 		# Hand over before Player 2 sees anything of their setup
@@ -258,9 +259,11 @@ func _set_up() -> void:
 		if selections.size() <= player.player_num:
 			choosing = true
 			selections.append(await player.get_ship_selection())
+			navies.append(player.navy)
 			choosing = false
+		player.navy = navies[player.player_num]
 		await player.place_ships(selections[player.player_num])
-	setup = {"islands": grid.get_islands(), "selections": selections}
+	setup = {"islands": grid.get_islands(), "selections": selections, "navies": navies}
 	# Random, and unaffected by seed()
 	game_id = ResourceUID.create_id()
 
@@ -326,6 +329,8 @@ func _restore(data: Dictionary) -> void:
 	var islands: Array[Vector2i] = []
 	islands.assign(setup.islands)
 	grid.set_islands(islands)
+	for player in players:
+		player.navy = setup.navies[player.player_num]
 	for saved: Dictionary in data.tiles:
 		var tile := grid.tile(saved.hex)
 		tile.history.assign(saved.history)

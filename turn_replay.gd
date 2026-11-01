@@ -171,7 +171,7 @@ func play() -> void:
 	next_action = 0
 	base_time_scale = Engine.time_scale
 	_set_fast(fast)
-	$Bar/Row/Label.text = "Replay: Player " + str(actions[0].player.player_num + 1) + "'s turn"
+	$Bar/Row/Label.text = "Replay: " + actions[0].player.navy_name() + "'s turn"
 	visible = true
 	_rewind()
 	effects.child_entered_tree.connect(_on_spawned)

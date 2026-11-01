@@ -50,9 +50,12 @@ func test_slots_describe_themselves_and_the_latest_is_continued() -> void:
 	assert_eq(SaveGame.latest(), "", "nothing saved yet")
 	assert_eq(SaveGame.describe("slot2"), "Slot 2: Empty")
 	var hot_seat := Root.Mode.HOT_SEAT
-	SaveGame.write("slot2", {"mode": hot_seat, "turn": 4, "player_up": 1})
-	SaveGame.write(SaveGame.AUTOSAVE, {"mode": hot_seat, "turn": 5, "player_up": 0})
-	assert_string_starts_with(SaveGame.describe("slot2"), "Slot 2: Hot-seat, Turn 4, Player 2 - ")
+	var setup := {"navies": ["uk", "usa"]}
+	SaveGame.write("slot2", {"mode": hot_seat, "turn": 4, "player_up": 1, "setup": setup})
+	SaveGame.write(SaveGame.AUTOSAVE, {"mode": hot_seat, "turn": 5, "player_up": 0, "setup": setup})
+	assert_string_starts_with(
+		SaveGame.describe("slot2"), "Slot 2: Hot-seat, Turn 4, United States Navy - "
+	)
 	assert_eq(SaveGame.latest(), SaveGame.AUTOSAVE)
 	SaveGame.write("slot3", {"mode": Root.Mode.VS_AI, "turn": 6, "player_up": 0})
 	assert_string_starts_with(SaveGame.describe("slot3"), "Slot 3: vs AI, Turn 6 - ")
@@ -126,7 +129,8 @@ func test_hand_off_save_starts_the_next_players_turn() -> void:
 	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
 	await reload(SaveGame.read(SaveGame.AUTOSAVE))
 	var swap := driver._dialog(game, "res://gui/local_turn_swap.tscn")
-	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2", "says who's up")
+	var navy := game.players[1].navy_name()
+	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to " + navy, "says who's up")
 	assert_eq(game.gui.get_node("GUIGrid/TurnNumber/TurnNumber").text, "1", "the turn replayed")
 	assert_true(swap.get_node("VBoxContainer/WatchReplay").visible, "last turn's replay")
 	var smoke: CPUParticles2D = game.turn_replay.actions[0].smoke()[0]
@@ -270,7 +274,8 @@ func test_title_screen_continue_and_load() -> void:
 	assert_false(buttons.get_node("Continue").visible, "nothing to continue")
 	assert_true(buttons.get_node("Load").disabled)
 	title.free()
-	SaveGame.write("slot1", {"mode": Root.Mode.HOT_SEAT, "turn": 2, "player_up": 0})
+	var setup := {"navies": ["uk", "usa"]}
+	SaveGame.write("slot1", {"mode": Root.Mode.HOT_SEAT, "turn": 2, "player_up": 0, "setup": setup})
 	title = add_child_autofree(TITLE_SCENE.instantiate())
 	buttons = title.get_node("TextureRect/PanelContainer/Buttons")
 	assert_true(buttons.get_node("Continue").visible)

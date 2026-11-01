@@ -1,6 +1,6 @@
 extends PanelContainer
 
-# Emitted with {node name: count} when the player confirms
+# Emitted with {node name: count} when the player confirms; `navy` is set by then
 signal confirmed(counts: Dictionary)
 
 const POINTS_BUDGET := 25
@@ -24,6 +24,10 @@ var used_points := 0
 var pending: Callable
 # Each ship type's details, read from the ship itself
 var details := {}
+# The navy chosen (a Navies key), and the opponent's, which we can't have (set
+# before adding us)
+var navy := ""
+var taken := ""
 
 @onready var grid: GridContainer = $VBoxContainer/Body/SelectionGrid
 
@@ -45,6 +49,25 @@ func _ready() -> void:
 		)
 	# Each slider's limit, rather than whatever the scene was saved with
 	_on_CountSlider_value_changed(0.0)
+	var flags := ButtonGroup.new()
+	for key: String in Navies.ALL:
+		var flag := Button.new()
+		flag.name = key
+		flag.icon = Navies.ensign(key)
+		flag.tooltip_text = Navies.ALL[key].name
+		flag.toggle_mode = true
+		flag.button_group = flags
+		flag.disabled = key == taken
+		flag.toggled.connect(
+			func(on: bool) -> void:
+				if on:
+					navy = key
+					$VBoxContainer/NavyName.text = Navies.ALL[key].name
+		)
+		$VBoxContainer/Navies.add_child(flag)
+	# Start on any navy that's free
+	var free := Navies.ALL.keys().filter(func(key: String) -> bool: return key != taken)
+	($VBoxContainer/Navies.get_node(free.pick_random()) as Button).button_pressed = true
 
 
 # The ship's size, weapon, abilities, passive and drawback

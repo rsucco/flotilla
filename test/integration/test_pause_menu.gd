@@ -55,12 +55,14 @@ func test_replay_needs_a_finished_setup() -> void:
 func test_replay_keeps_board_and_fleets_but_places_again() -> void:
 	var islands: Array[Vector2i] = [Vector2i(2, 3), Vector2i(20, 9)]
 	var fleet := {"Destroyer": 1, "Submarine": 2}
-	Root.replay = {"islands": islands, "selections": [fleet, fleet]}
+	Root.replay = {"islands": islands, "selections": [fleet, fleet], "navies": ["uk", "usa"]}
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
 	var driver := GameDriver.new(game)
 	assert_eq(game.grid.get_islands(), islands)
 	var ship := await driver.placing_ship(game.players[0])
 	assert_eq(ship.ship_type, "destroyer", "skips ship selection")
+	assert_eq(game.players[0].navy, "uk", "keeps the navies")
+	assert_string_starts_with(ship.title, "HMS ")
 	assert_null(
 		driver._dialog(game.players[0], "res://gui/ship_selection.tscn"), "no selection dialog"
 	)
@@ -106,7 +108,8 @@ func test_concede_ends_the_game_for_the_player_whose_turn_it_is() -> void:
 	assert_eq(menu.question.text, "Concede the game?")
 	menu.get_node("Panel/Confirm/Buttons/Yes").pressed.emit()
 	var victory := await driver.find_dialog(game, "res://gui/victory.tscn")
-	assert_eq(victory.get_node("VBoxContainer/Label").text, "Player 1 wins! Player 2 conceded.")
+	var navies := [game.players[0].navy_name(), game.players[1].navy_name()]
+	assert_eq(victory.get_node("VBoxContainer/Label").text, "%s wins! %s conceded." % navies)
 	assert_false(menu.visible, "menu closed")
 	assert_false(get_tree().paused)
 	get_node("/root/GutRunner/GutLayer").visible = true

@@ -62,9 +62,16 @@ const SHELLED := 0.2
 const SPOTTED := 1.0
 
 
-# One of the fleets, with any batteries we've no islands for swapped for
-# corvettes (the same points)
+# Any navy but the opponent's, and one of the fleets, with any batteries we've
+# no islands for swapped for corvettes (the same points)
 func get_ship_selection() -> Dictionary:
+	navy = (
+		Navies
+		. ALL
+		. keys()
+		. filter(func(key: String) -> bool: return key != opponent.navy)
+		. pick_random()
+	)
 	var fleet: Dictionary = FLEETS.pick_random().duplicate()
 	var spare: int = fleet.get("CoastalBattery", 0) - grid.get_num_island_tiles(player_num)
 	if spare > 0:

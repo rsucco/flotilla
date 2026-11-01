@@ -5,8 +5,8 @@ class_name SaveGame
 # Root decides what goes in a save; this turns ships to and from plain data.
 
 # Bumped when a save's contents change, so older saves read as empty rather
-# than half-load (2: the turn replay, held ships and the mode; 3: ship names)
-const VERSION := 3
+# than half-load (2: the turn replay, held ships and the mode; 3: ship names; 4: navies)
+const VERSION := 4
 const AUTOSAVE := "autosave"
 const SLOTS: Array[String] = ["slot1", "slot2", "slot3"]
 # Shown to players
@@ -80,17 +80,18 @@ static func latest() -> String:
 	return newest
 
 
-# e.g. "Slot 1: Hot-seat, Turn 4, Player 2 - 2026-10-31 21:04", "Slot 1: vs AI,
-# Turn 4 - ...", "Slot 1: Empty", or with " (finished)" after a finished game
+# e.g. "Slot 1: Hot-seat, Turn 4, Royal Navy - 2026-10-31 21:04", "Slot 1: vs
+# AI, Turn 4 - ...", "Slot 1: Empty", or with " (finished)" after a finished game
 static func describe(slot: String) -> String:
 	var data := read(slot)
 	if data.is_empty():
 		return NAMES[slot] + ": Empty"
 	var bias: int = Time.get_time_zone_from_system().bias * 60
 	var when := Time.get_datetime_string_from_unix_time(int(data.saved_at) + bias, true)
-	var game := "Hot-seat, Turn %d, Player %d" % [data.turn, data.player_up + 1]
-	if data.mode == Root.Mode.VS_AI:
-		game = "vs AI, Turn %d" % data.turn
+	var game := "vs AI, Turn %d" % data.turn
+	if data.mode == Root.Mode.HOT_SEAT:
+		var up: String = data.setup.navies[data.player_up]
+		game = "Hot-seat, Turn %d, %s" % [data.turn, Navies.ALL[up].name]
 	var text := "%s: %s - %s" % [NAMES[slot], game, when.left(16)]
 	return text + " (finished)" if data.get("finished") else text
 
