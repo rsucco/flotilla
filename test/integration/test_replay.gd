@@ -205,6 +205,21 @@ func test_replay_ends_with_the_visuals_and_sounds_play_on() -> void:
 	await driver.wait_until(func() -> bool: return ref.get_ref() == null, 5, "the sound to end")
 
 
+# From column 14 the flash is just over no-man's-land, where shots are shown
+func test_muzzle_flash_hidden_even_from_the_edge() -> void:
+	driver.ship_of(0, "battleship").set_grid_position(Vector2i(14, 7), 0)
+	await driver.act("battleship", "Special", GameDriver.spot(1, "destroyer"))
+	await driver.end_turn()
+	await driver.swap(true)
+	var flashes := 0
+	while game.turn_replay.playing:
+		for node in get_tree().get_nodes_in_group(BattleshipProjectile.FLASH_GROUP):
+			flashes += 1
+			assert_false((node as CanvasItem).visible, "flash hidden")
+		await get_tree().process_frame
+	assert_gt(flashes, 0, "the salvo was replayed")
+
+
 func test_battery_shells_always_shown() -> void:
 	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
 	await driver.end_turn()

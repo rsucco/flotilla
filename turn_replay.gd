@@ -409,9 +409,10 @@ func _on_spawned(node: Node) -> void:
 	if node is Missile:
 		(node as Missile).engaged.connect(_on_ciws_engaged.bind(node))
 	if masking and node is Node2D:
-		masked.append(node)
-		# Hidden until _process has checked where it is
+		# Hidden until _process has checked where it is, or for good
 		node.visible = false
+		if not node.is_in_group(BattleshipProjectile.FLASH_GROUP):
+			masked.append(node)
 
 
 # The defender's cruiser shooting `missile` down is seen doing it

@@ -2,6 +2,9 @@ class_name BattleshipProjectile
 extends Projectile
 
 const DEFAULT_FIRE_SOUND := preload("res://audio/battleship.wav")
+# Kept hidden in the replay, as it shows where the ship is even when it's just
+# over no-man's-land (from a ship at the edge)
+const FLASH_GROUP := &"muzzle_flash"
 
 
 func launch(
@@ -30,6 +33,7 @@ func launch(
 	flash.one_shot = true
 	flash.explosiveness = 1.0
 	flash.global_position = global_position
+	flash.add_to_group(FLASH_GROUP)
 	add_sibling(flash)
 	# Not on `finished`: hidden particles (e.g. on the attacker's side in a
 	# replay) don't run, so they never finish
