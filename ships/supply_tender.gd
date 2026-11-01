@@ -3,6 +3,7 @@ extends Ship
 
 const REPAIR_SOUND := preload("res://audio/repair.wav")
 
+# Turns until Damage Control next heals a hex, or -1 while undamaged
 var dc_timer := -1
 
 
@@ -27,19 +28,28 @@ func can_fire(_target: Vector2i = Vector2i.ZERO) -> bool:
 func new_turn() -> void:
 	super()
 	if not hit_hexes.has(true):
+		# Counts afresh from the next damage, including after UNREP
+		dc_timer = -1
 		return
-	# Drawback - Flammable Cargo: lose 2 AP per turn if damaged
-	print("drawback - flammable cargo")
-	ap = 2
 	# Passive - Damage Control: heal one hex every 10 turns if damaged
 	if dc_timer == -1:
 		dc_timer = 10
-	elif dc_timer == 0:
+	dc_timer -= 1
+	if dc_timer == 0:
 		dc_timer = 10
 		hit_hexes[hit_hexes.rfind(true)] = false
+		# Smoke isn't tied to a hex, so put back what's still burning
+		for smoke in smoke_nodes:
+			smoke.queue_free()
+		smoke_nodes.clear()
+		for index in hit_hexes.size():
+			if hit_hexes[index]:
+				_add_smoke(index)
 		print("passive - damage control")
-	else:
-		dc_timer -= 1
+	# Drawback - Flammable Cargo: lose 2 AP per turn if damaged
+	if hit_hexes.has(true):
+		print("drawback - flammable cargo")
+		ap = 2
 
 
 # Our other ships touching any of the tender's hexes

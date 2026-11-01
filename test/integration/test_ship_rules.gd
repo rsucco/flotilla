@@ -210,3 +210,37 @@ func test_battery_never_moves() -> void:
 	battery.ap = 4
 	assert_false(battery.can_move())
 	assert_false(battery.can_rotate(60))
+
+
+func test_damage_control_heals_a_hex_every_ten_turns() -> void:
+	var tender: SupplyTender = spawn(p0, "supply_tender", Vector2i(5, 7))
+	var hexes := tender.get_occupied_hexes()
+	tender.hit(hexes[0], tender)
+	tender.hit(hexes[2], tender)
+	for turn in 9:
+		tender.new_turn()
+	assert_eq(tender.hit_hexes.count(true), 2, "not after nine turns")
+	assert_eq(tender.ap, 2, "half speed while damaged")
+	tender.new_turn()
+	assert_eq(tender.hit_hexes.count(true), 1, "one hex healed on the tenth")
+	await wait_process_frames(1)
+	assert_eq(tender.smoke_nodes.size(), 1, "its smoke gone too")
+	for turn in 10:
+		tender.new_turn()
+	assert_false(tender.hit_hexes.has(true), "the other ten turns later")
+	assert_eq(tender.ap, 4, "full speed again")
+
+
+func test_damage_control_counts_afresh_after_unrep() -> void:
+	var tender: SupplyTender = spawn(p0, "supply_tender", Vector2i(5, 7))
+	tender.hit(tender.hex, tender)
+	for turn in 5:
+		tender.new_turn()
+	tender.heal()
+	tender.new_turn()
+	tender.hit(tender.hex, tender)
+	for turn in 9:
+		tender.new_turn()
+	assert_true(tender.hit_hexes.has(true), "not healed early on the old count")
+	tender.new_turn()
+	assert_false(tender.hit_hexes.has(true))
