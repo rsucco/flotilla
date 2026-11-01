@@ -90,7 +90,6 @@ func navy_name() -> String:
 	return Navies.ALL[navy].name if not navy.is_empty() else "Player " + str(player_num + 1)
 
 
-# Gives up, ending the turn (and the game)
 # The ships we bring, by PascalCase ship type -> count
 func get_ship_selection() -> Dictionary:
 	return {}
@@ -208,6 +207,7 @@ func get_move() -> void:
 	pass
 
 
+# Gives up, ending the turn (and the game)
 func concede() -> void:
 	conceded = true
 	made_move.emit()
