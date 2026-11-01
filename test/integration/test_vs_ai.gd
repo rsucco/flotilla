@@ -95,3 +95,13 @@ func test_saved_and_loaded_as_a_game_against_the_ai() -> void:
 	assert_null(swap_screen(), "no hand-off")
 	assert_true(game.players[0].ships.all(func(s: Ship) -> bool: return s.visible), "our fleet")
 	assert_false(game.players[1].ships.any(func(s: Ship) -> bool: return s.visible), "not theirs")
+
+
+func test_the_victory_screen_says_you_and_the_ai() -> void:
+	game.pause_menu.open()
+	game.pause_menu.concede.pressed.emit()
+	game.pause_menu.get_node("Panel/Confirm/Buttons/Yes").pressed.emit()
+	var victory := await driver.find_dialog(game, "res://gui/victory.tscn")
+	assert_eq(victory.get_node("VBoxContainer/Label").text, "The AI wins! You conceded.")
+	var stats := victory.get_node("VBoxContainer/Stats").get_children()
+	assert_eq([stats[1].text, stats[2].text], ["You", "The AI"])

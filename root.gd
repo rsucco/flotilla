@@ -230,6 +230,8 @@ func play_game() -> void:
 	SaveGame.delete(SaveGame.AUTOSAVE)
 	SaveGame.mark_finished(game_id)
 	var victory := VICTORY_SCENE.instantiate()
+	if not hot_seat:
+		victory.names.assign(["You", "The AI"])
 	if players[player_up].conceded:
 		victory.update_winner(2 - player_up, player_up + 1)
 	else:

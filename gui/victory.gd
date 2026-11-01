@@ -1,18 +1,22 @@
 extends PanelContainer
 
+# What to call each player, set by Root before update_winner()
+var names: Array[String] = ["Player 1", "Player 2"]
 
-# `conceded` is the player who gave up, if one did
+
+# `winner` and `conceded` (the player who gave up, if one did) count from 1
 func update_winner(winner: int, conceded: int = 0) -> void:
-	$VBoxContainer/Label.text = "Player " + str(winner) + " wins!"
+	var who := names[winner - 1]
+	$VBoxContainer/Label.text = who + (" win!" if who == "You" else " wins!")
 	if conceded != 0:
-		$VBoxContainer/Label.text += " Player " + str(conceded) + " conceded."
+		$VBoxContainer/Label.text += " " + names[conceded - 1] + " conceded."
 
 
 # `players` is untyped: naming Player here would make Root, which preloads
 # this scene, a dependency of its own victory screen
 func show_stats(players: Array, turns: int) -> void:
 	$VBoxContainer/Turns.text = "Turns: " + str(turns)
-	var rows := [["", "Player 1", "Player 2"], ["Attacks"], ["Hit rate"], ["Ships left"]]
+	var rows := [["", names[0], names[1]], ["Attacks"], ["Hit rate"], ["Ships left"]]
 	for player in players:
 		rows[1].append(str(player.attacks))
 		rows[2].append(
