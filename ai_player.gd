@@ -1,22 +1,76 @@
 class_name AIPlayer
 extends Player
-# The computer opponent. For now it plays at random: a stand-in while the
-# single-player game is built around it (the real one is fl-aqz.5).
+# The computer opponent. It plays fair, knowing only what a player would (see
+# HeatMap): it makes the attack it expects to do the most damage, then moves
+# ships out of trouble, and the tender towards ships it can repair.
 
-# A pause before each move, so its turn can be followed
-const THINK_TIME := 0.5
+# Pauses before each attack and each move, so its turn can be followed
+const ATTACK_PAUSE := 0.4
+const MOVE_PAUSE := 0.15
 const SELECTION := preload("res://gui/ship_selection.gd")
+# Fleets to pick from, each within the points budget. Rough starting points
+# for balance passes, not a final word.
+const FLEETS: Array[Dictionary] = [
+	# Classic: one of everything
+	{
+		"CoastalBattery": 1,
+		"Corvette": 1,
+		"Destroyer": 1,
+		"Cruiser": 1,
+		"Submarine": 1,
+		"SupplyTender": 1,
+		"Battleship": 1,
+		"Carrier": 1,
+	},
+	# Gun line
+	{"Battleship": 2, "Cruiser": 2, "Destroyer": 2, "Corvette": 2},
+	# Carrier group
+	{"Carrier": 2, "Cruiser": 1, "Destroyer": 1, "SupplyTender": 1, "Submarine": 1, "Corvette": 1},
+	# Wolfpack
+	{"Submarine": 3, "Destroyer": 2, "Battleship": 1, "Corvette": 2},
+	# Fortress: batteries ashore, a tender to keep the rest afloat
+	{
+		"CoastalBattery": 2,
+		"Battleship": 1,
+		"Cruiser": 1,
+		"SupplyTender": 1,
+		"Destroyer": 1,
+		"Submarine": 1,
+		"Corvette": 2,
+	},
+]
 const DIRECTIONS: Array[int] = [0, 60, 120, 180, 240, 300]
 const MOVES: Array[String] = ["forward", "reverse", "port", "starboard"]
 const ATTACKS: Array[String] = ["fire", "special", "secondary"]
+# Rough worth of each ability against one expected ship in reach, next to
+# firing at a hex (1 per expected ship). Judgement, not tuning: abilities
+# that sink outright count double, ones that only reveal or hinder count less.
+const VALUES := {
+	"Salvo": 1.0,
+	"Nuclear Strike": 1.0,
+	"ASW Strike": 2.0,
+	"EW Strike": 0.3,
+	"Sonar Pulse": 0.25,
+	"Recon Flight": 0.25,
+	"Lay Mine": 0.1,
+}
+# Per damaged hex repaired
+const UNREP_VALUE := 0.4
+# How much a ship wants to get away from what the opponent knows: each recent
+# shot landing within a hex, and each recent hit or reveal on the ship itself
+const SHELLED := 0.2
+const SPOTTED := 1.0
 
 
-# One of each ship, as the selection dialog's Classic button picks
+# One of the fleets, with any batteries we've no islands for swapped for
+# corvettes (the same points)
 func get_ship_selection() -> Dictionary:
-	var counts := {}
-	for ship_type: String in SELECTION.POINT_VALUES:
-		counts[ship_type] = 1
-	return counts
+	var fleet: Dictionary = FLEETS.pick_random().duplicate()
+	var spare: int = fleet.get("CoastalBattery", 0) - grid.get_num_island_tiles(player_num)
+	if spare > 0:
+		fleet.CoastalBattery -= spare
+		fleet.Corvette = fleet.get("Corvette", 0) + spare
+	return fleet
 
 
 # Anywhere it fits, hidden from the opponent
@@ -69,38 +123,118 @@ func get_move() -> void:
 
 
 func _move() -> void:
-	await get_tree().create_timer(THINK_TIME, false).timeout
-	var attacks := _legal(ATTACKS)
-	var moves := _legal(MOVES)
-	# Rather attack than wander
-	var choices := attacks if not attacks.is_empty() and randf() < 0.7 else attacks + moves
-	if choices.is_empty():
-		# Ships with AP but nothing they can do
+	var move := _best_attack()
+	if move.is_empty():
+		move = _best_move()
+	await (
+		get_tree()
+		. create_timer(MOVE_PAUSE if move.is_empty() or move[1] in MOVES else ATTACK_PAUSE, false)
+		. timeout
+	)
+	if move.is_empty():
+		# Nothing worth doing with the AP left
 		end_turn()
 	else:
-		var move: Array = choices.pick_random()
 		await perform(move[0], move[1], move[2])
 	made_move.emit()
 
 
-# [ship, action, target] for each legal move among `actions`, with a random
-# target for attacks
-func _legal(actions: Array[String]) -> Array[Array]:
-	var legal: Array[Array] = []
+# [ship, action, no target] for the move that most improves a ship's lot, or
+# [] if none does
+func _best_move() -> Array:
+	var best := []
+	var best_gain := 0.0
 	for ship in ships:
-		for action in actions:
-			var target := _random_target(ship, action)
-			if can_perform(ship, action, target):
-				legal.append([ship, action, target])
-	return legal
+		var here := _danger(ship, ship.get_occupied_hexes())
+		for action in MOVES:
+			if not can_perform(ship, action):
+				continue
+			var gain := here - _danger(ship, _hexes_after(ship, action))
+			# Moving costs AP that could have gone elsewhere; reversing costs most
+			gain -= 0.05 if action != "reverse" else 0.2
+			if gain > best_gain:
+				best = [ship, action, Grid.OFF_GRID]
+				best_gain = gain
+	return best
 
 
-func _random_target(ship: Ship, action: String) -> Vector2i:
-	if action in MOVES:
-		return Grid.OFF_GRID
-	# UNREP heals one of ours
-	if action == "special" and ship is SupplyTender:
-		var near := (ship as SupplyTender).adjacent_ships()
-		return Grid.OFF_GRID if near.is_empty() else near.pick_random().hex
-	var columns := grid.columns_of(opponent.player_num)
-	return Vector2i(columns.pick_random(), randi_range(0, Grid.ROWS - 1))
+func _hexes_after(ship: Ship, action: String) -> Array[Vector2i]:
+	match action:
+		"forward":
+			return ship.hexes_at(grid.get_hex_neighbor(ship.hex, ship.direction), ship.direction)
+		"reverse":
+			return ship.hexes_at(
+				grid.get_hex_neighbor(ship.hex, ship.direction + 180), ship.direction
+			)
+		"port":
+			return ship.hexes_at(ship.hex, ship.direction - 60)
+	return ship.hexes_at(ship.hex, ship.direction + 60)
+
+
+# How much trouble `ship` would be in on `hexes`, judged by what the opponent
+# has seen of our side lately. The tender is drawn to damaged ships instead.
+func _danger(ship: Ship, hexes: Array[Vector2i]) -> float:
+	var danger := 0.0
+	for hex in hexes:
+		for near: Vector2i in grid.get_all_hex_neighbors(hex) + [hex]:
+			for event: Array in grid.tile(near).history:
+				if grid.turn - event[0] > 1:
+					continue
+				var text: String = event[1]
+				if text.begins_with("Hit") or text.contains(" revealed by "):
+					danger += SPOTTED if near == hex and ship.get_occupied_hexes().has(hex) else 0.0
+				if text.begins_with("Miss") or text.begins_with("Hit"):
+					danger += SHELLED
+	if ship is SupplyTender and ship.special.cooldown_current <= 1:
+		for other in ships:
+			if other != ship and other.hit_hexes.has(true):
+				for hex in hexes:
+					for h in other.get_occupied_hexes():
+						if Grid.distance(hex, h) == 1:
+							return danger - UNREP_VALUE * other.hit_hexes.count(true)
+	return danger
+
+
+# [ship, action, target] for the attack worth the most, or [] if none is legal
+func _best_attack() -> Array:
+	var map := HeatMap.new(
+		grid, opponent.player_num, opponent.ships, temp_revealed_ships, grid.turn
+	)
+	var best := []
+	var best_score := -1.0
+	for ship in ships:
+		for kind in ATTACKS:
+			if kind == "special" and ship is SupplyTender:
+				for near in (ship as SupplyTender).adjacent_ships():
+					var score := near.hit_hexes.count(true) * UNREP_VALUE
+					if score > maxf(best_score, 0.0) and can_perform(ship, kind, near.hex):
+						best = [ship, kind, near.hex]
+						best_score = score
+				continue
+			for hex: Vector2i in map.heat:
+				# A hair of noise, so ties don't always go the same way
+				var score := _score(map, ship, kind, hex) + randf() * 0.001
+				if score > maxf(best_score, 0.001) and can_perform(ship, kind, hex):
+					best = [ship, kind, hex]
+					best_score = score
+	return best
+
+
+func _score(map: HeatMap, ship: Ship, kind: String, hex: Vector2i) -> float:
+	if kind == "fire":
+		return 0.0 if hex in map.fresh_hits else map.heat[hex]
+	var ability := ship.special if kind == "special" else ship.secondary
+	var worth: float = VALUES.get(ability.name, 0.5)
+	match ability.name:
+		"Salvo":
+			# Dead-on a damaged hex sinks the ship
+			var sinks := 2.0 if hex in map.fresh_hits else 0.0
+			return worth * map.area(map.heat, hex, ability.aoe) + sinks
+		"Nuclear Strike":
+			# Dead-on sinks whatever it hits
+			return worth * (map.area(map.heat, hex, ability.aoe) + map.heat[hex])
+		"ASW Strike":
+			return worth * map.area(map.sub_heat, hex, ability.aoe)
+		"Recon Flight":
+			return worth * map.row(hex)
+	return worth * map.area(map.heat, hex, ability.aoe)

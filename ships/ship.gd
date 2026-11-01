@@ -116,7 +116,7 @@ func _input(event: InputEvent) -> void:
 func can_place(at: Vector2i, dir: int) -> bool:
 	if grid.side_of(at) != player.player_num:
 		return false
-	var hexes := _get_hexes_at(at, dir)
+	var hexes := hexes_at(at, dir)
 	if hexes.has(Grid.OFF_GRID):
 		return false
 	for h in hexes:
@@ -137,13 +137,13 @@ func set_grid_position(new_hex: Vector2i, new_direction: int) -> void:
 
 
 func get_occupied_hexes() -> Array[Vector2i]:
-	return _get_hexes_at(hex, direction)
+	return hexes_at(hex, direction)
 
 
 # Hexes the ship would occupy centered on `center` facing `dir`, ordered
 # stern to bow (the center hex is at index len_aft). Out-of-bounds hexes
 # appear as Grid.OFF_GRID.
-func _get_hexes_at(center: Vector2i, dir: int) -> Array[Vector2i]:
+func hexes_at(center: Vector2i, dir: int) -> Array[Vector2i]:
 	var hexes: Array[Vector2i] = []
 	var h := center
 	for _i in len_aft:
@@ -275,7 +275,7 @@ func sink_effect() -> void:
 
 # Rotates by a multiple of 60 degrees if the new position is clear
 func turn_by(offset: int) -> void:
-	var hexes := _get_hexes_at(hex, direction + offset)
+	var hexes := hexes_at(hex, direction + offset)
 	if hexes.has(Grid.OFF_GRID) or not _is_clear(hexes):
 		return
 	direction += offset
@@ -317,14 +317,14 @@ func can_move(reverse: bool = false) -> bool:
 	if ap < 1 or (reverse and ap < 4):
 		return false
 	var new_hex := grid.get_hex_neighbor(hex, direction + (180 if reverse else 0))
-	var hexes := _get_hexes_at(new_hex, direction)
+	var hexes := hexes_at(new_hex, direction)
 	return not hexes.has(Grid.OFF_GRID) and _is_clear(hexes)
 
 
 func can_rotate(offset: int) -> bool:
 	if is_immobilized() or ap < 2:
 		return false
-	var hexes := _get_hexes_at(hex, direction + offset)
+	var hexes := hexes_at(hex, direction + offset)
 	return not hexes.has(Grid.OFF_GRID) and _is_clear(hexes)
 
 

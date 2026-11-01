@@ -68,3 +68,14 @@ func test_every_side_has_at_least_three_islands() -> void:
 		var board := Grid.new()
 		assert_gte(board.get_num_island_tiles(0), Grid.MIN_ISLANDS)
 		assert_gte(board.get_num_island_tiles(1), Grid.MIN_ISLANDS)
+
+
+func test_distance_matches_walking_the_neighbors() -> void:
+	for hex in [Vector2i(5, 5), Vector2i(6, 5), Vector2i(0, 0), Vector2i(20, 14)]:
+		assert_eq(Grid.distance(hex, hex), 0)
+		for steps in [1, 2, 3]:
+			for other in grid.get_all_hex_neighbors(hex, steps):
+				assert_lte(Grid.distance(hex, other), steps, "%s to %s" % [hex, other])
+		for neighbor in grid.get_all_hex_neighbors(hex, 1):
+			assert_eq(Grid.distance(hex, neighbor), 1, "%s to %s" % [hex, neighbor])
+	assert_eq(Grid.distance(Vector2i(0, 7), Vector2i(4, 7)), 4, "straight across")

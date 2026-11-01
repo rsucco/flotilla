@@ -116,6 +116,19 @@ func get_all_hex_neighbors(hex: Vector2i, distance: int = 1) -> Array[Vector2i]:
 	return neighbors
 
 
+# Steps between two hexes, ignoring what's in the way (no-man's-land included)
+static func distance(a: Vector2i, b: Vector2i) -> int:
+	# Odd-q offset to axial coordinates
+	@warning_ignore("integer_division")
+	var ar := a.y - (a.x - (a.x & 1)) / 2
+	@warning_ignore("integer_division")
+	var br := b.y - (b.x - (b.x & 1)) / 2
+	var dq := b.x - a.x
+	var dr := br - ar
+	@warning_ignore("integer_division")
+	return (absi(dq) + absi(dr) + absi(dq + dr)) / 2
+
+
 # Returns the hex bordering `hex` in a direction in degrees (multiple of 60),
 # or OFF_GRID if that's off the board or in no-man's-land
 func get_hex_neighbor(hex: Vector2i, direction: int) -> Vector2i:
