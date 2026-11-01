@@ -82,7 +82,8 @@ func test_a_crippled_ship_is_still_where_it_was_hit() -> void:
 	assert_gt(map().heat[Vector2i(5, 5)], 0.5, "over half damaged, so it can't move")
 
 
-func test_the_ai_fires_where_a_ship_was_just_seen() -> void:
+# Swaps the hot-seat game for one against the AI
+func play_the_ai() -> void:
 	game.queue_free()
 	Root.mode = Root.Mode.VS_AI
 	game = add_child_autofree(ROOT_SCENE.instantiate())
@@ -93,6 +94,10 @@ func test_the_ai_fires_where_a_ship_was_just_seen() -> void:
 	for column: Array in grid.tiles:
 		for tile: Tile in column:
 			tile.island = false
+
+
+func test_the_ai_fires_where_a_ship_was_just_seen() -> void:
+	play_the_ai()
 	spawn(p0, "carrier", Vector2i(7, 7))
 	var gunner := spawn(p1, "corvette", Vector2i(20, 7))
 	grid.log_event(Vector2i(7, 7), "Aircraft Carrier revealed by Recon Flight")
@@ -152,3 +157,22 @@ func test_the_tender_heads_for_a_damaged_ship() -> void:
 		for o in hurt.get_occupied_hexes():
 			alongside = alongside or Grid.distance(h, o) == 1
 	assert_true(alongside, "alongside it")
+
+
+func test_a_cloaked_battery_shows_itself_as_it_fires() -> void:
+	play_the_ai()
+	grid.tile(Vector2i(20, 3)).island = true
+	var battery: CoastalBattery = spawn(p1, "coastal_battery", Vector2i(20, 3))
+	game.turn_replay.watch(p1)
+	battery.cloaked = true
+	await p1.perform(battery, "fire", Vector2i(5, 5))
+	await wait_process_frames(1)
+	assert_eq(p0.temp_revealed_ships.size(), 1)
+	var copy := p0.temp_revealed_ships[0]
+	assert_true(copy.is_inside_tree() and copy.visible, "shown on our side straight away")
+	assert_eq(copy.self_modulate, Color.WHITE, "not cloaked like the battery")
+	assert_true(copy.get_node("Turret").visible)
+	assert_almost_eq(
+		(copy.get_node("Turret") as Node2D).rotation, battery.turret.rotation, 0.01, "as it fired"
+	)
+	game.turn_replay.stop_watching()

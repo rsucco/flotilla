@@ -311,7 +311,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 
 		"Sonar Pulse":
 			# Reveals ships around the hex, and also reveals the submarine
-			var revealed_sub: Ship = from_ship.duplicate()
+			var revealed_sub := from_ship.copy_as_seen()
 			temp_revealed_ships.append(revealed_sub)
 			from_ship.revealed_buddy = revealed_sub
 			for h in from_ship.get_occupied_hexes():

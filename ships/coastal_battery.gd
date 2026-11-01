@@ -48,9 +48,9 @@ func turn_by(_offset: int) -> void:
 
 func fire(target: Vector2i) -> void:
 	super(target)
-	# Drawback - Stationary: reveals itself to the opponent on their next turn
+	# Drawback - Stationary: reveals itself to the opponent
 	if not ghost:
-		var buddy: Ship = duplicate()
+		var buddy := copy_as_seen()
 		player.opponent.temp_revealed_ships.append(buddy)
 		revealed_buddy = buddy
 		grid.log_event(hex, "Coastal Battery revealed by firing")

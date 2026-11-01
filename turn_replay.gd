@@ -157,6 +157,10 @@ func end() -> void:
 				action.sounds.append([defender.get_ship_at_hex(hex), Battleship.ARMOR_SOUND])
 	action.revealed = defender.temp_revealed_ships.slice(action.revealed_before)
 	actions.append(action)
+	# Watched live, what gave itself away shows now, as it would in a replay
+	if watching != null:
+		for copy in action.revealed:
+			defender.show_revealed(copy)
 
 
 # Plays the recorded attacks; returns when done or skipped

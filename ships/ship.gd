@@ -253,6 +253,19 @@ func sink() -> void:
 		queue_free()
 
 
+# A copy of us for the opponent to see where we gave ourselves away: not
+# cloaked, even if we are
+func copy_as_seen() -> Ship:
+	var copy: Ship = duplicate()
+	copy.self_modulate = Color.WHITE
+	for child in _cloaked_children:
+		# Children added at runtime (smoke, say) aren't duplicated
+		var copied := copy.get_node_or_null(get_path_to(child))
+		if copied != null:
+			copied.visible = true
+	return copy
+
+
 # Fades out with the sinking sound; returns when both are done
 func sink_effect() -> void:
 	var sound := Sfx.play(self, sink_sound)
