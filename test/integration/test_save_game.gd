@@ -79,6 +79,20 @@ func test_autosaved_at_each_hand_off() -> void:
 	assert_eq(data.get("turn"), 1)
 
 
+func test_turn_counter_reads_as_before_the_save() -> void:
+	await start()
+	await driver.end_turn()
+	await driver.swap()
+	await driver.wait_until(func() -> bool: return game.players[1].active, 5, "Player 2's turn")
+	await driver.end_turn()
+	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
+	var label := "GUIGrid/TurnNumber/TurnNumber"
+	var live: String = game.gui.get_node(label).text
+	assert_eq(live, "1", "Player 1's hand-off, before turn 2")
+	await reload(SaveGame.read(SaveGame.AUTOSAVE))
+	assert_eq(game.gui.get_node(label).text, live)
+
+
 func test_mid_turn_save_carries_on_where_it_left_off() -> void:
 	await start()
 	await driver.act("battleship", "Fire", GameDriver.spot(1, "destroyer"))
@@ -106,6 +120,7 @@ func test_hand_off_save_starts_the_next_players_turn() -> void:
 	await reload(SaveGame.read(SaveGame.AUTOSAVE))
 	var swap := driver._dialog(game, "res://gui/local_turn_swap.tscn")
 	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2", "says who's up")
+	assert_eq(game.gui.get_node("GUIGrid/TurnNumber/TurnNumber").text, "1", "the turn replayed")
 	assert_true(swap.get_node("VBoxContainer/WatchReplay").visible, "last turn's replay")
 	var smoke: CPUParticles2D = game.turn_replay.actions[0].smoke()[0]
 	await driver.swap(true)

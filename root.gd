@@ -307,6 +307,9 @@ func _restore(data: Dictionary) -> void:
 	current_turn = data.turn
 	grid.turn = current_turn
 	player_up = data.player_up
+	# As it reads at this swap in a game played through: the turn last played,
+	# which at Player 1's hand-off is the one before
+	gui.update_turn(current_turn - 1 if data.phase == "swap" and player_up == 0 else current_turn)
 	var fleets: Array[Array] = []
 	for player in players:
 		var saved: Dictionary = data.players[player.player_num]
