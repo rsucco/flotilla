@@ -83,9 +83,12 @@ func prepare_board() -> void:
 		game.grid.tile(spot(player, "coastal_battery")).island = true
 
 
-# Both players pick the classic fleet (one of everything) and place it
+# Each local player picks the classic fleet (one of everything) and places
+# it; the AI sets itself up
 func start_game() -> void:
 	for player in game.players:
+		if not player is LocalPlayer:
+			continue
 		if player.player_num == 1:
 			await swap()
 		var dialog: Node = await find_dialog(player, "res://gui/ship_selection.tscn")

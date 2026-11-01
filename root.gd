@@ -1,6 +1,9 @@
 class_name Root
 extends Node2D
 
+# Who's playing: LAN and online play will join these
+enum Mode { HOT_SEAT, VS_AI }
+
 const ROW_LABELS := ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"]
 const FONT_SIZE := 11
 const FONT := preload("res://opensans.ttf")
@@ -10,6 +13,8 @@ const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")
 const VICTORY_SCENE := preload("res://gui/victory.tscn")
 const MUSIC_FADE := 2.0
 
+# Set by the title screen before loading us
+static var mode := Mode.HOT_SEAT
 # "Replay This Game" keeps the board and both fleets across a scene reload
 static var replay := {}
 # Where the title screen's music was, so it carries on through setup
@@ -19,6 +24,8 @@ static var loaded := {}
 
 var grid: Grid
 var players: Array[Player] = []
+# Two players taking turns at one screen, rather than one against the AI
+var hot_seat := true
 var player_up := 0
 # Projectiles and other effects, drawn above the ships
 var effects: Node2D
@@ -45,7 +52,9 @@ var reveal_all := false
 func _ready() -> void:
 	effects = Node2D.new()
 	effects.name = "Effects"
-	players = [LocalPlayer.new(0), LocalPlayer.new(1)]
+	hot_seat = mode == Mode.HOT_SEAT
+	var second: Player = LocalPlayer.new(1) if hot_seat else AIPlayer.new(1)
+	players = [LocalPlayer.new(0), second]
 	players[0].opponent = players[1]
 	players[1].opponent = players[0]
 	for player in players:
@@ -53,6 +62,7 @@ func _ready() -> void:
 		add_child(player)
 		if player is LocalPlayer:
 			var local := player as LocalPlayer
+			local.hot_seat = hot_seat
 			local.tile_history = $TileHistory
 			local.ship_shown.connect(gui.update_ship_info)
 			local.buttons_changed.connect(gui.set_buttons)
@@ -156,7 +166,7 @@ func play_game() -> void:
 			current_turn += 1
 			grid.turn = current_turn
 		# Wait for the hotseat players to swap seats, except on player 1's first turn
-		if resuming or current_turn != 1 or player_up == 1:
+		if hot_seat and (resuming or current_turn != 1 or player_up == 1):
 			swapping = true
 			# From the next player's side from here on
 			_update_fleets()
@@ -182,6 +192,9 @@ func play_game() -> void:
 			turn_replay.clear()
 		gui.update_turn(current_turn)
 		_update_fleets()
+		# The AI's turn plays out live in front of the player
+		if players[player_up] is AIPlayer:
+			turn_replay.watch(players[player_up])
 		if carrying_on:
 			# Carry on with the AP and fire actions it was saved with
 			players[player_up].resume_turn()
@@ -198,6 +211,8 @@ func play_game() -> void:
 			# For hits and repairs, which don't change the fleet
 			_update_fleets()
 		players[player_up].finish_turn()
+		if turn_replay.watching != null:
+			turn_replay.stop_watching()
 		if players[player_up].conceded:
 			break
 		# Go to the next player if they have any ships remaining
@@ -225,7 +240,7 @@ func _set_up() -> void:
 		replay = {}
 	for player in players:
 		# Hand over before Player 2 sees anything of their setup
-		if player.player_num == 1:
+		if player.player_num == 1 and hot_seat:
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
 			swapper.set_heading("Pass to Player 2")
@@ -356,19 +371,27 @@ func _start_battle_music() -> void:
 
 func _update_fleets() -> void:
 	# Ships sunk last turn still count until the replay shows them sinking
-	var ours: Array[Ship] = players[player_up].ships.duplicate()
-	ours.append_array(turn_replay.held_ships(players[player_up]))
+	var seat := viewer()
+	var ours: Array[Ship] = players[seat].ships.duplicate()
+	ours.append_array(turn_replay.held_ships(players[seat]))
 	# Our damage is part of what the replay shows
-	gui.update_fleets(ours, players[1 - player_up].ships, not swapping)
+	gui.update_fleets(ours, players[1 - seat].ships, not swapping)
+
+
+# Whose side of the game the screen shows: whoever's turn it is in hot-seat,
+# otherwise always the local player's
+func viewer() -> int:
+	return player_up if hot_seat else 0
 
 
 # Only mid-turn, when it's clear who's at the screen (not during setup, swaps
 # or replays), and not with a shot in the air, which would land after the end
 func _on_pause_menu_opened() -> void:
 	var player := players[player_up]
-	var mid_turn := player.active and not player.animation_playing
+	var mid_turn := player is LocalPlayer and player.active and not player.animation_playing
 	pause_menu.can_concede = mid_turn
-	pause_menu.can_save = mid_turn
+	# Saves only know hot-seat games so far
+	pause_menu.can_save = mid_turn and hot_seat
 
 
 func _on_gui_action_pressed(action: String) -> void:
@@ -401,10 +424,10 @@ func get_ship_at_hex(hex: Vector2i) -> Ship:
 
 func _draw() -> void:
 	var mouse_hex := grid.get_hex_from_coords(get_viewport().get_mouse_position())
-	var hover_hexes := players[player_up].get_hover_hexes(mouse_hex)
+	var hover_hexes := players[viewer()].get_hover_hexes(mouse_hex)
 	var selected_hexes: Array[Vector2i] = []
 	var selected_center := Grid.OFF_GRID
-	var selected := players[player_up].selected_ship
+	var selected := players[viewer()].selected_ship
 	if selected != null:
 		selected_hexes = selected.get_occupied_hexes()
 		selected_center = selected_hexes[selected.len_aft]
@@ -473,7 +496,7 @@ func _draw() -> void:
 
 			# Hit/miss markers on the opponent's grid, fading out over turns. Over
 			# the label, which a miss's ring goes around.
-			if grid.side_of(hex) == 1 - player_up:
+			if grid.side_of(hex) == 1 - viewer():
 				draw_markers(hex, tile)
 
 
@@ -486,7 +509,7 @@ func hex_color(
 ) -> Color:
 	if hover_hexes.has(hex) and current_turn != 0:
 		# Darker on the opponent's grid
-		if grid.side_of(hex) == player_up:
+		if grid.side_of(hex) == viewer():
 			return Color(0.8, 0.5, 0.25) if tile.island else Color(0.0, 0.3, 0.9)
 		return Color(0.47, 0.27, 0.14) if tile.island else Color(0.0, 0.26, 0.5)
 	if hex == selected_center and not swapping:

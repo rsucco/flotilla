@@ -30,6 +30,8 @@ var effects: Node2D
 # but not where the attacker's ships are
 var masked: Array[Node2D] = []
 var masking := false
+# An AI whose turn is playing out live, masked as its replay would be
+var watching: Player
 
 @onready var speed: Button = $Bar/Row/Speed
 
@@ -253,6 +255,26 @@ func restore(saved: Array, players: Array[Player], fleets: Array[Array]) -> void
 		actions.append(action)
 
 
+# Masks `attacker`'s turn as it happens, as if it were being replayed: its
+# shots only show once over the opponent's side, and so do its aircraft
+func watch(attacker: Player) -> void:
+	watching = attacker
+	masking = true
+	effects.child_entered_tree.connect(_on_spawned)
+
+
+func stop_watching() -> void:
+	effects.child_entered_tree.disconnect(_on_spawned)
+	# Parked aircraft show with their ship again when it's revealed
+	for ship in watching.ships:
+		for child in ship.get_children():
+			if child is SH60 or child is F35:
+				child.visible = true
+	watching = null
+	spawned.clear()
+	masked.clear()
+
+
 # Forgets the recorded turn, freeing ships kept only to be shown sinking
 func clear() -> void:
 	for action in actions:
@@ -301,9 +323,9 @@ func _run() -> void:
 
 
 func _process(_delta: float) -> void:
-	if not playing:
+	if not playing and watching == null:
 		return
-	var defender := actions[0].player.opponent.player_num
+	var defender := _attacker().opponent.player_num
 	for node in masked:
 		if is_instance_valid(node):
 			# Torpedoes move along their own path rather than moving themselves
@@ -314,12 +336,17 @@ func _process(_delta: float) -> void:
 			)
 			# Shown over no-man's-land too, where missiles are shot down
 			node.visible = not _over(1 - defender, at)
-	for ghost in ghosts:
-		if ghost is CoastalBattery:
+	for ship in ghosts if playing else watching.ships:
+		if ship is CoastalBattery:
 			continue
-		for child in ghost.get_children():
+		for child in ship.get_children():
 			if child is SH60 or child is F35:
 				child.visible = _over(defender, child.path_follow.global_position)
+
+
+# Whose attacks are being shown
+func _attacker() -> Player:
+	return watching if watching != null else actions[0].player
 
 
 func _over(player: int, at: Vector2) -> bool:
@@ -496,7 +523,7 @@ func _on_spawned(node: Node) -> void:
 
 # The defender's cruiser shooting `missile` down is seen doing it
 func _on_ciws_engaged(missile: Missile) -> void:
-	for ship in actions[0].player.opponent.ships:
+	for ship in _attacker().opponent.ships:
 		if ship is Cruiser and ship.global_position.is_equal_approx(missile.ciws_at):
 			(ship as Cruiser).track(missile)
 

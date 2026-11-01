@@ -50,6 +50,22 @@ var sunk_event := "Sunk"
 var ghost := false
 # Kept (hidden) after sinking until the opponent's turn replay has shown it
 var held := false
+# While the AI's turn plays out live: the hull and everything on it is unseen,
+# except aircraft (TurnReplay masks what it fires), and it moves silently
+var cloaked := false:
+	set(value):
+		cloaked = value
+		self_modulate = Color.TRANSPARENT if value else Color.WHITE
+		if value:
+			for child in get_children():
+				if child is CanvasItem and child.visible and not (child is SH60 or child is F35):
+					child.visible = false
+					_cloaked_children.append(child)
+		else:
+			for child in _cloaked_children:
+				if is_instance_valid(child):
+					child.visible = true
+			_cloaked_children.clear()
 # Set by EW Strike; blocks firing on the ship's next turn
 var jammed := false
 # Set as each attack starts: whether the opponent's cruisers will shoot it down
@@ -62,6 +78,8 @@ var grid: Grid
 # Where projectiles and other effects go
 var effects: Node2D
 var movement_audio_player: AudioStreamPlayer2D
+# What cloaking hid, to show again
+var _cloaked_children: Array[CanvasItem] = []
 
 
 # Subclasses must call super() first
@@ -216,6 +234,9 @@ func _add_smoke(index: int) -> void:
 			smoke.position.y += 15
 	smoke_nodes[index] = smoke
 	add_child(smoke)
+	if cloaked:
+		smoke.visible = false
+		_cloaked_children.append(smoke)
 
 
 func sink() -> void:
@@ -264,7 +285,7 @@ func turn_by(offset: int) -> void:
 # Plays the movement sound for the duration of a (possibly overlapping) move
 func _animate_move(property: String, target: Variant, duration: float) -> void:
 	moves_queued += 1
-	if not movement_audio_player.playing:
+	if not movement_audio_player.playing and not cloaked:
 		# Here rather than at placement, which loaded ships skip
 		movement_audio_player.stream = move_sound
 		movement_audio_player.play()

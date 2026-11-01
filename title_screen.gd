@@ -18,7 +18,16 @@ func _ready() -> void:
 	$TextureRect/PanelContainer/Buttons/Load.disabled = not has_saves
 
 
+func _on_single_player_pressed() -> void:
+	_start(Root.Mode.VS_AI)
+
+
 func _on_Hotseat_pressed() -> void:
+	_start(Root.Mode.HOT_SEAT)
+
+
+func _start(mode: Root.Mode) -> void:
+	Root.mode = mode
 	Root.title_music_at = $Music.get_playback_position()
 	get_tree().change_scene_to_file("res://root.tscn")
 
@@ -37,8 +46,8 @@ func _load(slot: String) -> void:
 	Root.loaded = SaveGame.read(slot)
 	if Root.loaded.is_empty():
 		return
-	Root.title_music_at = $Music.get_playback_position()
-	get_tree().change_scene_to_file("res://root.tscn")
+	# Saves only know hot-seat games so far
+	_start(Root.Mode.HOT_SEAT)
 
 
 func _on_how_to_play_pressed() -> void:

@@ -23,6 +23,8 @@ var on_hex_time := 0.0
 var awaiting_move := false
 # Set by Root
 var tile_history: TileHistory
+# Sharing the screen with another local player, so our fleet hides between turns
+var hot_seat := true
 var pips: APPips
 
 
@@ -233,7 +235,7 @@ func place_ships(counts: Dictionary) -> void:
 	await super(counts)
 	# Hide ships from the next player
 	for ship in ships:
-		ship.visible = false
+		ship.visible = not hot_seat
 
 
 # Follows the mouse until clicked into place
@@ -291,7 +293,7 @@ func finish_turn() -> void:
 	active = false
 	pips.visible = false
 	for ship in ships:
-		ship.visible = false
+		ship.visible = not hot_seat
 	# Its history is about the opponent's fleet
 	tile_history.visible = false
 	buttons_changed.emit({"EndTurn": false})
