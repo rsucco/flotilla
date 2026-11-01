@@ -20,6 +20,8 @@ var players: Array[LocalPlayer] = []
 var player_up := 0
 # Projectiles and other effects, drawn above the ships
 var effects: Node2D
+# Above the ships and effects: the hovered hex's coordinate, which they may cover
+var hover_label: Node2D
 var current_turn := 0
 var swapping := false
 # The board and fleets this game started with, once both players have chosen
@@ -55,6 +57,9 @@ func _ready() -> void:
 	gui.menu_pressed.connect(pause_menu.open)
 	add_child(effects)
 	turn_replay.effects = effects
+	hover_label = Node2D.new()
+	add_child(hover_label)
+	hover_label.draw.connect(_draw_hover_label)
 	$TitleMusic.play(title_music_at)
 	# New Game and replays start it from the top
 	title_music_at = 0.0
@@ -63,6 +68,30 @@ func _ready() -> void:
 
 func _input(_event: InputEvent) -> void:
 	queue_redraw()
+	hover_label.queue_redraw()
+
+
+# What the tag over `hex` says, if it's shown at all
+func hover_text(hex: Vector2i) -> String:
+	if hex == Grid.OFF_GRID or swapping:
+		return ""
+	return ROW_LABELS[hex.y] + str(hex.x)
+
+
+# The coordinate on a dark tag, readable over markers and ships
+func _draw_hover_label() -> void:
+	var hex := grid.get_hex_from_coords(get_viewport().get_mouse_position())
+	var text := hover_text(hex)
+	if text.is_empty():
+		return
+	var text_size := FONT.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE)
+	var center := grid.get_hex_center(hex)
+	var tag := Rect2(center - text_size / 2, text_size).grow_individual(3, 0, 3, 0)
+	hover_label.draw_rect(tag, Color(0.0, 0.0, 0.0, 0.7))
+	var baseline := Vector2(tag.position.x + 3, tag.position.y + FONT.get_ascent(FONT_SIZE))
+	hover_label.draw_string(
+		FONT, baseline, text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, Color.WHITE
+	)
 
 
 func _unhandled_input(event: InputEvent) -> void:

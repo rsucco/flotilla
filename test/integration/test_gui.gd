@@ -381,3 +381,15 @@ func test_hand_over_before_player_2_sets_up() -> void:
 	await driver.swap()
 	assert_not_null(await driver.find_dialog(game.players[1], "res://gui/ship_selection.tscn"))
 	get_node("/root/GutRunner/GutLayer").visible = true
+
+
+func test_hovered_coordinate_tagged_over_markers_and_ships() -> void:
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	assert_eq(game.hover_text(Vector2i(17, 2)), "C17")
+	assert_eq(game.hover_text(Grid.OFF_GRID), "", "not off the board")
+	game.swapping = true
+	assert_eq(game.hover_text(Vector2i(17, 2)), "", "nor while seats are swapped")
+	var index := game.hover_label.get_index()
+	assert_gt(index, game.effects.get_index(), "drawn over the effects")
+	for player in game.players:
+		assert_gt(index, player.get_index(), "and the ships")
