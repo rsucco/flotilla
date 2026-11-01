@@ -93,6 +93,7 @@ func test_mid_turn_save_carries_on_where_it_left_off() -> void:
 	assert_true(game.grid.tile(GameDriver.spot(1, "cruiser")).is_mined, "mines")
 	var now := game.save_state("turn")
 	assert_eq(now.tiles, saved.tiles, "every hex's history")
+	assert_eq(now.replay, saved.replay, "the attacks so far, for the replay")
 	for player in 2:
 		assert_eq(now.players[player], saved.players[player], "Player %d's fleet" % (player + 1))
 
@@ -105,12 +106,36 @@ func test_hand_off_save_starts_the_next_players_turn() -> void:
 	await reload(SaveGame.read(SaveGame.AUTOSAVE))
 	var swap := driver._dialog(game, "res://gui/local_turn_swap.tscn")
 	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2", "says who's up")
-	assert_false(swap.get_node("VBoxContainer/WatchReplay").visible, "the replay wasn't saved")
-	await driver.swap()
-	await driver.wait_until(func() -> bool: return game.players[1].active, 5, "Player 2's turn")
+	assert_true(swap.get_node("VBoxContainer/WatchReplay").visible, "last turn's replay")
+	var smoke: CPUParticles2D = game.turn_replay.actions[0].smoke()[0]
+	await driver.swap(true)
+	await wait_process_frames(1)
+	assert_true(game.turn_replay.playing, "replayed")
+	assert_false(smoke.visible, "the hit not shown before the shell lands")
+	await driver.wait_until(func() -> bool: return game.players[1].active, 20, "Player 2's turn")
+	assert_true(smoke.visible, "shown once it lands")
 	assert_eq(game.current_turn, 1)
 	assert_eq(driver.ship_of(1, "battleship").ap, 4, "a fresh turn")
 	assert_true(driver.ship_of(1, "destroyer").hit_hexes.has(true), "with last turn's damage")
+
+
+func test_a_ship_sunk_last_turn_is_replayed_sinking_after_loading() -> void:
+	await start()
+	driver.ready_abilities(game.players[0])
+	await driver.act("destroyer", "Special", driver.ship_of(1, "submarine").hex)
+	await driver.end_turn()
+	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
+	await reload(SaveGame.read(SaveGame.AUTOSAVE))
+	var held := game.turn_replay.held_ships(game.players[1])
+	assert_eq(held.size(), 1, "kept for the replay")
+	var sub := held[0]
+	assert_eq(sub.ship_type, "submarine")
+	assert_false(game.players[1].ships.has(sub), "not afloat")
+	await driver.swap(true)
+	await wait_process_frames(1)
+	assert_true(sub.visible, "afloat again at the start of the replay")
+	await driver.wait_until(func() -> bool: return game.players[1].active, 20, "Player 2's turn")
+	assert_false(is_instance_valid(sub) and sub.visible, "shown sinking")
 
 
 func test_a_battery_that_fired_is_still_shown_after_loading() -> void:
@@ -119,9 +144,10 @@ func test_a_battery_that_fired_is_still_shown_after_loading() -> void:
 	await driver.end_turn()
 	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
 	await reload(SaveGame.read(SaveGame.AUTOSAVE))
+	var copies := game.players[1].temp_revealed_ships
+	assert_eq(game.turn_replay.actions[0].revealed, copies, "the replay shows it firing")
 	await driver.swap()
 	await driver.wait_until(func() -> bool: return game.players[1].active, 5, "Player 2's turn")
-	var copies := game.players[1].temp_revealed_ships
 	assert_eq(copies.size(), 1)
 	var battery := driver.ship_of(0, "coastal_battery")
 	assert_true(copies[0].visible and copies[0].is_inside_tree(), "shown to Player 2")
@@ -134,14 +160,19 @@ func test_a_battery_that_fired_is_still_shown_after_loading() -> void:
 	)
 
 
-func test_no_replay_of_a_turn_resumed_part_way() -> void:
+func test_a_turn_resumed_part_way_is_replayed_whole() -> void:
 	await start()
-	await reload(game.save_state("turn"))
-	await driver.swap()
 	await driver.act("battleship", "Fire", GameDriver.spot(1, "destroyer"))
+	await reload(game.save_state("turn"))
+	var swap := driver._dialog(game, "res://gui/local_turn_swap.tscn")
+	assert_false(swap.get_node("VBoxContainer/WatchReplay").visible, "not our own attacks")
+	await driver.swap()
+	await driver.wait_until(func() -> bool: return game.players[0].active, 5, "the turn")
+	await driver.act("destroyer", "Fire", GameDriver.spot(1, "cruiser"))
 	await driver.end_turn()
-	var swap := await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
-	assert_false(swap.get_node("VBoxContainer/WatchReplay").visible, "it would be missing attacks")
+	swap = await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
+	assert_true(swap.get_node("VBoxContainer/WatchReplay").visible)
+	assert_eq(game.turn_replay.actions.size(), 2, "from before the save and after")
 
 
 func test_save_from_the_esc_menu() -> void:

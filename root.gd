@@ -33,9 +33,6 @@ var setup := {}
 # Tells this game's saves from others', to mark them finished when it ends.
 # A replay is a new game.
 var game_id := 0
-# Set when a saved game is resumed part-way through a turn: the attacks made
-# before the save weren't saved, so that turn has no replay
-var replay_partial := false
 # Testing cheats (debug builds): V shows both fleets, C readies every ability
 # of the player whose turn it is
 var reveal_all := false
@@ -148,6 +145,9 @@ func play_game() -> void:
 	var resuming := not resume.is_empty()
 	# Play until one player has no more ships
 	while not players[0].ships.is_empty() and not players[1].ships.is_empty():
+		# Saved mid-turn: the replay holds this player's own attacks so far, to
+		# be shown with the rest of the turn at its end
+		var carrying_on: bool = resuming and resume.phase == "turn"
 		# Increment the turn counter at the start of player 1's turn
 		if player_up == 0 and not resuming:
 			current_turn += 1
@@ -157,9 +157,6 @@ func play_game() -> void:
 			swapping = true
 			# From the next player's side from here on
 			_update_fleets()
-			if replay_partial:
-				turn_replay.clear()
-				replay_partial = false
 			if not resuming:
 				SaveGame.write(SaveGame.AUTOSAVE, save_state("swap"))
 			var player := players[player_up]
@@ -167,23 +164,24 @@ func play_game() -> void:
 			add_child(swapper)
 			# Who's up, which a loaded game otherwise leaves unsaid
 			swapper.set_heading("Pass to Player %d" % (player_up + 1))
-			swapper.offer_replay(turn_replay.has_actions(), player.watch_replay)
+			var replayable: bool = turn_replay.has_actions() and not carrying_on
+			swapper.offer_replay(replayable, player.watch_replay)
 			var watch: bool = await swapper.swap_done
 			# The board was last drawn from the other player's side
 			queue_redraw()
-			if turn_replay.has_actions():
+			if replayable:
 				# Remember the choice for this player's next swap
 				player.watch_replay = watch
 				if watch:
 					await turn_replay.play()
 			swapping = false
-		turn_replay.clear()
+		if not carrying_on:
+			turn_replay.clear()
 		gui.update_turn(current_turn)
 		_update_fleets()
-		if resuming and resume.phase == "turn":
+		if carrying_on:
 			# Carry on with the AP and fire actions it was saved with
 			players[player_up].resume_turn()
-			replay_partial = true
 		else:
 			# Reset AP counts, decrement ability timers, etc.
 			players[player_up].new_turn()
@@ -257,13 +255,20 @@ func save_state(phase: String) -> Dictionary:
 						"mined": tile.is_mined
 					}
 				)
-	var fleets: Array[Dictionary] = []
+	var saved: Array[Dictionary] = []
+	# What the replay refers to: each player's ships, afloat then held for the
+	# replay to sink, and the copies of the opponent's ships they've seen
+	var fleets: Array[Array] = []
+	var copies: Array[Array] = []
 	for player in players:
+		var held := turn_replay.held_ships(player)
 		var revealed := player.temp_revealed_ships.filter(
 			func(copy: Ship) -> bool: return is_instance_valid(copy)
 		)
+		fleets.append(player.ships + held)
+		copies.append(revealed)
 		(
-			fleets
+			saved
 			. append(
 				{
 					"attacks": player.attacks,
@@ -271,6 +276,7 @@ func save_state(phase: String) -> Dictionary:
 					"fleet_size": player.fleet_size,
 					"watch_replay": player.watch_replay,
 					"ships": player.ships.map(SaveGame.ship_state),
+					"held": held.map(SaveGame.ship_state),
 					"revealed": revealed.map(SaveGame.revealed_state),
 				}
 			)
@@ -282,7 +288,8 @@ func save_state(phase: String) -> Dictionary:
 		"player_up": player_up,
 		"setup": setup,
 		"tiles": tiles,
-		"players": fleets,
+		"players": saved,
+		"replay": turn_replay.save(fleets, copies),
 	}
 
 
@@ -300,6 +307,7 @@ func _restore(data: Dictionary) -> void:
 	current_turn = data.turn
 	grid.turn = current_turn
 	player_up = data.player_up
+	var fleets: Array[Array] = []
 	for player in players:
 		var saved: Dictionary = data.players[player.player_num]
 		player.attacks = saved.attacks
@@ -316,8 +324,17 @@ func _restore(data: Dictionary) -> void:
 			if revealed:
 				ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
 			player.ships.append(ship)
+		var fleet: Array[Ship] = player.ships.duplicate()
+		for state: Dictionary in saved.held:
+			var ship := SaveGame.restore_ship(state, player)
+			ship.sunk = true
+			ship.held = true
+			ship.visible = false
+			fleet.append(ship)
+		fleets.append(fleet)
 		for state: Dictionary in saved.revealed:
 			player.temp_revealed_ships.append(SaveGame.restore_revealed(state))
+	turn_replay.restore(data.replay, players, fleets)
 
 
 # Crossfades from the title music to the battle music as the first turn starts

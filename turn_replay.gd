@@ -184,6 +184,75 @@ func held_ships(player: Player) -> Array[Ship]:
 	return held
 
 
+# The recorded attacks as plain data for a save. Ships are saved by where they
+# are in `fleets` (each player's, by player number) and revealed copies by
+# where they are in `copies`, which restore() is given again.
+func save(fleets: Array[Array], copies: Array[Array]) -> Array[Dictionary]:
+	var saved: Array[Dictionary] = []
+	for action in actions:
+		var fleet: Array = fleets[action.player.opponent.player_num]
+		var data := {
+			"player": action.player.player_num,
+			"scene": action.scene,
+			"position": action.position,
+			"rotation": action.rotation,
+			"turrets": action.turrets,
+			"props": action.props,
+			"kind": action.kind,
+			"target": action.target,
+			"damage": [],
+			"hit_ships": [],
+			"hp_changes": [],
+			"sunk": [],
+			"sounds": [],
+			"revealed": [],
+		}
+		for hit in action.damage:
+			data.damage.append([fleet.find(hit[0]), hit[1]])
+		for ship in action.hit_ships:
+			data.hit_ships.append(fleet.find(ship))
+		for ship in action.sunk:
+			data.sunk.append(fleet.find(ship))
+		for change in action.hp_changes:
+			data.hp_changes.append([fleet.find(change[0]), change[1], change[2]])
+		for sound in action.sounds:
+			data.sounds.append([fleet.find(sound[0]), (sound[1] as Resource).resource_path])
+		for copy in action.revealed:
+			# Not if it went down with its ship
+			if is_instance_valid(copy):
+				data.revealed.append(copies[action.player.opponent.player_num].find(copy))
+		saved.append(data)
+	return saved
+
+
+# Puts back the attacks save() made `saved` from
+func restore(saved: Array, players: Array[LocalPlayer], fleets: Array[Array]) -> void:
+	for data: Dictionary in saved:
+		var action := Action.new()
+		action.player = players[data.player]
+		var fleet: Array = fleets[action.player.opponent.player_num]
+		action.scene = data.scene
+		action.position = data.position
+		action.rotation = data.rotation
+		action.turrets = data.turrets
+		action.props = data.props
+		action.kind = data.kind
+		action.target = data.target
+		for hit: Array in data.damage:
+			action.damage.append([fleet[hit[0]], hit[1]])
+		for index: int in data.hit_ships:
+			action.hit_ships.append(fleet[index])
+		for change: Array in data.hp_changes:
+			action.hp_changes.append([fleet[change[0]], change[1], change[2]])
+		for index: int in data.sunk:
+			action.sunk.append(fleet[index])
+		for sound: Array in data.sounds:
+			action.sounds.append([fleet[sound[0]], load(sound[1])])
+		for index: int in data.revealed:
+			action.revealed.append(action.player.opponent.temp_revealed_ships[index])
+		actions.append(action)
+
+
 # Forgets the recorded turn, freeing ships kept only to be shown sinking
 func clear() -> void:
 	for action in actions:
