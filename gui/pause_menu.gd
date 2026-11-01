@@ -5,6 +5,7 @@ extends CanvasLayer
 
 signal replay_requested
 signal concede_requested
+signal opened
 
 const HOW_TO_PLAY_SCENE := preload("res://gui/how_to_play.tscn")
 const SETTINGS_SCENE := preload("res://gui/settings.tscn")
@@ -14,8 +15,7 @@ var can_replay := false:
 	set(value):
 		can_replay = value
 		replay.disabled = not value
-# Set by Root: the player (1 or 2) whose turn it is, who may concede, or 0
-# when it's not clear who's at the screen (setup, swaps and replays)
+# Set by Root as the menu opens: the player (1 or 2) who may concede, or 0
 var conceder := 0:
 	set(value):
 		conceder = value
@@ -51,6 +51,7 @@ func open() -> void:
 	confirm.visible = false
 	visible = true
 	get_tree().paused = true
+	opened.emit()
 
 
 func close() -> void:

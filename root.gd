@@ -147,7 +147,6 @@ func play_game() -> void:
 		_update_fleets()
 		# Reset AP counts, decrement ability timers, etc.
 		players[player_up].new_turn()
-		pause_menu.conceder = player_up + 1
 		# The player emits made_move once a move has been made. This makes it
 		# easy to wait for GUI input for local players, or network input if I
 		# ever get around to adding network play.
@@ -159,7 +158,6 @@ func play_game() -> void:
 			# Make sure only the active player receives button signals
 			players[player_up].disconnect_buttons()
 		players[player_up].finish_turn()
-		pause_menu.conceder = 0
 		if players[player_up].conceded:
 			break
 		# Go to the next player if they have any ships remaining
@@ -194,6 +192,13 @@ func _update_fleets() -> void:
 	ours.append_array(turn_replay.held_ships(players[player_up]))
 	# Our damage is part of what the replay shows
 	gui.update_fleets(ours, players[1 - player_up].ships, not swapping)
+
+
+# Only mid-turn, when it's clear who's at the screen (not during setup, swaps
+# or replays), and not with a shot in the air, which would land after the end
+func _on_pause_menu_opened() -> void:
+	var player := players[player_up]
+	pause_menu.conceder = player_up + 1 if player.active and not player.animation_playing else 0
 
 
 func _on_pause_menu_concede_requested() -> void:

@@ -88,16 +88,19 @@ func test_concede_ends_the_game_for_the_player_whose_turn_it_is() -> void:
 	var driver := GameDriver.new(game)
 	driver.prepare_board()
 	var menu := game.pause_menu
+	menu.open()
 	assert_true(menu.concede.disabled, "not during setup")
+	menu.close()
 	await driver.start_game()
 	await driver.end_turn()
-	assert_true(menu.concede.disabled, "not at the swap, with no telling who's there")
-	await driver.swap()
-	await driver.wait_until(
-		func() -> bool: return game.player_up == 1 and menu.conceder == 2, 5, "P2's turn"
-	)
-	assert_eq(menu.concede.text, "Concede (Player 2)")
+	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
 	menu.open()
+	assert_true(menu.concede.disabled, "not at the swap, with no telling who's there")
+	menu.close()
+	await driver.swap()
+	await driver.wait_until(func() -> bool: return game.players[1].active, 5, "P2's turn")
+	menu.open()
+	assert_eq(menu.concede.text, "Concede (Player 2)")
 	menu.concede.pressed.emit()
 	assert_eq(menu.question.text, "Concede the game?")
 	menu.get_node("Panel/Confirm/Buttons/Yes").pressed.emit()
@@ -115,3 +118,25 @@ func test_other_destructive_items_still_ask_to_abandon() -> void:
 	menu.get_node("Panel/Main/Title").pressed.emit()
 	assert_eq(menu.question.text, "Abandon this game?")
 	menu.get_node("Panel/Confirm/Buttons/No").pressed.emit()
+
+
+func test_no_conceding_with_a_shot_in_the_air() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	await driver.start_game()
+	await driver.select("battleship")
+	driver.press(driver.action_button("Fire"))
+	await driver.click(GameDriver.spot(1, "destroyer"))
+	assert_true(game.players[0].animation_playing, "shell in flight")
+	game.pause_menu.open()
+	assert_true(game.pause_menu.concede.disabled)
+	game.pause_menu.close()
+	await driver.wait_until(
+		func() -> bool: return not game.players[0].animation_playing, 30, "the shot"
+	)
+	game.pause_menu.open()
+	assert_false(game.pause_menu.concede.disabled, "once it has landed")
+	game.pause_menu.close()
+	get_node("/root/GutRunner/GutLayer").visible = true
