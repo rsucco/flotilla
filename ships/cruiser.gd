@@ -5,8 +5,8 @@ const MISSILE_SCENE := preload("res://ships/projectiles/missile.tscn")
 const EW_SCENE := preload("res://ships/projectiles/ew_strike.tscn")
 const EW_STRIKE_DESC := (
 	"Select a hex on opponent's board; prevents all units within two hexes of central hex"
-	+ " from firing next turn and either resets or adds five to their special ability "
-	+ "cooldowns, whichever is less"
+	+ " from firing next turn and either resets or adds five to their special and "
+	+ "secondary ability cooldowns, whichever is less"
 )
 const MISSILE_DEFENSE_DESC := (
 	"50% chance of intercepting incoming missile attacks within two hexes (chance is "

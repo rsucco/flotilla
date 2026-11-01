@@ -10,8 +10,9 @@ const NUCLEAR_STRIKE_DESC := (
 	+ "damages all hexes within two hexes of central hex"
 )
 const SONAR_PULSE_DESC := (
-	"Select a hex on opponent's board; reveals ships and submarines on that hex and its "
-	+ "direct neighbors and also reveals the location of the submarine"
+	"Select a hex on opponent's board; reveals ships and submarines (but not coastal "
+	+ "batteries) on that hex and its direct neighbors and also reveals the location of "
+	+ "the submarine"
 )
 const CRUSHING_DEPTHS_DESC := (
 	"Sinks instantly when hit in center hex by surface unit, or when hit in any hex by "

@@ -46,7 +46,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Size: 3
 - Points Cost: 3
 - Special Ability: (Nuclear Strike - 6 turns) Select a hex on opponent's board; instantly sinks any unit it hits directly and damages all hexes within two hexes of central hex
-- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines on that hex and its direct neighbors and also reveals the location of the submarine
+- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines (but not coastal batteries) on that hex and its direct neighbors and also reveals the location of the submarine
 - Passive Ability: Can only be hit by surface units on center hex
 - Drawbacks: Sinks when any hex is hit by a mine, ASW strike, or another sub, sinks instantly when hit in center hex by surface unit, cannot shoot at island tiles except with Nuclear Strike
 
@@ -54,7 +54,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Weapon: Anti-Ship Missiles
 - Size: 3
 - Points Cost: 3
-- Special Ability: (EW Strike - 3 turns) Select a hex on opponent's board; prevents all units within two hexes of central hex from firing next turn and either resets or adds five to their special ability cooldowns, whichever is less
+- Special Ability: (EW Strike - 3 turns) Select a hex on opponent's board; prevents all units within two hexes of central hex from firing next turn and either resets or adds five to their special and secondary ability cooldowns, whichever is less
 - Passive Ability: Has a 50% chance of intercepting incoming attacks from destroyers, cruisers, and aircraft carriers on hexes within two hexes of itself, has a 25% chance of intercepting incoming Nuclear Strike (an intercepted Nuclear Strike has no effect)
 - Drawbacks: None
 
@@ -78,7 +78,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Weapon: F-35
 - Size: 5
 - Points Cost: 5
-- Special Ability: (Recon Flight - 2 turns) Reveals one row of hexes on opponent's board
+- Special Ability: (Recon Flight - 2 turns) Reveals one row of hexes on opponent's board, except for submarines
 - Passive Ability: Can use two attacks in one turn instead of moving
 - Drawbacks: If at least two hexes are damaged, can only use one attack move per turn
 

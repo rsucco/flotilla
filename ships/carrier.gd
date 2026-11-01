@@ -13,7 +13,9 @@ func _ready() -> void:
 	hit_hexes = [false, false, false, false, false]
 	ship_name = "Aircraft Carrier"
 	weapon = "F-35 Strike"
-	special = SpecialAbility.new(2, "Recon Flight", "Reveals one row of hexes on opponent's board")
+	special = SpecialAbility.new(
+		2, "Recon Flight", "Reveals one row of hexes on opponent's board, except for submarines"
+	)
 	passive = PassiveAbility.new(
 		"Flight Ops", "Can take two attack moves in one turn instead of moving"
 	)
