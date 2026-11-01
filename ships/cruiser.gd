@@ -12,8 +12,9 @@ const MISSILE_DEFENSE_DESC := (
 	"50% chance of intercepting incoming missile attacks within two hexes (chance is "
 	+ "reduced to 25% for incoming nuclear strike)"
 )
-# How fast the CIWS mount turns, in radians per second
-const CIWS_SLEW := TAU
+# How fast the CIWS mount turns, in radians per second: fast enough to be on
+# target before the tracers show, from when it's first heard
+const CIWS_SLEW := TAU * 4
 
 # Alternates between the fore and aft missile silos
 var fore_silo := true

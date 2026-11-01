@@ -147,6 +147,12 @@ func _aim(cruiser: Cruiser, at: Vector2) -> float:
 	return cruiser.ciws.global_position.direction_to(at).angle() + PI / 2
 
 
+# The replay starts the mount turning when the CIWS is first heard. Checked
+# against the timings, as test frames can be far longer than the game's.
+func test_ciws_mount_turns_any_way_round_before_the_tracers_show() -> void:
+	assert_lt(PI / Cruiser.CIWS_SLEW, Missile.SOUND_LEAD * 0.5, "with time to spare")
+
+
 func test_ciws_mount_tracks_the_missile_then_returns_to_the_bow() -> void:
 	var cruiser: Cruiser = spawn(p1, "cruiser", Vector2i(24, 7), 1)
 	var missile := _intercepted_missile()
