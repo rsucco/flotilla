@@ -178,6 +178,17 @@ func test_battleship_armor_blocks_about_a_quarter_of_hits() -> void:
 	assert_between(blocked, 70, 130, "~25% of 400")
 
 
+func test_armor_never_blocks_a_hit_on_a_damaged_hex() -> void:
+	seed(1)
+	var attacker := spawn(p0, "destroyer", Vector2i(5, 7))
+	var battleship := spawn(p1, "battleship", Vector2i(22, 7))
+	battleship.hit_hexes = [false, false, true, false]
+	for i in 20:
+		p1.receive_fire(battleship.hex, attacker)
+		var event: String = game.grid.tile(battleship.hex).history[-1][1]
+		assert_eq(event, "Hit, Battleship (No effect)", "still marked as a hit")
+
+
 # Aircraft Carrier: Flight Ops, Degraded Runway and Recon Flight
 
 

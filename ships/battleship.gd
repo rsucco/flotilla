@@ -42,9 +42,10 @@ func fire(target: Vector2i) -> void:
 	await projectile.done
 
 
-# Passive - Armor: 25% chance of a hit not counting
+# Passive - Armor: 25% chance of a hit not counting. A hex that's already
+# damaged has nothing left to protect, so it's logged as no effect as usual.
 func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
-	if randf() > 0.25:
+	if is_hex_hit(hit_hex) or randf() > 0.25:
 		super(hit_hex, from_ship)
 	else:
 		Sfx.play(self, ARMOR_SOUND)
