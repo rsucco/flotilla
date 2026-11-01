@@ -137,7 +137,7 @@ func play_game() -> void:
 		if player.player_num == 1:
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
-			swapper.get_node("VBoxContainer/Label").text = "Pass to Player 2"
+			swapper.set_heading("Pass to Player 2")
 			swapper.offer_replay(false, false)
 			await swapper.swap_done
 		if selections.size() <= player.player_num:
