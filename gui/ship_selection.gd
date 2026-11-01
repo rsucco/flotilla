@@ -25,7 +25,7 @@ var pending: Callable
 # Each ship type's details, read from the ship itself
 var details := {}
 
-@onready var grid: GridContainer = $VBoxContainer/SelectionGrid
+@onready var grid: GridContainer = $VBoxContainer/Body/SelectionGrid
 
 
 func _ready() -> void:
@@ -89,7 +89,7 @@ func _describe(ship_type: String) -> String:
 
 
 func _show_details(ship_type: String) -> void:
-	$VBoxContainer/Info.text = details[ship_type]
+	$VBoxContainer/Body/Info.text = details[ship_type]
 
 
 func slider(ship_type: String) -> HSlider:
@@ -119,7 +119,7 @@ func _on_CountSlider_value_changed(_value: float) -> void:
 		max_count = mini(max_count, MAX_PER_TYPE)
 		slider(ship_type).max_value = max_count
 		slider(ship_type).tick_count = max_count + 1
-	$VBoxContainer/SelectionGrid/Points/PointsUsed.text = (
+	$VBoxContainer/Body/SelectionGrid/Points/PointsUsed.text = (
 		str(used_points) + "/" + str(POINTS_BUDGET)
 	)
 	$VBoxContainer/Buttons/OK.disabled = used_points == 0
@@ -132,7 +132,7 @@ func _on_Reset_pressed() -> void:
 		label(ship_type).text = (
 			ship_type.capitalize() + " (" + str(POINT_VALUES[ship_type]) + " Points)"
 		)
-	$VBoxContainer/SelectionGrid/Points/PointsUsed.text = "0/" + str(POINTS_BUDGET)
+	$VBoxContainer/Body/SelectionGrid/Points/PointsUsed.text = "0/" + str(POINTS_BUDGET)
 
 
 func _on_OK_pressed() -> void:

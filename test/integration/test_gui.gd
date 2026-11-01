@@ -7,7 +7,7 @@ const GameDriver := preload("res://test/game_driver.gd")
 
 
 func slider(dialog: Node, ship_type: String) -> HSlider:
-	return dialog.get_node("VBoxContainer/SelectionGrid/" + ship_type + "/CountSlider")
+	return dialog.get_node("VBoxContainer/Body/SelectionGrid/" + ship_type + "/CountSlider")
 
 
 func test_battery_count_capped_by_island_tiles() -> void:
@@ -29,8 +29,8 @@ func test_classic_fleet_skips_battery_without_islands() -> void:
 
 func test_ship_selection_shows_ship_details() -> void:
 	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
-	var info: Label = dialog.get_node("VBoxContainer/Info")
-	dialog.get_node("VBoxContainer/SelectionGrid/Destroyer").mouse_entered.emit()
+	var info: Label = dialog.get_node("VBoxContainer/Body/Info")
+	dialog.get_node("VBoxContainer/Body/SelectionGrid/Destroyer").mouse_entered.emit()
 	assert_string_contains(info.text, "Destroyer: 3 hexes, 4 AP")
 	assert_string_contains(info.text, "Special: ASW Strike (2-turn cooldown)")
 	assert_string_contains(info.text, "Secondary: Lay Mine (3-turn cooldown)")
@@ -39,7 +39,7 @@ func test_ship_selection_shows_ship_details() -> void:
 	var tap := InputEventMouseButton.new()
 	tap.button_index = MOUSE_BUTTON_LEFT
 	tap.pressed = true
-	dialog.get_node("VBoxContainer/SelectionGrid/CoastalBattery").gui_input.emit(tap)
+	dialog.get_node("VBoxContainer/Body/SelectionGrid/CoastalBattery").gui_input.emit(tap)
 	assert_string_contains(info.text, "Coastal Battery: 1 hex, 2 AP")
 	assert_string_contains(info.text, "Drawback: Stationary")
 

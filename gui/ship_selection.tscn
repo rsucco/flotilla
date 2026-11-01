@@ -33,26 +33,30 @@ theme_override_font_sizes/font_size = 16
 text = "Select your ships:"
 horizontal_alignment = 1
 
-[node name="SelectionGrid" type="GridContainer" parent="VBoxContainer"]
+[node name="Body" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SelectionGrid" type="GridContainer" parent="VBoxContainer/Body"]
 offset_top = 27.0
 offset_right = 638.0
 offset_bottom = 343.0
 size_flags_vertical = 3
 columns = 3
 
-[node name="CoastalBattery" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="CoastalBattery" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_right = 210.0
 offset_bottom = 93.0
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/CoastalBattery"]
 offset_right = 210.0
 offset_bottom = 37.0
 texture = ExtResource("11")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/CoastalBattery"]
 offset_top = 41.0
 offset_right = 210.0
 offset_bottom = 55.0
@@ -61,7 +65,7 @@ theme_override_font_sizes/font_size = 10
 text = "Coastal Battery"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/CoastalBattery"]
 offset_top = 59.0
 offset_right = 210.0
 offset_bottom = 75.0
@@ -70,21 +74,21 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/CoastalBattery"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/CoastalBattery"]
 offset_top = 79.0
 offset_right = 210.0
 offset_bottom = 93.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Corvette" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Corvette" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_left = 214.0
 offset_right = 424.0
 offset_bottom = 93.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Corvette"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/Corvette"]
 offset_left = 77.0
 offset_top = 24.0
 offset_right = 132.0
@@ -95,7 +99,7 @@ size_flags_vertical = 0
 texture = ExtResource("12")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Corvette"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/Corvette"]
 offset_top = 41.0
 offset_right = 210.0
 offset_bottom = 55.0
@@ -105,7 +109,7 @@ text = "Corvette"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Corvette"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/Corvette"]
 offset_top = 59.0
 offset_right = 210.0
 offset_bottom = 75.0
@@ -114,21 +118,21 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Corvette"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Corvette"]
 offset_top = 79.0
 offset_right = 210.0
 offset_bottom = 93.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Destroyer" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Destroyer" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_left = 428.0
 offset_right = 638.0
 offset_bottom = 93.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Destroyer"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/Destroyer"]
 offset_left = 55.0
 offset_top = 17.0
 offset_right = 155.0
@@ -139,7 +143,7 @@ size_flags_vertical = 0
 texture = ExtResource("9")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Destroyer"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/Destroyer"]
 offset_top = 41.0
 offset_right = 210.0
 offset_bottom = 55.0
@@ -148,7 +152,7 @@ theme_override_font_sizes/font_size = 10
 text = "Destroyer"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Destroyer"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/Destroyer"]
 offset_top = 59.0
 offset_right = 210.0
 offset_bottom = 75.0
@@ -157,21 +161,21 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Destroyer"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Destroyer"]
 offset_top = 79.0
 offset_right = 210.0
 offset_bottom = 93.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Cruiser" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Cruiser" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_top = 97.0
 offset_right = 210.0
 offset_bottom = 188.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Cruiser"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/Cruiser"]
 offset_left = 41.0
 offset_top = 12.0
 offset_right = 169.0
@@ -182,7 +186,7 @@ size_flags_vertical = 0
 texture = ExtResource("5")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Cruiser"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/Cruiser"]
 offset_top = 39.0
 offset_right = 210.0
 offset_bottom = 53.0
@@ -191,7 +195,7 @@ theme_override_font_sizes/font_size = 10
 text = "Cruiser"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Cruiser"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/Cruiser"]
 offset_top = 57.0
 offset_right = 210.0
 offset_bottom = 73.0
@@ -200,14 +204,14 @@ max_value = 3.0
 tick_count = 4
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Cruiser"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Cruiser"]
 offset_top = 77.0
 offset_right = 210.0
 offset_bottom = 91.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Submarine" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Submarine" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_left = 214.0
 offset_top = 97.0
 offset_right = 424.0
@@ -215,7 +219,7 @@ offset_bottom = 188.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Submarine"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/Submarine"]
 offset_left = 34.0
 offset_right = 176.0
 offset_bottom = 35.0
@@ -225,7 +229,7 @@ size_flags_vertical = 0
 texture = ExtResource("8")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Submarine"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/Submarine"]
 offset_top = 39.0
 offset_right = 210.0
 offset_bottom = 53.0
@@ -234,7 +238,7 @@ theme_override_font_sizes/font_size = 10
 text = "Submarine"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Submarine"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/Submarine"]
 offset_top = 57.0
 offset_right = 210.0
 offset_bottom = 73.0
@@ -243,14 +247,14 @@ max_value = 3.0
 tick_count = 4
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Submarine"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Submarine"]
 offset_top = 77.0
 offset_right = 210.0
 offset_bottom = 91.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="SupplyTender" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="SupplyTender" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_left = 428.0
 offset_top = 97.0
 offset_right = 638.0
@@ -258,7 +262,7 @@ offset_bottom = 188.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/SupplyTender"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/SupplyTender"]
 offset_left = 55.0
 offset_top = 18.0
 offset_right = 155.0
@@ -269,7 +273,7 @@ size_flags_vertical = 0
 texture = ExtResource("7")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/SupplyTender"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/SupplyTender"]
 offset_top = 39.0
 offset_right = 210.0
 offset_bottom = 53.0
@@ -278,7 +282,7 @@ theme_override_font_sizes/font_size = 10
 text = "Supply Tender"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/SupplyTender"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/SupplyTender"]
 offset_top = 57.0
 offset_right = 210.0
 offset_bottom = 73.0
@@ -287,21 +291,21 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/SupplyTender"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/SupplyTender"]
 offset_top = 77.0
 offset_right = 210.0
 offset_bottom = 91.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Battleship" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Battleship" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_top = 192.0
 offset_right = 210.0
 offset_bottom = 305.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Battleship"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/Battleship"]
 offset_top = 17.0
 offset_right = 209.0
 offset_bottom = 57.0
@@ -311,7 +315,7 @@ size_flags_vertical = 0
 texture = ExtResource("6")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Battleship"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/Battleship"]
 offset_top = 61.0
 offset_right = 210.0
 offset_bottom = 75.0
@@ -320,7 +324,7 @@ theme_override_font_sizes/font_size = 10
 text = "Battleship"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Battleship"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/Battleship"]
 offset_top = 79.0
 offset_right = 210.0
 offset_bottom = 95.0
@@ -329,14 +333,14 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Battleship"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Battleship"]
 offset_top = 99.0
 offset_right = 210.0
 offset_bottom = 113.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Carrier" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Carrier" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_left = 214.0
 offset_top = 192.0
 offset_right = 424.0
@@ -344,7 +348,7 @@ offset_bottom = 305.0
 size_flags_horizontal = 3
 alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/SelectionGrid/Carrier"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Body/SelectionGrid/Carrier"]
 offset_left = 10.0
 offset_right = 199.0
 offset_bottom = 57.0
@@ -354,7 +358,7 @@ size_flags_vertical = 0
 texture = ExtResource("2")
 stretch_mode = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]
+[node name="Label" type="Label" parent="VBoxContainer/Body/SelectionGrid/Carrier"]
 offset_top = 61.0
 offset_right = 210.0
 offset_bottom = 75.0
@@ -363,7 +367,7 @@ theme_override_font_sizes/font_size = 10
 text = "Aircraft Carrier"
 horizontal_alignment = 1
 
-[node name="CountSlider" type="HSlider" parent="VBoxContainer/SelectionGrid/Carrier"]
+[node name="CountSlider" type="HSlider" parent="VBoxContainer/Body/SelectionGrid/Carrier"]
 offset_top = 79.0
 offset_right = 210.0
 offset_bottom = 95.0
@@ -372,37 +376,38 @@ max_value = 5.0
 tick_count = 6
 ticks_on_borders = true
 
-[node name="CountLabel" type="Label" parent="VBoxContainer/SelectionGrid/Carrier"]
+[node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Carrier"]
 offset_top = 99.0
 offset_right = 210.0
 offset_bottom = 113.0
 text = "0 (0 Points)"
 horizontal_alignment = 1
 
-[node name="Points" type="VBoxContainer" parent="VBoxContainer/SelectionGrid"]
+[node name="Points" type="VBoxContainer" parent="VBoxContainer/Body/SelectionGrid"]
 offset_left = 428.0
 offset_top = 192.0
 offset_right = 638.0
 offset_bottom = 305.0
 alignment = 1
 
-[node name="PointsUsedLabel" type="Label" parent="VBoxContainer/SelectionGrid/Points"]
+[node name="PointsUsedLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Points"]
 offset_top = 40.0
 offset_right = 210.0
 offset_bottom = 54.0
 text = "Points Used:"
 horizontal_alignment = 1
 
-[node name="PointsUsed" type="Label" parent="VBoxContainer/SelectionGrid/Points"]
+[node name="PointsUsed" type="Label" parent="VBoxContainer/Body/SelectionGrid/Points"]
 offset_top = 58.0
 offset_right = 210.0
 offset_bottom = 72.0
 text = "0/25"
 horizontal_alignment = 1
 
-[node name="Info" type="Label" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 200)
+[node name="Info" type="Label" parent="VBoxContainer/Body"]
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
+size_flags_vertical = 1
 theme_override_fonts/font = ExtResource("1")
 text = "Hover over or tap a ship for its details."
 autowrap_mode = 3
@@ -454,14 +459,14 @@ custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 text = "No"
 
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/CoastalBattery/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Corvette/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Destroyer/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Cruiser/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Submarine/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/SupplyTender/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Battleship/CountSlider" to="." method="_on_CountSlider_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/SelectionGrid/Carrier/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/CoastalBattery/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/Corvette/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/Destroyer/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/Cruiser/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/Submarine/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/SupplyTender/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/Battleship/CountSlider" to="." method="_on_CountSlider_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Body/SelectionGrid/Carrier/CountSlider" to="." method="_on_CountSlider_value_changed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/Classic" to="." method="_on_Classic_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/Reset" to="." method="_on_Reset_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/OK" to="." method="_on_OK_pressed"]
