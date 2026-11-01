@@ -4,7 +4,9 @@ class_name SaveGame
 # browser's storage), written with store_var and read back without objects.
 # Root decides what goes in a save; this turns ships to and from plain data.
 
-const VERSION := 1
+# Bumped when a save's contents change, so older saves read as empty rather
+# than half-load (2: the turn replay, held ships and the mode)
+const VERSION := 2
 const AUTOSAVE := "autosave"
 const SLOTS: Array[String] = ["slot1", "slot2", "slot3"]
 # Shown to players
@@ -78,17 +80,18 @@ static func latest() -> String:
 	return newest
 
 
-# e.g. "Slot 1: Turn 4, Player 2 - 2026-10-31 21:04", "Slot 1: Empty", or
-# with " (finished)" after a finished game
+# e.g. "Slot 1: Hot-seat, Turn 4, Player 2 - 2026-10-31 21:04", "Slot 1: vs AI,
+# Turn 4 - ...", "Slot 1: Empty", or with " (finished)" after a finished game
 static func describe(slot: String) -> String:
 	var data := read(slot)
 	if data.is_empty():
 		return NAMES[slot] + ": Empty"
 	var bias: int = Time.get_time_zone_from_system().bias * 60
 	var when := Time.get_datetime_string_from_unix_time(int(data.saved_at) + bias, true)
-	var text := (
-		"%s: Turn %d, Player %d - %s" % [NAMES[slot], data.turn, data.player_up + 1, when.left(16)]
-	)
+	var game := "Hot-seat, Turn %d, Player %d" % [data.turn, data.player_up + 1]
+	if data.mode == Root.Mode.VS_AI:
+		game = "vs AI, Turn %d" % data.turn
+	var text := "%s: %s - %s" % [NAMES[slot], game, when.left(16)]
 	return text + " (finished)" if data.get("finished") else text
 
 

@@ -23,6 +23,9 @@ func before_each() -> void:
 
 func after_each() -> void:
 	Root.mode = Root.Mode.HOT_SEAT
+	Root.loaded = {}
+	for slot in [SaveGame.AUTOSAVE] + SaveGame.SLOTS:
+		SaveGame.delete(slot)
 	Engine.time_scale = 1.0
 	get_node("/root/GutRunner/GutLayer").visible = true
 
@@ -69,3 +72,26 @@ func test_no_saving_or_conceding_on_the_ais_turn() -> void:
 	assert_true(game.pause_menu.concede.disabled)
 	assert_true(game.pause_menu.save_game.disabled)
 	game.pause_menu.close()
+
+
+func test_saved_and_loaded_as_a_game_against_the_ai() -> void:
+	game.pause_menu.open()
+	assert_false(game.pause_menu.save_game.disabled, "saving on our turn")
+	game.pause_menu.close()
+	await driver.end_turn()
+	await driver.wait_until(func() -> bool: return game.players[0].active, 60, "our next turn")
+	var data := SaveGame.read(SaveGame.AUTOSAVE)
+	assert_eq(data.get("mode"), Root.Mode.VS_AI, "autosaved as our turn starts")
+	assert_eq(data.get("turn"), 2)
+	# Loaded as Continue would, whatever mode was last played
+	Root.mode = Root.Mode.HOT_SEAT
+	game.queue_free()
+	await wait_process_frames(1)
+	Root.loaded = data
+	game = add_child_autofree(ROOT_SCENE.instantiate())
+	driver = GameDriver.new(game)
+	assert_true(game.players[1] is AIPlayer, "against the AI again")
+	await driver.wait_until(func() -> bool: return game.players[0].active, 5, "our turn")
+	assert_null(swap_screen(), "no hand-off")
+	assert_true(game.players[0].ships.all(func(s: Ship) -> bool: return s.visible), "our fleet")
+	assert_false(game.players[1].ships.any(func(s: Ship) -> bool: return s.visible), "not theirs")

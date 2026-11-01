@@ -52,6 +52,9 @@ var reveal_all := false
 func _ready() -> void:
 	effects = Node2D.new()
 	effects.name = "Effects"
+	# A saved game brings its own
+	if not loaded.is_empty():
+		mode = loaded.mode
 	hot_seat = mode == Mode.HOT_SEAT
 	var second: Player = LocalPlayer.new(1) if hot_seat else AIPlayer.new(1)
 	players = [LocalPlayer.new(0), second]
@@ -190,6 +193,10 @@ func play_game() -> void:
 			swapping = false
 		if not carrying_on:
 			turn_replay.clear()
+		# Against the AI, at the start of each of the player's turns (hot-seat
+		# saves at the hand-off)
+		if not hot_seat and not resuming and players[player_up] is LocalPlayer:
+			SaveGame.write(SaveGame.AUTOSAVE, save_state("swap"))
 		gui.update_turn(current_turn)
 		_update_fleets()
 		# The AI's turn plays out live in front of the player
@@ -299,6 +306,7 @@ func save_state(phase: String) -> Dictionary:
 		)
 	return {
 		"phase": phase,
+		"mode": mode,
 		"game": game_id,
 		"turn": current_turn,
 		"player_up": player_up,
@@ -390,8 +398,7 @@ func _on_pause_menu_opened() -> void:
 	var player := players[player_up]
 	var mid_turn := player is LocalPlayer and player.active and not player.animation_playing
 	pause_menu.can_concede = mid_turn
-	# Saves only know hot-seat games so far
-	pause_menu.can_save = mid_turn and hot_seat
+	pause_menu.can_save = mid_turn
 
 
 func _on_gui_action_pressed(action: String) -> void:

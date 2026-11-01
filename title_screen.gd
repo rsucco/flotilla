@@ -46,8 +46,8 @@ func _load(slot: String) -> void:
 	Root.loaded = SaveGame.read(slot)
 	if Root.loaded.is_empty():
 		return
-	# Saves only know hot-seat games so far
-	_start(Root.Mode.HOT_SEAT)
+	Root.title_music_at = $Music.get_playback_position()
+	get_tree().change_scene_to_file("res://root.tscn")
 
 
 func _on_how_to_play_pressed() -> void:

@@ -24,6 +24,7 @@ func after_each() -> void:
 	Engine.time_scale = 1.0
 	get_tree().paused = false
 	Root.loaded = {}
+	Root.mode = Root.Mode.HOT_SEAT
 	Root.replay = {}
 	get_node("/root/GutRunner/GutLayer").visible = true
 
@@ -48,11 +49,13 @@ func reload(data: Dictionary) -> void:
 func test_slots_describe_themselves_and_the_latest_is_continued() -> void:
 	assert_eq(SaveGame.latest(), "", "nothing saved yet")
 	assert_eq(SaveGame.describe("slot2"), "Slot 2: Empty")
-	SaveGame.write("slot2", {"turn": 4, "player_up": 1})
-	SaveGame.write(SaveGame.AUTOSAVE, {"turn": 5, "player_up": 0})
-	assert_string_starts_with(SaveGame.describe("slot2"), "Slot 2: Turn 4, Player 2 - ")
+	var hot_seat := Root.Mode.HOT_SEAT
+	SaveGame.write("slot2", {"mode": hot_seat, "turn": 4, "player_up": 1})
+	SaveGame.write(SaveGame.AUTOSAVE, {"mode": hot_seat, "turn": 5, "player_up": 0})
+	assert_string_starts_with(SaveGame.describe("slot2"), "Slot 2: Hot-seat, Turn 4, Player 2 - ")
 	assert_eq(SaveGame.latest(), SaveGame.AUTOSAVE)
-	SaveGame.write("slot3", {"turn": 6, "player_up": 0})
+	SaveGame.write("slot3", {"mode": Root.Mode.VS_AI, "turn": 6, "player_up": 0})
+	assert_string_starts_with(SaveGame.describe("slot3"), "Slot 3: vs AI, Turn 6 - ")
 	assert_eq(SaveGame.latest(), "slot3")
 
 
@@ -267,7 +270,7 @@ func test_title_screen_continue_and_load() -> void:
 	assert_false(buttons.get_node("Continue").visible, "nothing to continue")
 	assert_true(buttons.get_node("Load").disabled)
 	title.free()
-	SaveGame.write("slot1", {"turn": 2, "player_up": 0})
+	SaveGame.write("slot1", {"mode": Root.Mode.HOT_SEAT, "turn": 2, "player_up": 0})
 	title = add_child_autofree(TITLE_SCENE.instantiate())
 	buttons = title.get_node("TextureRect/PanelContainer/Buttons")
 	assert_true(buttons.get_node("Continue").visible)
