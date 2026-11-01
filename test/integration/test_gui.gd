@@ -206,8 +206,9 @@ func test_end_turn_ends_the_whole_fleet_with_nothing_selected() -> void:
 	await driver.click(GameDriver.spot(0, "cruiser"), MOUSE_BUTTON_RIGHT)
 	assert_null(game.players[0].selected_ship, "deselected")
 	driver.press(driver.action_button("EndTurn"))
-	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
+	var swap := await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
 	assert_eq(game.player_up, 1)
+	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2")
 	assert_true(driver.action_button("EndTurn").disabled, "disabled between turns")
 	get_node("/root/GutRunner/GutLayer").visible = true
 

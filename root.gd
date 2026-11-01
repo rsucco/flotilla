@@ -166,6 +166,8 @@ func play_game() -> void:
 			var player := players[player_up]
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
+			# Who's up, which a loaded game otherwise leaves unsaid
+			swapper.set_heading("Pass to Player %d" % (player_up + 1))
 			swapper.offer_replay(turn_replay.has_actions(), player.watch_replay)
 			var watch: bool = await swapper.swap_done
 			# The board was last drawn from the other player's side

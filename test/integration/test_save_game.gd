@@ -104,6 +104,7 @@ func test_hand_off_save_starts_the_next_players_turn() -> void:
 	await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
 	await reload(SaveGame.read(SaveGame.AUTOSAVE))
 	var swap := driver._dialog(game, "res://gui/local_turn_swap.tscn")
+	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2", "says who's up")
 	assert_false(swap.get_node("VBoxContainer/WatchReplay").visible, "the replay wasn't saved")
 	await driver.swap()
 	await driver.wait_until(func() -> bool: return game.players[1].active, 5, "Player 2's turn")
