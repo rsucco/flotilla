@@ -200,8 +200,8 @@ offset_top = 57.0
 offset_right = 210.0
 offset_bottom = 73.0
 size_flags_horizontal = 3
-max_value = 3.0
-tick_count = 4
+max_value = 5.0
+tick_count = 6
 ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Cruiser"]
@@ -243,8 +243,8 @@ offset_top = 57.0
 offset_right = 210.0
 offset_bottom = 73.0
 size_flags_horizontal = 3
-max_value = 3.0
-tick_count = 4
+max_value = 5.0
+tick_count = 6
 ticks_on_borders = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer/Body/SelectionGrid/Submarine"]

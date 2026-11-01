@@ -43,6 +43,8 @@ func _ready() -> void:
 				if event is InputEventMouseButton and event.pressed:
 					_show_details(ship_type)
 		)
+	# Each slider's limit, rather than whatever the scene was saved with
+	_on_CountSlider_value_changed(0.0)
 
 
 # The ship's size, weapon, abilities, passive and drawback
@@ -181,8 +183,7 @@ func _on_No_pressed() -> void:
 
 func set_island_tiles(count: int) -> void:
 	island_tiles = count
-	slider("CoastalBattery").max_value = count
-	slider("CoastalBattery").tick_count = count + 1
+	_on_CountSlider_value_changed(0.0)
 
 
 func _on_Classic_pressed() -> void:

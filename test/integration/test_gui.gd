@@ -13,10 +13,17 @@ func slider(dialog: Node, ship_type: String) -> HSlider:
 func test_battery_count_capped_by_island_tiles() -> void:
 	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
 	dialog.set_island_tiles(1)
-	# Any slider change recalculates every slider's limit
-	slider(dialog, "Destroyer").value = 1
 	slider(dialog, "CoastalBattery").value = 3
 	assert_eq(slider(dialog, "CoastalBattery").value, 1.0)
+	dialog.set_island_tiles(7)
+	assert_eq(slider(dialog, "CoastalBattery").max_value, 5.0, "nor more than five")
+
+
+func test_up_to_five_of_each_from_the_start() -> void:
+	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
+	dialog.set_island_tiles(5)
+	for ship_type: String in dialog.POINT_VALUES:
+		assert_eq(slider(dialog, ship_type).max_value, 5.0, ship_type)
 
 
 func test_classic_fleet_skips_battery_without_islands() -> void:
