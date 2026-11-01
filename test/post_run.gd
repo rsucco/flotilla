@@ -1,9 +1,12 @@
 extends GutHookScript
-# Fails the run if a test script doesn't load. GUT skips one that fails to
-# parse with just a warning ("does not extend GutTest"), and still passes.
+# Clears the run's saves (see pre_run.gd), and fails the run if a test script
+# doesn't load. GUT skips one that fails to parse with just a warning ("does
+# not extend GutTest"), and still passes.
 
 
 func run() -> void:
+	for file in DirAccess.get_files_at(SaveGame.dir):
+		DirAccess.remove_absolute(SaveGame.dir.path_join(file))
 	for path in _test_scripts("res://test"):
 		var script := load(path) as GDScript
 		if script == null or not script.can_instantiate():

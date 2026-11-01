@@ -40,6 +40,10 @@ offset_bottom = 370.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
 
+[node name="Continue" type="Button" parent="TextureRect/PanelContainer/Buttons"]
+layout_mode = 2
+text = "Continue"
+
 [node name="SinglePlayer" type="Button" parent="TextureRect/PanelContainer/Buttons"]
 offset_right = 138.0
 offset_bottom = 20.0
@@ -51,6 +55,10 @@ offset_top = 24.0
 offset_right = 138.0
 offset_bottom = 44.0
 text = "Hotseat Multiplayer"
+
+[node name="Load" type="Button" parent="TextureRect/PanelContainer/Buttons"]
+layout_mode = 2
+text = "Load Game"
 
 [node name="HowToPlay" type="Button" parent="TextureRect/PanelContainer/Buttons"]
 layout_mode = 2
@@ -93,6 +101,8 @@ volume_db = -9.996
 autoplay = true
 bus = &"Music"
 
+[connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Continue" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Load" to="." method="_on_load_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Hotseat" to="." method="_on_Hotseat_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/HowToPlay" to="." method="_on_how_to_play_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Settings" to="." method="_on_settings_pressed"]

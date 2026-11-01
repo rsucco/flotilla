@@ -337,9 +337,21 @@ func get_ship_selection() -> Dictionary:
 
 func new_turn() -> void:
 	super()
+	_take_the_helm()
+
+
+# Carries on with a turn from a saved game, with the AP it was saved with
+func resume_turn() -> void:
+	for revealed in temp_revealed_ships:
+		show_revealed(revealed)
+	_take_the_helm()
+
+
+# Shows our fleet and hands us the controls
+func _take_the_helm() -> void:
 	for ship in ships:
 		ship.visible = true
-	ships_with_moves = ships.duplicate()
+	ships_with_moves = ships.filter(func(s: Ship) -> bool: return s.ap > 0)
 	_select_ship(ships_with_moves[0])
 	on_hex_time = 0
 	active = true

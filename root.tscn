@@ -37,3 +37,4 @@ bus = &"Music"
 [connection signal="replay_requested" from="PauseMenu" to="." method="_on_pause_menu_replay_requested"]
 [connection signal="concede_requested" from="PauseMenu" to="." method="_on_pause_menu_concede_requested"]
 [connection signal="opened" from="PauseMenu" to="." method="_on_pause_menu_opened"]
+[connection signal="save_requested" from="PauseMenu" to="." method="_on_pause_menu_save_requested"]

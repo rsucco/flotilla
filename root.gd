@@ -14,6 +14,8 @@ const MUSIC_FADE := 2.0
 static var replay := {}
 # Where the title screen's music was, so it carries on through setup
 static var title_music_at := 0.0
+# A saved game to carry on with, set by the title screen before loading us
+static var loaded := {}
 
 var grid: Grid
 var players: Array[LocalPlayer] = []
@@ -26,6 +28,12 @@ var current_turn := 0
 var swapping := false
 # The board and fleets this game started with, once both players have chosen
 var setup := {}
+# Tells this game's saves from others', to mark them finished when it ends.
+# A replay is a new game.
+var game_id := 0
+# Set when a saved game is resumed part-way through a turn: the attacks made
+# before the save weren't saved, so that turn has no replay
+var replay_partial := false
 # Testing cheats (debug builds): V shows both fleets, C readies every ability
 # of the player whose turn it is
 var reveal_all := false
@@ -126,38 +134,33 @@ func play_game() -> void:
 	$TileHistory.grid = grid
 	turn_replay.grid = grid
 	player_up = 0
-	var selections: Array = []
-	if not replay.is_empty():
-		grid.set_islands(replay.islands)
-		selections = replay.selections
-		replay = {}
-	# Ship selection and placement
-	for player in players:
-		# Hand over before Player 2 sees anything of their setup
-		if player.player_num == 1:
-			var swapper := TURN_SWAP_SCENE.instantiate()
-			add_child(swapper)
-			swapper.set_heading("Pass to Player 2")
-			swapper.offer_replay(false, false)
-			await swapper.swap_done
-		if selections.size() <= player.player_num:
-			selections.append(await player.get_ship_selection())
-		await player.place_ships(selections[player.player_num])
-	setup = {"islands": grid.get_islands(), "selections": selections}
+	var resume := loaded
+	loaded = {}
+	if resume.is_empty():
+		await _set_up()
+	else:
+		_restore(resume)
 	pause_menu.can_replay = true
 	_update_fleets()
 	_start_battle_music()
+	# A resumed game starts at the swap screen of the turn it was saved in
+	var resuming := not resume.is_empty()
 	# Play until one player has no more ships
 	while not players[0].ships.is_empty() and not players[1].ships.is_empty():
 		# Increment the turn counter at the start of player 1's turn
-		if player_up == 0:
+		if player_up == 0 and not resuming:
 			current_turn += 1
 			grid.turn = current_turn
 		# Wait for the hotseat players to swap seats, except on player 1's first turn
-		if current_turn != 1 or player_up == 1:
+		if resuming or current_turn != 1 or player_up == 1:
 			swapping = true
 			# From the next player's side from here on
 			_update_fleets()
+			if replay_partial:
+				turn_replay.clear()
+				replay_partial = false
+			if not resuming:
+				SaveGame.write(SaveGame.AUTOSAVE, save_state("swap"))
 			var player := players[player_up]
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
@@ -174,8 +177,14 @@ func play_game() -> void:
 		turn_replay.clear()
 		gui.update_turn(current_turn)
 		_update_fleets()
-		# Reset AP counts, decrement ability timers, etc.
-		players[player_up].new_turn()
+		if resuming and resume.phase == "turn":
+			# Carry on with the AP and fire actions it was saved with
+			players[player_up].resume_turn()
+			replay_partial = true
+		else:
+			# Reset AP counts, decrement ability timers, etc.
+			players[player_up].new_turn()
+		resuming = false
 		# The player emits made_move once a move has been made. This makes it
 		# easy to wait for GUI input for local players, or network input if I
 		# ever get around to adding network play.
@@ -193,6 +202,9 @@ func play_game() -> void:
 		if not players[1 - player_up].ships.is_empty():
 			player_up = 1 - player_up
 
+	# Nothing left to carry on with
+	SaveGame.delete(SaveGame.AUTOSAVE)
+	SaveGame.mark_finished(game_id)
 	var victory := VICTORY_SCENE.instantiate()
 	if players[player_up].conceded:
 		victory.update_winner(2 - player_up, player_up + 1)
@@ -200,6 +212,107 @@ func play_game() -> void:
 		victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
 	add_child(victory)
 	victory.show_stats(players, current_turn)
+
+
+# Ship selection and placement for both players
+func _set_up() -> void:
+	var selections: Array = []
+	if not replay.is_empty():
+		grid.set_islands(replay.islands)
+		selections = replay.selections
+		replay = {}
+	for player in players:
+		# Hand over before Player 2 sees anything of their setup
+		if player.player_num == 1:
+			var swapper := TURN_SWAP_SCENE.instantiate()
+			add_child(swapper)
+			swapper.set_heading("Pass to Player 2")
+			swapper.offer_replay(false, false)
+			await swapper.swap_done
+		if selections.size() <= player.player_num:
+			selections.append(await player.get_ship_selection())
+		await player.place_ships(selections[player.player_num])
+	setup = {"islands": grid.get_islands(), "selections": selections}
+	# Random, and unaffected by seed()
+	game_id = ResourceUID.create_id()
+
+
+# Everything needed to carry on with this game: at the swap screen before
+# `player_up`'s turn (phase "swap"), or part-way through it ("turn")
+func save_state(phase: String) -> Dictionary:
+	var tiles: Array[Dictionary] = []
+	for x in Grid.COLUMNS:
+		for y in Grid.ROWS:
+			var tile := grid.tile(Vector2i(x, y))
+			if not tile.history.is_empty() or tile.is_mined:
+				tiles.append(
+					{
+						"hex": Vector2i(x, y),
+						"history": tile.history.duplicate(true),
+						"mined": tile.is_mined
+					}
+				)
+	var fleets: Array[Dictionary] = []
+	for player in players:
+		var revealed := player.temp_revealed_ships.filter(
+			func(copy: Ship) -> bool: return is_instance_valid(copy)
+		)
+		(
+			fleets
+			. append(
+				{
+					"attacks": player.attacks,
+					"hits": player.hits,
+					"fleet_size": player.fleet_size,
+					"watch_replay": player.watch_replay,
+					"ships": player.ships.map(SaveGame.ship_state),
+					"revealed": revealed.map(SaveGame.revealed_state),
+				}
+			)
+		)
+	return {
+		"phase": phase,
+		"game": game_id,
+		"turn": current_turn,
+		"player_up": player_up,
+		"setup": setup,
+		"tiles": tiles,
+		"players": fleets,
+	}
+
+
+# Puts the board and fleets back as `data` (from save_state()) had them
+func _restore(data: Dictionary) -> void:
+	setup = data.setup
+	game_id = data.game
+	var islands: Array[Vector2i] = []
+	islands.assign(setup.islands)
+	grid.set_islands(islands)
+	for saved: Dictionary in data.tiles:
+		var tile := grid.tile(saved.hex)
+		tile.history.assign(saved.history)
+		tile.is_mined = saved.mined
+	current_turn = data.turn
+	grid.turn = current_turn
+	player_up = data.player_up
+	for player in players:
+		var saved: Dictionary = data.players[player.player_num]
+		player.attacks = saved.attacks
+		player.hits = saved.hits
+		player.fleet_size = saved.fleet_size
+		player.watch_replay = saved.watch_replay
+		for state: Dictionary in saved.ships:
+			var ship := SaveGame.restore_ship(state, player)
+			# Saved mid-turn, the opponent's ships we'd revealed stay revealed
+			var revealed: bool = (
+				data.phase == "turn" and player.player_num != player_up and state.shown
+			)
+			ship.visible = revealed
+			if revealed:
+				ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
+			player.ships.append(ship)
+		for state: Dictionary in saved.revealed:
+			player.temp_revealed_ships.append(SaveGame.restore_revealed(state))
 
 
 # Crossfades from the title music to the battle music as the first turn starts
@@ -227,7 +340,13 @@ func _update_fleets() -> void:
 # or replays), and not with a shot in the air, which would land after the end
 func _on_pause_menu_opened() -> void:
 	var player := players[player_up]
-	pause_menu.conceder = player_up + 1 if player.active and not player.animation_playing else 0
+	var mid_turn := player.active and not player.animation_playing
+	pause_menu.conceder = player_up + 1 if mid_turn else 0
+	pause_menu.can_save = mid_turn
+
+
+func _on_pause_menu_save_requested(slot: String) -> void:
+	SaveGame.write(slot, save_state("turn"))
 
 
 func _on_pause_menu_concede_requested() -> void:

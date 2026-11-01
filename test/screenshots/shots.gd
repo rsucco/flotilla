@@ -15,6 +15,8 @@ var d: GameDriver
 
 func _initialize() -> void:
 	out = OS.get_cmdline_user_args()[0]
+	# Hand-offs autosave; keep that out of the player's own saves
+	SaveGame.dir = out.path_join("saves")
 	run.call_deferred()
 
 

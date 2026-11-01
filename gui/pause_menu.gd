@@ -5,6 +5,7 @@ extends CanvasLayer
 
 signal replay_requested
 signal concede_requested
+signal save_requested(slot: String)
 signal opened
 
 const HOW_TO_PLAY_SCENE := preload("res://gui/how_to_play.tscn")
@@ -21,13 +22,23 @@ var conceder := 0:
 		conceder = value
 		concede.disabled = value == 0
 		concede.text = "Concede" if value == 0 else "Concede (Player %d)" % value
+# Set by Root as the menu opens: only mid-turn, with nothing in flight
+var can_save := false:
+	set(value):
+		can_save = value
+		save_game.disabled = not value
 var pending: Callable
+# Where No returns to
+var back: Control
 
 @onready var panel: Control = $Panel
 @onready var main: Control = $Panel/Main
 @onready var confirm: Control = $Panel/Confirm
 @onready var replay: Button = $Panel/Main/Replay
 @onready var concede: Button = $Panel/Main/Concede
+@onready var save_game: Button = $Panel/Main/SaveGame
+@onready var saves: Control = $Panel/Saves
+@onready var heading: Label = $Panel/Main/Label
 @onready var question: Label = $Panel/Confirm/Label
 
 
@@ -40,15 +51,19 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
-		if visible:
+		if saves.visible:
+			_on_saves_back_pressed()
+		elif visible:
 			close()
 		else:
 			open()
 
 
 func open() -> void:
+	heading.text = "Paused"
 	main.visible = true
 	confirm.visible = false
+	saves.visible = false
 	visible = true
 	get_tree().paused = true
 	opened.emit()
@@ -59,11 +74,13 @@ func close() -> void:
 	get_tree().paused = false
 
 
-# Asks before running something that throws the current game away
-func ask(action: Callable, text: String = "Abandon this game?") -> void:
+# Asks before running something that throws the current game away, or from
+# the slot list, before overwriting a save
+func ask(action: Callable, text: String = "Abandon this game?", from: Control = main) -> void:
 	pending = action
+	back = from
 	question.text = text
-	main.visible = false
+	from.visible = false
 	confirm.visible = true
 
 
@@ -95,6 +112,38 @@ func _show_overlay(scene: PackedScene) -> void:
 	add_child(overlay)
 
 
+# Lists the slots, each with what's in it now
+func _on_save_game_pressed() -> void:
+	var slots := $Panel/Saves/Slots
+	for button in slots.get_children():
+		button.free()
+	for slot in SaveGame.SLOTS:
+		var button := Button.new()
+		button.text = SaveGame.describe(slot)
+		button.pressed.connect(_on_slot_pressed.bind(slot))
+		slots.add_child(button)
+	main.visible = false
+	saves.visible = true
+
+
+func _on_slot_pressed(slot: String) -> void:
+	if SaveGame.read(slot).is_empty():
+		_save(slot)
+	else:
+		ask(_save.bind(slot), "Overwrite %s?" % SaveGame.NAMES[slot], saves)
+
+
+func _save(slot: String) -> void:
+	save_requested.emit(slot)
+	heading.text = "Saved to " + SaveGame.NAMES[slot]
+	_on_saves_back_pressed()
+
+
+func _on_saves_back_pressed() -> void:
+	saves.visible = false
+	main.visible = true
+
+
 func _on_concede_pressed() -> void:
 	ask(func() -> void: concede_requested.emit(), "Concede the game?")
 
@@ -108,11 +157,14 @@ func _on_quit_pressed() -> void:
 
 
 func _on_yes_pressed() -> void:
-	# The pause would otherwise carry over into the next scene
-	get_tree().paused = false
+	if back == saves:
+		_on_no_pressed()
+	else:
+		# The pause would otherwise carry over into the next scene
+		get_tree().paused = false
 	pending.call()
 
 
 func _on_no_pressed() -> void:
-	main.visible = true
+	back.visible = true
 	confirm.visible = false
