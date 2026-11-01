@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://gui/pause_menu.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://turn_replay.tscn" id="6"]
 [ext_resource type="AudioStream" path="res://audio/title_music.ogg" id="7"]
+[ext_resource type="Script" path="res://gui/menu_button.gd" id="8"]
 
 [node name="Root" type="Node2D"]
 script = ExtResource("4")
@@ -16,6 +17,14 @@ offset_left = 10.0
 offset_top = 705.0
 offset_right = 1270.0
 offset_bottom = 793.0
+
+[node name="Menu" type="Button" parent="."]
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 32.0
+offset_bottom = 28.0
+tooltip_text = "Menu (Esc)"
+script = ExtResource("8")
 
 [node name="TileHistory" parent="." instance=ExtResource("2")]
 visible = false
@@ -34,6 +43,7 @@ bus = &"Music"
 
 [node name="PauseMenu" parent="." instance=ExtResource("5")]
 
+[connection signal="pressed" from="Menu" to="PauseMenu" method="open"]
 [connection signal="replay_requested" from="PauseMenu" to="." method="_on_pause_menu_replay_requested"]
 [connection signal="concede_requested" from="PauseMenu" to="." method="_on_pause_menu_concede_requested"]
 [connection signal="opened" from="PauseMenu" to="." method="_on_pause_menu_opened"]

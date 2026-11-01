@@ -322,15 +322,3 @@ offset_bottom = 51.0
 size_flags_horizontal = 4
 size_flags_vertical = 6
 columns = 3
-
-[node name="VSeparator4" type="VSeparator" parent="GUIGrid"]
-layout_mode = 2
-theme_override_styles/separator = SubResource("2")
-
-[node name="Menu" type="Button" parent="GUIGrid"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("1")
-theme_override_font_sizes/font_size = 10
-tooltip_text = "Menu (Esc)"
-text = "Menu"

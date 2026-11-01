@@ -114,7 +114,7 @@ func test_hud_menu_button_opens_the_pause_menu() -> void:
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
 	var pressed: Array[String] = []
 	game.gui.action_pressed.connect(func(action: String) -> void: pressed.append(action))
-	game.gui.get_node("GUIGrid/Menu").pressed.emit()
+	game.get_node("Menu").pressed.emit()
 	assert_true(game.pause_menu.visible)
 	assert_eq(pressed, [] as Array[String], "not sent to the player as an action")
 	game.pause_menu.close()
