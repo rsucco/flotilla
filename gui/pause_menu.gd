@@ -103,7 +103,7 @@ func _on_title_pressed() -> void:
 
 
 func _on_quit_pressed() -> void:
-	ask(get_tree().quit)
+	ask(Sfx.quit.bind(get_tree()))
 
 
 func _on_yes_pressed() -> void:
