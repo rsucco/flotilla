@@ -1,6 +1,7 @@
 extends GutTest
-# Player.can_perform() and perform(): the moves every kind of player makes,
-# whether from input, an AI or the network
+# Where ships may start (Ship.can_place()) and the moves they make
+# (Player.can_perform() and perform()): the same for every kind of player,
+# whether its choices come from input, an AI or the network
 
 const ROOT_SCENE := preload("res://root.tscn")
 
@@ -30,6 +31,34 @@ func spawn(player: Player, type: String, hex: Vector2i) -> Ship:
 	player.ships.append(ship)
 	ship.new_turn()
 	return ship
+
+
+func unplaced(player: Player, type: String) -> Ship:
+	var ship: Ship = add_child_autofree(load("res://ships/" + type + ".tscn").instantiate())
+	ship.player = player
+	ship.grid = game.grid
+	return ship
+
+
+func test_placed_on_our_own_water_clear_of_our_ships() -> void:
+	var destroyer := unplaced(p0, "destroyer")
+	assert_true(destroyer.can_place(Vector2i(5, 7), 0))
+	assert_false(destroyer.can_place(Vector2i(20, 7), 0), "not on the opponent's side")
+	assert_false(destroyer.can_place(Vector2i(5, 0), 0), "not hanging off the board")
+	assert_false(destroyer.can_place(Vector2i(14, 7), 60), "not into no-man's-land")
+	game.grid.tile(Vector2i(5, 7)).island = true
+	assert_false(destroyer.can_place(Vector2i(5, 7), 0), "not on land")
+	game.grid.tile(Vector2i(5, 7)).island = false
+	spawn(p0, "corvette", Vector2i(5, 7))
+	assert_false(destroyer.can_place(Vector2i(5, 7), 0), "not on another of our ships")
+	assert_false(destroyer.can_place(Vector2i(5, 8), 0), "nor overlapping it")
+
+
+func test_batteries_go_on_land() -> void:
+	var battery := unplaced(p0, "coastal_battery")
+	assert_false(battery.can_place(Vector2i(3, 3), 0), "not on water")
+	game.grid.tile(Vector2i(3, 3)).island = true
+	assert_true(battery.can_place(Vector2i(3, 3), 0))
 
 
 func test_attacks_only_on_the_opponents_side() -> void:

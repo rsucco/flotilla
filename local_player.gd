@@ -227,21 +227,17 @@ func _update_buttons(ship: Ship) -> void:
 	)
 
 
-# `counts` is keyed by PascalCase ship type (ship selection node names)
 func place_ships(counts: Dictionary) -> void:
-	for ship_type: String in counts:
-		for _i in counts[ship_type]:
-			var ship: Ship = (
-				load("res://ships/" + ship_type.to_snake_case() + ".tscn").instantiate()
-			)
-			adopt(ship)
-			ship.place()
-			await ship.placed
-			ships.append(ship)
-	fleet_size = ships.size()
+	await super(counts)
 	# Hide ships from the next player
 	for ship in ships:
 		ship.visible = false
+
+
+# Follows the mouse until clicked into place
+func _place(ship: Ship) -> void:
+	ship.place()
+	await ship.placed
 
 
 func get_ship_selection() -> Dictionary:

@@ -78,6 +78,26 @@ func show_revealed(ship: Ship) -> void:
 
 
 # Gives up, ending the turn (and the game)
+# Builds our fleet for the start of the game. `counts` is keyed by PascalCase
+# ship type (ship selection node names).
+func place_ships(counts: Dictionary) -> void:
+	for ship_type: String in counts:
+		for _i in counts[ship_type]:
+			var ship: Ship = (
+				load("res://ships/" + ship_type.to_snake_case() + ".tscn").instantiate()
+			)
+			adopt(ship)
+			await _place(ship)
+			ships.append(ship)
+	fleet_size = ships.size()
+
+
+# Puts `ship` somewhere Ship.can_place() allows. Each kind of player decides
+# where: by input, by an AI, or from the network.
+func _place(_ship: Ship) -> void:
+	pass
+
+
 # Whether our `ship` may make a move this turn: "forward", "reverse", "port",
 # "starboard", or "fire", "special" or "secondary" at `target`. Whatever the
 # moves come from (input, an AI, the network), they're checked here.

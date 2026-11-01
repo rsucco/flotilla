@@ -77,25 +77,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseMotion:
 		var mouse_hex := grid.get_hex_from_coords(event.position)
-		var hexes := _get_hexes_at(mouse_hex, direction)
-		var any_land := false
-		var occupied := false
-		for h in hexes:
-			if h == Grid.OFF_GRID:
-				continue
-			if grid.tile(h).island:
-				any_land = true
-			if player.get_ship_at_hex(h) != null:
-				occupied = true
-		# Coastal batteries go on land instead of water
-		if ship_type == "coastal_battery":
-			any_land = not any_land
-		if (
-			not hexes.has(Grid.OFF_GRID)
-			and not any_land
-			and not occupied
-			and grid.side_of(mouse_hex) == player.player_num
-		):
+		if can_place(mouse_hex, direction):
 			set_grid_position(mouse_hex, direction)
 			visible = true
 	elif event is InputEventMouseButton and event.pressed:
@@ -108,6 +90,25 @@ func _input(event: InputEvent) -> void:
 				if hex != UNPLACED:
 					placing = false
 					placed.emit()
+
+
+# Whether we can be placed for the start of the game centred on `at`, facing
+# `dir`: on our side, all on the board, all on water (land for coastal
+# batteries), and clear of our other ships
+func can_place(at: Vector2i, dir: int) -> bool:
+	if grid.side_of(at) != player.player_num:
+		return false
+	var hexes := _get_hexes_at(at, dir)
+	if hexes.has(Grid.OFF_GRID):
+		return false
+	for h in hexes:
+		var other := player.get_ship_at_hex(h)
+		if (
+			grid.tile(h).island != (ship_type == "coastal_battery")
+			or (other != null and other != self)
+		):
+			return false
+	return true
 
 
 func set_grid_position(new_hex: Vector2i, new_direction: int) -> void:
