@@ -163,7 +163,6 @@ func new_turn() -> void:
 
 
 func place() -> void:
-	movement_audio_player.stream = move_sound
 	# Hidden until the mouse finds a valid spot, or it shows at the origin
 	visible = false
 	placing = true
@@ -266,6 +265,8 @@ func turn_by(offset: int) -> void:
 func _animate_move(property: String, target: Variant, duration: float) -> void:
 	moves_queued += 1
 	if not movement_audio_player.playing:
+		# Here rather than at placement, which loaded ships skip
+		movement_audio_player.stream = move_sound
 		movement_audio_player.play()
 	var tween := create_tween()
 	tween.tween_property(self, property, target, duration).set_trans(Tween.TRANS_SINE).set_ease(

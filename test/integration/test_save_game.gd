@@ -110,6 +110,10 @@ func test_mid_turn_save_carries_on_where_it_left_off() -> void:
 	assert_eq(now.replay, saved.replay, "the attacks so far, for the replay")
 	for player in 2:
 		assert_eq(now.players[player], saved.players[player], "Player %d's fleet" % (player + 1))
+	await driver.act("cruiser", "Forward")
+	var cruiser := driver.ship_of(0, "cruiser")
+	assert_true(cruiser.movement_audio_player.playing, "moving with its sound")
+	assert_eq(cruiser.movement_audio_player.stream, cruiser.move_sound)
 
 
 func test_hand_off_save_starts_the_next_players_turn() -> void:
