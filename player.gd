@@ -32,6 +32,7 @@ var hits := 0
 var intercepting := false
 # The cruiser that made the last intercept
 var interceptor: Ship
+var conceded := false
 
 
 func _init(num: int) -> void:
@@ -48,7 +49,7 @@ func _exit_tree() -> void:
 
 func has_moves() -> bool:
 	# Don't make any more moves if the opponent is defeated
-	if opponent.ships.is_empty():
+	if conceded or opponent.ships.is_empty():
 		return false
 	return ships.any(func(s: Ship) -> bool: return s.ap > 0)
 
@@ -72,6 +73,12 @@ func show_revealed(ship: Ship) -> void:
 		adopt(ship)
 	ship.visible = true
 	ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
+
+
+# Gives up, ending the turn (and the game)
+func concede() -> void:
+	conceded = true
+	made_move.emit()
 
 
 func finish_turn() -> void:

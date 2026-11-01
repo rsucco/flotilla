@@ -1,8 +1,11 @@
 extends PanelContainer
 
 
-func update_winner(winner: int) -> void:
+# `conceded` is the player who gave up, if one did
+func update_winner(winner: int, conceded: int = 0) -> void:
 	$VBoxContainer/Label.text = "Player " + str(winner) + " wins!"
+	if conceded != 0:
+		$VBoxContainer/Label.text += " Player " + str(conceded) + " conceded."
 
 
 # `players` is untyped: naming Player here would make Root, which preloads

@@ -56,6 +56,11 @@ text = "How to Play"
 layout_mode = 2
 text = "Settings"
 
+[node name="Concede" type="Button" parent="Panel/Main"]
+layout_mode = 2
+disabled = true
+text = "Concede"
+
 [node name="Title" type="Button" parent="Panel/Main"]
 layout_mode = 2
 text = "Title Screen"
@@ -93,6 +98,7 @@ text = "No"
 [connection signal="pressed" from="Panel/Main/Replay" to="." method="_on_replay_pressed"]
 [connection signal="pressed" from="Panel/Main/HowToPlay" to="." method="_on_how_to_play_pressed"]
 [connection signal="pressed" from="Panel/Main/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="Panel/Main/Concede" to="." method="_on_concede_pressed"]
 [connection signal="pressed" from="Panel/Main/Title" to="." method="_on_title_pressed"]
 [connection signal="pressed" from="Panel/Main/Quit" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="Panel/Confirm/Buttons/Yes" to="." method="_on_yes_pressed"]

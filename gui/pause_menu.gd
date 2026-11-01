@@ -4,6 +4,7 @@ extends CanvasLayer
 # can't see your fleet while it's open.
 
 signal replay_requested
+signal concede_requested
 
 const HOW_TO_PLAY_SCENE := preload("res://gui/how_to_play.tscn")
 const SETTINGS_SCENE := preload("res://gui/settings.tscn")
@@ -13,12 +14,21 @@ var can_replay := false:
 	set(value):
 		can_replay = value
 		replay.disabled = not value
+# Set by Root: the player (1 or 2) whose turn it is, who may concede, or 0
+# when it's not clear who's at the screen (setup, swaps and replays)
+var conceder := 0:
+	set(value):
+		conceder = value
+		concede.disabled = value == 0
+		concede.text = "Concede" if value == 0 else "Concede (Player %d)" % value
 var pending: Callable
 
 @onready var panel: Control = $Panel
 @onready var main: Control = $Panel/Main
 @onready var confirm: Control = $Panel/Confirm
 @onready var replay: Button = $Panel/Main/Replay
+@onready var concede: Button = $Panel/Main/Concede
+@onready var question: Label = $Panel/Confirm/Label
 
 
 func _ready() -> void:
@@ -49,8 +59,9 @@ func close() -> void:
 
 
 # Asks before running something that throws the current game away
-func ask(action: Callable) -> void:
+func ask(action: Callable, text: String = "Abandon this game?") -> void:
 	pending = action
+	question.text = text
 	main.visible = false
 	confirm.visible = true
 
@@ -81,6 +92,10 @@ func _show_overlay(scene: PackedScene) -> void:
 	panel.visible = false
 	overlay.tree_exited.connect(func() -> void: panel.visible = true)
 	add_child(overlay)
+
+
+func _on_concede_pressed() -> void:
+	ask(func() -> void: concede_requested.emit(), "Concede the game?")
 
 
 func _on_title_pressed() -> void:
