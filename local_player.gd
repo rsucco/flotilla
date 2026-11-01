@@ -19,7 +19,6 @@ var ships_with_moves: Array[Ship] = []
 var targeting_hex_range := -1
 var current_on_hex := Grid.OFF_GRID
 var on_hex_time := 0.0
-var animation_playing := false
 # Only the player whose move it is responds to the action buttons
 var awaiting_move := false
 # From the start of our turn (after any replay) to its end
@@ -56,18 +55,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				var ship := get_ship_at_hex(on_hex)
 				if aiming["unrep"]:
 					# UNREP targets an adjacent friendly ship instead of selecting it
-					if ship in (selected_ship as SupplyTender).adjacent_ships():
-						_special(on_hex)
+					_act("special", on_hex)
 				elif ship != null and not animation_playing:
 					_select_ship(ship)
 			elif side == 1 - player_num:
 				# If aiming a shot or ability, use it
-				if aiming["fire"]:
-					_fire(on_hex)
-				elif aiming["special"]:
-					_special(on_hex)
-				elif aiming["secondary"]:
-					_secondary(on_hex)
+				for kind in ["fire", "special", "secondary"]:
+					if aiming[kind]:
+						_act(kind, on_hex)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_select_ship(null)
 	elif event is InputEventMouseMotion:
@@ -113,15 +108,10 @@ func press(action: String) -> void:
 		"NextShip":
 			_next_ship()
 		"EndTurn":
-			_end_turn()
-		"Forward":
-			_forward()
-		"Port":
-			_port()
-		"Starboard":
-			_starboard()
-		"Reverse":
-			_reverse()
+			end_turn()
+			made_move.emit()
+		"Forward", "Reverse", "Port", "Starboard":
+			_act(action.to_lower())
 
 
 func _set_aiming(mode: String, hex_range: int) -> void:
@@ -159,59 +149,19 @@ func _set_attack_buttons_disabled(disabled: bool) -> void:
 	buttons_changed.emit(enabled)
 
 
-func _fire(hex: Vector2i) -> void:
-	if selected_ship != null and selected_ship.can_fire(hex):
-		_attack("fire", hex)
-
-
-func _special(hex: Vector2i) -> void:
-	if selected_ship != null and selected_ship.can_special():
-		_attack("special", hex)
-
-
-func _secondary(hex: Vector2i) -> void:
-	if selected_ship != null and selected_ship.can_secondary():
-		_attack("secondary", hex)
-
-
-# Plays the attack's animation, then has the opponent resolve it. Recorded
-# for the opponent's turn replay.
-func _attack(kind: String, hex: Vector2i) -> void:
-	var ship := selected_ship
-	animation_playing = true
-	_set_attack_buttons_disabled(true)
-	ship.intercepted = opponent.roll_intercept(ship, kind, hex)
-	ship.ciws_at = opponent.interceptor.global_position if ship.intercepted else Vector2.INF
-	attack_started.emit(ship, kind, hex)
-	match kind:
-		"fire":
-			await ship.fire(hex)
-		"special":
-			await ship.use_special(hex)
-		"secondary":
-			await ship.use_secondary(hex)
-	_set_attack_buttons_disabled(false)
-	attack_landed.emit()
-	var damage := opponent.damage_taken()
-	var afloat := opponent.ships.size()
-	if kind == "fire":
-		opponent.receive_fire(hex, ship)
-	else:
-		opponent.receive_special(hex, ship, kind == "secondary")
-	attack_resolved.emit()
-	var ability := ship.special if kind == "special" else ship.secondary
-	if kind == "fire" or ability.name in DAMAGING_ABILITIES:
-		attacks += 1
-		if opponent.damage_taken() > damage or opponent.ships.size() < afloat:
-			hits += 1
-	_finish_action()
-
-
-func _finish_action() -> void:
+# The selected ship makes a move, if it may
+func _act(action: String, target: Vector2i = Grid.OFF_GRID) -> void:
+	if selected_ship == null or not can_perform(selected_ship, action, target):
+		return
+	var attack := action in ["fire", "special", "secondary"]
+	if attack:
+		_set_attack_buttons_disabled(true)
+	await perform(selected_ship, action, target)
+	if attack:
+		_set_attack_buttons_disabled(false)
 	if selected_ship != null:
 		_update_buttons(selected_ship)
 		ship_shown.emit(selected_ship)
-	animation_playing = false
 	made_move.emit()
 
 
@@ -220,37 +170,6 @@ func _next_ship() -> void:
 	if selected_ship == ships_with_moves[0]:
 		ships_with_moves.push_back(ships_with_moves.pop_front())
 	_select_ship(ships_with_moves[0])
-
-
-# Ends every ship's turn
-func _end_turn() -> void:
-	for ship in ships:
-		ship.ap = 0
-	made_move.emit()
-
-
-func _forward() -> void:
-	if selected_ship != null and selected_ship.can_move():
-		selected_ship.forward()
-		_finish_action()
-
-
-func _reverse() -> void:
-	if selected_ship != null and selected_ship.can_move(true):
-		selected_ship.reverse()
-		_finish_action()
-
-
-func _port() -> void:
-	if selected_ship != null and selected_ship.can_rotate(-60):
-		selected_ship.port()
-		_finish_action()
-
-
-func _starboard() -> void:
-	if selected_ship != null and selected_ship.can_rotate(60):
-		selected_ship.starboard()
-		_finish_action()
 
 
 func get_hover_hexes(hex: Vector2i) -> Array[Vector2i]:

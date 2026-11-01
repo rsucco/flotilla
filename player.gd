@@ -33,6 +33,8 @@ var intercepting := false
 # The cruiser that made the last intercept
 var interceptor: Ship
 var conceded := false
+# From an attack's start until the opponent has resolved it
+var animation_playing := false
 
 
 func _init(num: int) -> void:
@@ -76,6 +78,88 @@ func show_revealed(ship: Ship) -> void:
 
 
 # Gives up, ending the turn (and the game)
+# Whether our `ship` may make a move this turn: "forward", "reverse", "port",
+# "starboard", or "fire", "special" or "secondary" at `target`. Whatever the
+# moves come from (input, an AI, the network), they're checked here.
+func can_perform(ship: Ship, action: String, target: Vector2i = Grid.OFF_GRID) -> bool:
+	if not ships.has(ship):
+		return false
+	var at_opponent := grid.side_of(target) == opponent.player_num
+	var legal := false
+	match action:
+		"forward":
+			legal = ship.can_move()
+		"reverse":
+			legal = ship.can_move(true)
+		"port":
+			legal = ship.can_rotate(-60)
+		"starboard":
+			legal = ship.can_rotate(60)
+		"fire":
+			legal = at_opponent and ship.can_fire(target)
+		"special":
+			# UNREP heals one of our ships next to the tender
+			if ship is SupplyTender:
+				var tender := ship as SupplyTender
+				legal = tender.can_special() and get_ship_at_hex(target) in tender.adjacent_ships()
+			else:
+				legal = at_opponent and ship.can_special()
+		"secondary":
+			legal = at_opponent and ship.can_secondary()
+	return legal
+
+
+# Makes a move that can_perform() allows. An attack plays its animation, then
+# the opponent resolves it, and returns once it has.
+func perform(ship: Ship, action: String, target: Vector2i = Grid.OFF_GRID) -> void:
+	match action:
+		"forward":
+			ship.forward()
+		"reverse":
+			ship.reverse()
+		"port":
+			ship.port()
+		"starboard":
+			ship.starboard()
+		_:
+			await _attack(ship, action, target)
+
+
+# Ends every ship's turn
+func end_turn() -> void:
+	for ship in ships:
+		ship.ap = 0
+
+
+# Recorded for the opponent's turn replay
+func _attack(ship: Ship, kind: String, hex: Vector2i) -> void:
+	animation_playing = true
+	ship.intercepted = opponent.roll_intercept(ship, kind, hex)
+	ship.ciws_at = opponent.interceptor.global_position if ship.intercepted else Vector2.INF
+	attack_started.emit(ship, kind, hex)
+	match kind:
+		"fire":
+			await ship.fire(hex)
+		"special":
+			await ship.use_special(hex)
+		"secondary":
+			await ship.use_secondary(hex)
+	attack_landed.emit()
+	var damage := opponent.damage_taken()
+	var afloat := opponent.ships.size()
+	if kind == "fire":
+		opponent.receive_fire(hex, ship)
+	else:
+		opponent.receive_special(hex, ship, kind == "secondary")
+	attack_resolved.emit()
+	var ability := ship.special if kind == "special" else ship.secondary
+	if kind == "fire" or ability.name in DAMAGING_ABILITIES:
+		attacks += 1
+		if opponent.damage_taken() > damage or opponent.ships.size() < afloat:
+			hits += 1
+	animation_playing = false
+
+
 func concede() -> void:
 	conceded = true
 	made_move.emit()
