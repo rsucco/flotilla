@@ -354,3 +354,30 @@ func test_title_music_carries_on_through_setup_then_crossfades() -> void:
 	await wait_seconds(Root.MUSIC_FADE + 0.2)
 	assert_false(title.playing, "title music faded out")
 	assert_almost_eq(battle.volume_db, -12.0, 0.01)
+
+
+# Player 2 doesn't watch Player 1 set up, nor the other way round
+func test_hand_over_before_player_2_sets_up() -> void:
+	get_node("/root/GutRunner/GutLayer").visible = false
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	driver.prepare_board()
+	var player := game.players[0]
+	var dialog := await driver.find_dialog(player, "res://gui/ship_selection.tscn")
+	dialog.set_island_tiles(game.grid.get_num_island_tiles(0))
+	driver.press(dialog.get_node("VBoxContainer/Buttons/Classic"))
+	driver.press(dialog.get_node("VBoxContainer/Buttons/OK"))
+	for _i in GameDriver.LAYOUT.size():
+		var ship := await driver.placing_ship(player)
+		await driver.click(GameDriver.spot(0, ship.ship_type))
+	var swap := await driver.find_dialog(game, "res://gui/local_turn_swap.tscn")
+	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to Player 2")
+	assert_false(swap.get_node("VBoxContainer/WatchReplay").visible, "nothing to replay")
+	assert_true(player.ships.all(func(s: Ship) -> bool: return not s.visible), "fleet hidden")
+	await wait_process_frames(2)
+	assert_null(
+		driver._dialog(game.players[1], "res://gui/ship_selection.tscn"), "not until handed over"
+	)
+	await driver.swap()
+	assert_not_null(await driver.find_dialog(game.players[1], "res://gui/ship_selection.tscn"))
+	get_node("/root/GutRunner/GutLayer").visible = true

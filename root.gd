@@ -104,6 +104,13 @@ func play_game() -> void:
 		replay = {}
 	# Ship selection and placement
 	for player in players:
+		# Hand over before Player 2 sees anything of their setup
+		if player.player_num == 1:
+			var swapper := TURN_SWAP_SCENE.instantiate()
+			add_child(swapper)
+			swapper.get_node("VBoxContainer/Label").text = "Pass to Player 2"
+			swapper.offer_replay(false, false)
+			await swapper.swap_done
 		if selections.size() <= player.player_num:
 			selections.append(await player.get_ship_selection())
 		await player.place_ships(selections[player.player_num])

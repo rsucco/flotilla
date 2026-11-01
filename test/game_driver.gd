@@ -86,6 +86,8 @@ func prepare_board() -> void:
 # Both players pick the classic fleet (one of everything) and place it
 func start_game() -> void:
 	for player in game.players:
+		if player.player_num == 1:
+			await swap()
 		var dialog: Node = await find_dialog(player, "res://gui/ship_selection.tscn")
 		if dialog == null:
 			return

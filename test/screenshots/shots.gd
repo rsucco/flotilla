@@ -60,6 +60,8 @@ func run() -> void:
 	d.prepare_board()
 
 	for player in game.players:
+		if player.player_num == 1:
+			await d.swap()
 		var dialog := await d.find_dialog(player, "res://gui/ship_selection.tscn")
 		dialog.set_island_tiles(game.grid.get_num_island_tiles(player.player_num))
 		d.press(dialog.get_node("VBoxContainer/Buttons/Classic"))
