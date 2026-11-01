@@ -186,7 +186,7 @@ func test_armor_never_blocks_a_hit_on_a_damaged_hex() -> void:
 	for i in 20:
 		p1.receive_fire(battleship.hex, attacker)
 		var event: String = game.grid.tile(battleship.hex).history[-1][1]
-		assert_eq(event, "Hit, Battleship (No effect)", "still marked as a hit")
+		assert_eq(event, "Hit, Battleship I (No effect)", "still marked as a hit")
 
 
 # Aircraft Carrier: Flight Ops, Degraded Runway and Recon Flight

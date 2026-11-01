@@ -1,8 +1,8 @@
 class_name FleetEntry
 extends HBoxContainer
 # One ship type in a fleet panel: its icon and count, the count in red if any
-# of them is damaged. Hovering it lists each ship of that type with its hit hexes;
-# so does tapping it, for touch screens, which have no hover.
+# of them is damaged. Hovering it lists each ship of that type by name, with
+# its hit hexes; so does tapping it, for touch screens, which have no hover.
 
 const HIT_COLOR := Color(1.0, 0.25, 0.25)
 
@@ -54,6 +54,9 @@ func _make_custom_tooltip(for_text: String) -> Object:
 		rect.texture = icon
 		rect.draw.connect(_draw_hits.bind(rect, ship))
 		row.add_child(rect)
+		var called := Label.new()
+		called.text = ship.title
+		row.add_child(called)
 		if ship is CoastalBattery and show_damage:
 			var hp := Label.new()
 			hp.text = str((ship as CoastalBattery).hp) + "/5 HP"

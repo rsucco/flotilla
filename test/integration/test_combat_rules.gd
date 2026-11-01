@@ -98,7 +98,7 @@ func test_destroyed_battery_logged_as_destroyed() -> void:
 	battery.hp = 1
 	battery.hit(battery.hex, battery)
 	var tile := game.grid.tile(battery.hex)
-	assert_eq(tile.history[-1][1], "Destroyed, Coastal Battery")
+	assert_eq(tile.history[-1][1], "Destroyed, Coastal Battery I")
 	assert_eq(tile.get_last_event()[1], "Sunk", "marked like a sinking")
 
 
@@ -168,7 +168,7 @@ func test_battery_reveals_itself_when_firing() -> void:
 	battery.fire_remaining = 1
 	battery.fire(Vector2i(22, 7))
 	assert_eq(p1.temp_revealed_ships.size(), 1)
-	assert_eq(game.grid.tile(Vector2i(5, 7)).history[-1][1], "Coastal Battery revealed by firing")
+	assert_eq(game.grid.tile(Vector2i(5, 7)).history[-1][1], "Coastal Battery I revealed by firing")
 	p1.finish_turn()
 	# Its revealed copy is freed at the end of the frame
 	await wait_process_frames(1)

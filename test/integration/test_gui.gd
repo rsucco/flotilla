@@ -305,9 +305,10 @@ func test_fleet_panels_show_hits() -> void:
 	await driver.act("battleship", "Fire", target.hex)
 	var entry := fleet_entry(game, "OpponentFleet", "Destroyer")
 	assert_true(marked(game, "OpponentFleet", "Destroyer"), "marked once hit")
-	# The hover list: a title, then each destroyer with its hit hexes
+	# The hover list: a title, then each destroyer by name with its hit hexes
 	var list: VBoxContainer = autofree(entry._make_custom_tooltip(entry.tooltip_text))
 	assert_eq(list.get_child_count(), 2)
+	assert_eq((list.get_child(1).get_child(1) as Label).text, "Destroyer I", "named")
 	assert_eq(entry._hits(target), [false, true, false] as Array[bool], "center hex hit")
 	# Tapping shows the same list, for touch screens
 	var tap := InputEventMouseButton.new()

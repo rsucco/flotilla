@@ -65,7 +65,7 @@ func test_a_miss_clears_a_hex_until_ships_could_have_moved() -> void:
 
 func test_a_sighting_draws_the_ship_to_it() -> void:
 	spawn(p0, "destroyer", Vector2i(5, 5))
-	grid.log_event(Vector2i(5, 5), "Destroyer revealed by Recon Flight")
+	grid.log_event(Vector2i(5, 5), "Destroyer I revealed by Recon Flight")
 	var heat := map().heat
 	var hottest: Vector2i = heat.keys().reduce(
 		func(a: Vector2i, b: Vector2i) -> Vector2i: return a if heat[a] >= heat[b] else b
@@ -74,10 +74,20 @@ func test_a_sighting_draws_the_ship_to_it() -> void:
 	assert_gt(heat[Vector2i(5, 5)], 0.5)
 
 
+func test_a_named_sighting_pins_down_that_ship_alone() -> void:
+	spawn(p0, "destroyer", Vector2i(2, 2))
+	var second := spawn(p0, "destroyer", Vector2i(5, 5))
+	second.title = "HMS Exeter"
+	grid.log_event(Vector2i(5, 5), "HMS Exeter (Destroyer) revealed by Recon Flight")
+	var heat := map().heat
+	assert_almost_eq(heat[Vector2i(5, 5)], 1.0, 0.05, "Exeter is there")
+	assert_gt(heat[Vector2i(12, 12)], 0.0, "the other destroyer could be anywhere")
+
+
 func test_a_crippled_ship_is_still_where_it_was_hit() -> void:
 	spawn(p0, "corvette", Vector2i(5, 5))
-	grid.log_event(Vector2i(5, 5), "Hit, Corvette")
-	grid.log_event(Vector2i(5, 6), "Hit, Corvette (Immobilized)")
+	grid.log_event(Vector2i(5, 5), "Hit, Corvette I")
+	grid.log_event(Vector2i(5, 6), "Hit, Corvette I (Immobilized)")
 	grid.turn += 3
 	assert_gt(map().heat[Vector2i(5, 5)], 0.5, "over half damaged, so it can't move")
 
@@ -100,7 +110,7 @@ func test_the_ai_fires_where_a_ship_was_just_seen() -> void:
 	play_the_ai()
 	spawn(p0, "carrier", Vector2i(7, 7))
 	var gunner := spawn(p1, "corvette", Vector2i(20, 7))
-	grid.log_event(Vector2i(7, 7), "Aircraft Carrier revealed by Recon Flight")
+	grid.log_event(Vector2i(7, 7), "Aircraft Carrier I revealed by Recon Flight")
 	var move: Array = (p1 as AIPlayer)._best_attack()
 	assert_eq(move.slice(0, 2), [gunner, "fire"])
 	assert_lte(Grid.distance(move[2], Vector2i(7, 7)), 2, "at the carrier")
@@ -133,7 +143,7 @@ func test_ships_move_off_where_they_were_seen() -> void:
 	ai.opponent = p0
 	add_child_autofree(ai)
 	var ship := spawn(ai, "destroyer", Vector2i(20, 7))
-	grid.log_event(Vector2i(20, 7), "Hit, Destroyer")
+	grid.log_event(Vector2i(20, 7), "Hit, Destroyer I")
 	assert_false(ai._best_move().is_empty(), "moves the ship that was hit")
 	var quiet := spawn(ai, "cruiser", Vector2i(26, 3))
 	ai.ships.erase(ship)

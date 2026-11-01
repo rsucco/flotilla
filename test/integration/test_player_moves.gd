@@ -54,6 +54,20 @@ func test_placed_on_our_own_water_clear_of_our_ships() -> void:
 	assert_false(destroyer.can_place(Vector2i(5, 8), 0), "nor overlapping it")
 
 
+func test_ships_named_in_turn_and_logged_by_name() -> void:
+	var first := spawn(p0, "cruiser", Vector2i(3, 3))
+	var second := spawn(p0, "cruiser", Vector2i(8, 8))
+	assert_eq([first.title, second.title], ["Cruiser I", "Cruiser II"])
+	second.hit(second.hex, null)
+	assert_eq(game.grid.tile(second.hex).history[-1][1], "Hit, Cruiser II")
+	first.title = "HMS Exeter"
+	first.hit(first.hex, null)
+	first.hit(first.hex, null)
+	var history := game.grid.tile(first.hex).history
+	assert_eq(history[-2][1], "Hit, HMS Exeter (Cruiser)", "a real name gets its type")
+	assert_eq(history[-1][1], "Hit, HMS Exeter (Cruiser, No effect)")
+
+
 func test_batteries_go_on_land() -> void:
 	var battery := unplaced(p0, "coastal_battery")
 	assert_false(battery.can_place(Vector2i(3, 3), 0), "not on water")

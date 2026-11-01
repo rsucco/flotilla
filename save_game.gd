@@ -5,8 +5,8 @@ class_name SaveGame
 # Root decides what goes in a save; this turns ships to and from plain data.
 
 # Bumped when a save's contents change, so older saves read as empty rather
-# than half-load (2: the turn replay, held ships and the mode)
-const VERSION := 2
+# than half-load (2: the turn replay, held ships and the mode; 3: ship names)
+const VERSION := 3
 const AUTOSAVE := "autosave"
 const SLOTS: Array[String] = ["slot1", "slot2", "slot3"]
 # Shown to players
@@ -98,6 +98,7 @@ static func describe(slot: String) -> String:
 static func ship_state(ship: Ship) -> Dictionary:
 	var state := {
 		"scene": ship.scene_file_path,
+		"title": ship.title,
 		"hex": ship.hex,
 		"direction": ship.direction,
 		"hit_hexes": ship.hit_hexes.duplicate(),
@@ -128,6 +129,7 @@ static func ship_state(ship: Ship) -> Dictionary:
 # Makes a ship from `state` for `player`, which adopts it
 static func restore_ship(state: Dictionary, player: Player) -> Ship:
 	var ship: Ship = load(state.scene).instantiate()
+	ship.title = state.title
 	player.adopt(ship)
 	ship.set_grid_position(state.hex, state.direction)
 	ship.hit_hexes.assign(state.hit_hexes)

@@ -32,6 +32,8 @@ var len_fore: int
 var len_aft: int
 var ship_type := ""
 var ship_name := ""
+# This ship's own name, given by Player.adopt()
+var title := ""
 var weapon := ""
 var hit_hexes: Array[bool] = []
 # By the index of the hex it burns on
@@ -193,17 +195,29 @@ func spawn(effect: Node2D) -> void:
 	effects.add_child(effect)
 
 
+# How tile history names us: "Exeter (Destroyer)", with any `note` alongside
+# the type
+func called(note := "") -> String:
+	var about := PackedStringArray()
+	# Batteries are named for what they are
+	if not title.begins_with(ship_name):
+		about.append(ship_name)
+	if not note.is_empty():
+		about.append(note)
+	return title if about.is_empty() else title + " (" + ", ".join(about) + ")"
+
+
 func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 	var index := get_occupied_hexes().find(hit_hex)
 	# Don't count hits on already hit hexes (maybe rework this if it's unfun)
 	if hit_hexes[index]:
-		grid.log_event(hit_hex, "Hit, " + ship_name + " (No effect)")
+		grid.log_event(hit_hex, "Hit, " + called("No effect"))
 		return
 	hit_hexes[index] = true
 	if is_immobilized():
-		grid.log_event(hit_hex, "Hit, " + ship_name + " (Immobilized)")
+		grid.log_event(hit_hex, "Hit, " + called("Immobilized"))
 	else:
-		grid.log_event(hit_hex, "Hit, " + ship_name)
+		grid.log_event(hit_hex, "Hit, " + called())
 	_add_smoke(index)
 	if not hit_hexes.has(false):
 		sink()
@@ -246,7 +260,7 @@ func sink() -> void:
 	if is_instance_valid(revealed_buddy):
 		revealed_buddy.queue_free()
 	for h in get_occupied_hexes():
-		grid.log_event(h, sunk_event + ", " + ship_name)
+		grid.log_event(h, sunk_event + ", " + called())
 	sank.emit()
 	await sink_effect()
 	if not held:
@@ -257,6 +271,7 @@ func sink() -> void:
 # cloaked, even if we are
 func copy_as_seen() -> Ship:
 	var copy: Ship = duplicate()
+	copy.title = title
 	copy.self_modulate = Color.WHITE
 	for child in _cloaked_children:
 		# Children added at runtime (smoke, say) aren't duplicated

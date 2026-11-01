@@ -35,11 +35,14 @@ var _turn: int
 # Hex -> what's left of the evidence that it's empty (0 = just missed)
 var _empty := {}
 var _no_sub := {}
-# [ship name ("" if unknown), hex, turns ago], newest first once read
+# [who, hex, turns ago], newest first once read. Who is the ship's own name
+# (title) when the history names it, else its type (ship_name), or "" if unknown.
 var _sightings: Array[Array] = []
-# Ship name -> hexes hit, to tell which can no longer move
+# Ship title -> hexes hit, to tell which can no longer move
 var _hits := {}
-# Ship name -> how many of them are afloat
+# Ship title -> type, for the opponent's ships afloat
+var _types := {}
+# Ship type -> how many of them are afloat
 var _alike := {}
 
 
@@ -49,6 +52,9 @@ func _init(grid: Grid, side: int, ships: Array[Ship], copies: Array[Ship], turn:
 	_grid = grid
 	_side = side
 	_turn = turn
+	for ship in ships:
+		_types[ship.title] = ship.ship_name
+		_alike[ship.ship_name] = _alike.get(ship.ship_name, 0) + 1
 	for x: int in grid.columns_of(side):
 		for y in Grid.ROWS:
 			heat[Vector2i(x, y)] = 0.0
@@ -63,8 +69,6 @@ func _init(grid: Grid, side: int, ships: Array[Ship], copies: Array[Ship], turn:
 			var ship_name: String = named[0].ship_name if not named.is_empty() else ""
 			_sightings.append([ship_name, grid.get_hex_from_coords(copy.position), 0])
 	_sightings.sort_custom(func(a: Array, b: Array) -> bool: return a[2] < b[2])
-	for ship in ships:
-		_alike[ship.ship_name] = _alike.get(ship.ship_name, 0) + 1
 	for ship in ships:
 		_add(ship)
 
@@ -84,22 +88,23 @@ func _read_history(hex: Vector2i) -> void:
 		elif text in ["Submarine used Sonar Pulse", "Miss (Silent Service)"]:
 			_sightings.append(["Submarine", hex, age])
 		elif text.begins_with("Hit, "):
-			var ship_name := text.trim_prefix("Hit, ").get_slice(" (", 0)
-			_sightings.append([ship_name, hex, age])
-			if not _hits.has(ship_name):
-				_hits[ship_name] = []
-			if not _hits[ship_name].has(hex):
-				_hits[ship_name].append(hex)
+			var title := text.trim_prefix("Hit, ").get_slice(" (", 0)
+			_sightings.append([title, hex, age])
+			if not _hits.has(title):
+				_hits[title] = []
+			if not _hits[title].has(hex):
+				_hits[title].append(hex)
 			# Batteries have HP, so take hit after hit on the same hex
-			if age == 0 and ship_name != "Coastal Battery":
+			if age == 0 and _types.get(title) != "Coastal Battery":
 				fresh_hits.append(hex)
 		elif text.contains(" revealed by "):
-			_sightings.append([text.get_slice(" revealed by ", 0), hex, age])
+			var title := text.get_slice(" revealed by ", 0).get_slice(" (", 0)
+			_sightings.append([title, hex, age])
 		elif text.begins_with("Sunk, ") or text.begins_with("Destroyed, "):
 			# Gone: the hexes are open water again
 			_empty[hex] = _faded(age)
 			fresh_hits.erase(hex)
-			_hits.erase(text.get_slice(", ", 1))
+			_hits.erase(text.substr(text.find(", ") + 2).get_slice(" (", 0))
 
 
 # 0 when it's this turn's news, rising towards 1 as it goes stale
@@ -112,7 +117,7 @@ func _faded(age: int) -> float:
 func _add(ship: Ship, sightings: bool = true) -> void:
 	var size := ship.len_aft + ship.len_fore + 1
 	# Batteries never move, nor do ships over half damaged
-	var fixed: bool = ship is CoastalBattery or _hits.get(ship.ship_name, []).size() * 2 > size
+	var fixed: bool = ship is CoastalBattery or _hits.get(ship.title, []).size() * 2 > size
 	var placements: Array[Array] = []
 	var weights: Array[float] = []
 	var total := 0.0
@@ -168,20 +173,24 @@ func _weigh(hexes: Array[Vector2i], ship: Ship, fixed: bool, sightings: bool) ->
 			weight *= _no_sub.get(hex, 1.0)
 	if not sightings:
 		return weight
-	# Its latest sighting, and any of ships unknown
+	# Its latest sighting, and any of ships unknown or maybe it
 	var seen := false
 	for sighting in _sightings:
-		var named: bool = sighting[0] == ship.ship_name
-		if (named and seen) or (not named and sighting[0] != ""):
+		var named: bool = (
+			sighting[0] == ship.title
+			or (sighting[0] == ship.ship_name and _alike[ship.ship_name] == 1)
+		)
+		var maybe: bool = sighting[0] == "" or sighting[0] == ship.ship_name
+		if seen or not (named or maybe):
 			continue
-		seen = seen or named
+		seen = named
 		var age: int = 0 if fixed else sighting[2]
 		var within := false
 		for hex in hexes:
 			if Grid.distance(hex, sighting[1]) <= ship.default_ap * age:
 				within = true
 				break
-		if named and _alike[ship.ship_name] == 1:
+		if named:
 			if not within:
 				return 0.0
 		elif within:

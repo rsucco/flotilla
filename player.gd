@@ -14,6 +14,8 @@ signal mine_blast(hex: Vector2i)
 
 # Abilities that can damage ships, which count toward the hit rate
 const DAMAGING_ABILITIES: Array[String] = ["Salvo", "Nuclear Strike", "ASW Strike"]
+# Ships without a name of their own are numbered by type (up to five of each)
+const NUMERALS: Array[String] = ["I", "II", "III", "IV", "V"]
 
 var player_num: int
 var ships: Array[Ship] = []
@@ -230,6 +232,9 @@ func adopt(ship: Ship) -> void:
 	ship.sank.connect(_on_ship_sank.bind(ship))
 	ship.mine_hit.connect(mine_blast.emit)
 	add_child(ship)
+	if ship.title.is_empty():
+		var alike := ships.filter(func(s: Ship) -> bool: return s.ship_name == ship.ship_name)
+		ship.title = ship.ship_name + " " + NUMERALS[alike.size()]
 
 
 func _on_ship_sank(ship: Ship) -> void:
@@ -396,4 +401,4 @@ func reveal(ship: Ship, event: String) -> void:
 	ship.visible = true
 	ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
 	for h in ship.get_occupied_hexes():
-		grid.log_event(h, ship.ship_name + event)
+		grid.log_event(h, ship.called() + event)
