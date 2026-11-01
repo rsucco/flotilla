@@ -281,10 +281,6 @@ func _draw() -> void:
 			points.append(points[0])
 			draw_polyline(points, Color.BLACK)
 
-			# Hit/miss markers on the opponent's grid, fading out over turns
-			if grid.side_of(hex) == 1 - player_up:
-				draw_markers(hex, tile)
-
 			draw_string(
 				FONT,
 				grid.get_hex_center(hex) + Vector2(-grid.hex_size / 2, grid.hex_size / 12),
@@ -294,6 +290,11 @@ func _draw() -> void:
 				FONT_SIZE,
 				Color.BLACK
 			)
+
+			# Hit/miss markers on the opponent's grid, fading out over turns. Over
+			# the label, which a miss's ring goes around.
+			if grid.side_of(hex) == 1 - player_up:
+				draw_markers(hex, tile)
 
 
 func hex_color(
@@ -323,11 +324,19 @@ func draw_markers(hex: Vector2i, tile: Tile) -> void:
 	if not last_event.is_empty():
 		var alpha := maxf(1.0 - (current_turn - last_event[0]) / 10.0, 0.0)
 		var event: String = last_event[1]
+		# Shapes as well as colours, for colour-blind players: an outlined red dot
+		# with a cross for a hit, a ring around the label for a miss, an outlined
+		# black dot when sunk
 		if event == "Hit":
+			draw_circle(center, 11, Color(0.0, 0.0, 0.0, alpha))
 			draw_circle(center, 10, Color(1.0, 0.0, 0.0, alpha))
+			var cross := Color(1.0, 1.0, 1.0, alpha)
+			draw_line(center + Vector2(-5, -5), center + Vector2(5, 5), cross, 2.5, true)
+			draw_line(center + Vector2(-5, 5), center + Vector2(5, -5), cross, 2.5, true)
 		elif event in ["Miss", "Miss (ASW Strike)", "Miss (Nuclear Strike)", "Miss (Salvo)"]:
-			draw_circle(center, 10, Color(1.0, 1.0, 1.0, alpha))
+			draw_circle(center, 14, Color(1.0, 1.0, 1.0, alpha), false, 3.0, true)
 		elif event == "Sunk":
+			draw_circle(center, 12, Color(1.0, 1.0, 1.0, alpha))
 			draw_circle(center, 10, Color(0.0, 0.0, 0.0, alpha))
 		elif event.begins_with("Miss ("):
 			# Mixed marker when a potential hit was blocked by an ability
