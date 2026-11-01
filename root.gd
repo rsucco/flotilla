@@ -347,7 +347,7 @@ func _update_fleets() -> void:
 func _on_pause_menu_opened() -> void:
 	var player := players[player_up]
 	var mid_turn := player.active and not player.animation_playing
-	pause_menu.conceder = player_up + 1 if mid_turn else 0
+	pause_menu.can_concede = mid_turn
 	pause_menu.can_save = mid_turn
 
 

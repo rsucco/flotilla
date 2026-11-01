@@ -16,12 +16,11 @@ var can_replay := false:
 	set(value):
 		can_replay = value
 		replay.disabled = not value
-# Set by Root as the menu opens: the player (1 or 2) who may concede, or 0
-var conceder := 0:
+# Set by Root as the menu opens: only mid-turn, when it's clear who's conceding
+var can_concede := false:
 	set(value):
-		conceder = value
-		concede.disabled = value == 0
-		concede.text = "Concede" if value == 0 else "Concede (Player %d)" % value
+		can_concede = value
+		concede.disabled = not value
 # Set by Root as the menu opens: only mid-turn, with nothing in flight
 var can_save := false:
 	set(value):
