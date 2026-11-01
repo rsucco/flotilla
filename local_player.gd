@@ -21,12 +21,8 @@ var current_on_hex := Grid.OFF_GRID
 var on_hex_time := 0.0
 # Only the player whose move it is responds to the action buttons
 var awaiting_move := false
-# From the start of our turn (after any replay) to its end
-var active := false
 # Set by Root
 var tile_history: TileHistory
-# Whether to watch the opponent's turn replay at the next swap
-var watch_replay := true
 var pips: APPips
 
 
@@ -109,7 +105,7 @@ func press(action: String) -> void:
 			_next_ship()
 		"EndTurn":
 			end_turn()
-			made_move.emit()
+			_made_move()
 		"Forward", "Reverse", "Port", "Starboard":
 			_act(action.to_lower())
 
@@ -162,6 +158,12 @@ func _act(action: String, target: Vector2i = Grid.OFF_GRID) -> void:
 	if selected_ship != null:
 		_update_buttons(selected_ship)
 		ship_shown.emit(selected_ship)
+	_made_move()
+
+
+# Ignores the buttons until Root asks for our next move
+func _made_move() -> void:
+	awaiting_move = false
 	made_move.emit()
 
 
@@ -305,7 +307,3 @@ func get_move() -> void:
 		ship.modulate = Color.WHITE if ship.ap > 0 else DONE_TINT
 	_select_ship(ships_with_moves[0])
 	awaiting_move = true
-
-
-func disconnect_buttons() -> void:
-	awaiting_move = false

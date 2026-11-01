@@ -226,7 +226,7 @@ func save(fleets: Array[Array], copies: Array[Array]) -> Array[Dictionary]:
 
 
 # Puts back the attacks save() made `saved` from
-func restore(saved: Array, players: Array[LocalPlayer], fleets: Array[Array]) -> void:
+func restore(saved: Array, players: Array[Player], fleets: Array[Array]) -> void:
 	for data: Dictionary in saved:
 		var action := Action.new()
 		action.player = players[data.player]

@@ -35,6 +35,10 @@ var interceptor: Ship
 var conceded := false
 # From an attack's start until the opponent has resolved it
 var animation_playing := false
+# From the start of our turn (after any replay) to its end
+var active := false
+# Whether to watch the opponent's turn replay at the next swap
+var watch_replay := true
 
 
 func _init(num: int) -> void:
@@ -78,6 +82,11 @@ func show_revealed(ship: Ship) -> void:
 
 
 # Gives up, ending the turn (and the game)
+# The ships we bring, by PascalCase ship type -> count
+func get_ship_selection() -> Dictionary:
+	return {}
+
+
 # Builds our fleet for the start of the game. `counts` is keyed by PascalCase
 # ship type (ship selection node names).
 func place_ships(counts: Dictionary) -> void:
@@ -178,6 +187,16 @@ func _attack(ship: Ship, kind: String, hex: Vector2i) -> void:
 		if opponent.damage_taken() > damage or opponent.ships.size() < afloat:
 			hits += 1
 	animation_playing = false
+
+
+# Carries on with a turn from a saved game, with the AP it was saved with
+func resume_turn() -> void:
+	pass
+
+
+# Starts choosing our next move, emitting made_move once it's been made
+func get_move() -> void:
+	pass
 
 
 func concede() -> void:

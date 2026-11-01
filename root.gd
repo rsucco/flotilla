@@ -18,7 +18,7 @@ static var title_music_at := 0.0
 static var loaded := {}
 
 var grid: Grid
-var players: Array[LocalPlayer] = []
+var players: Array[Player] = []
 var player_up := 0
 # Projectiles and other effects, drawn above the ships
 var effects: Node2D
@@ -50,17 +50,19 @@ func _ready() -> void:
 	players[1].opponent = players[0]
 	for player in players:
 		player.effects = effects
-		player.tile_history = $TileHistory
 		add_child(player)
-		player.ship_shown.connect(gui.update_ship_info)
-		player.buttons_changed.connect(gui.set_buttons)
+		if player is LocalPlayer:
+			var local := player as LocalPlayer
+			local.tile_history = $TileHistory
+			local.ship_shown.connect(gui.update_ship_info)
+			local.buttons_changed.connect(gui.set_buttons)
 		player.fleet_changed.connect(_update_fleets)
 		player.attack_started.connect(turn_replay.begin)
 		player.attack_landed.connect(turn_replay.land)
 		player.attack_resolved.connect(turn_replay.end)
 		player.mine_blast.connect(turn_replay.mine_blast.bind(player))
 	turn_replay.sinking_shown.connect(_update_fleets)
-	gui.action_pressed.connect(func(action: String) -> void: players[player_up].press(action))
+	gui.action_pressed.connect(_on_gui_action_pressed)
 	add_child(effects)
 	turn_replay.effects = effects
 	hover_label = Node2D.new()
@@ -106,8 +108,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if not key.pressed or key.echo:
 		return
-	if key.physical_keycode == KEY_C and players[player_up].active:
-		players[player_up].ready_abilities()
+	var up := players[player_up]
+	if key.physical_keycode == KEY_C and up is LocalPlayer and up.active:
+		(up as LocalPlayer).ready_abilities()
 	elif key.physical_keycode == KEY_V:
 		reveal_all = not reveal_all
 		if not reveal_all:
@@ -194,8 +197,6 @@ func play_game() -> void:
 			await players[player_up].made_move
 			# For hits and repairs, which don't change the fleet
 			_update_fleets()
-			# Make sure only the active player receives button signals
-			players[player_up].disconnect_buttons()
 		players[player_up].finish_turn()
 		if players[player_up].conceded:
 			break
@@ -368,6 +369,12 @@ func _on_pause_menu_opened() -> void:
 	var mid_turn := player.active and not player.animation_playing
 	pause_menu.can_concede = mid_turn
 	pause_menu.can_save = mid_turn
+
+
+func _on_gui_action_pressed(action: String) -> void:
+	var player := players[player_up]
+	if player is LocalPlayer:
+		(player as LocalPlayer).press(action)
 
 
 func _on_pause_menu_save_requested(slot: String) -> void:
