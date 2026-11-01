@@ -26,6 +26,8 @@ var effects: Node2D
 var hover_label: Node2D
 var current_turn := 0
 var swapping := false
+# The ship selection dialog is up
+var choosing := false
 # The board and fleets this game started with, once both players have chosen
 var setup := {}
 # Tells this game's saves from others', to mark them finished when it ends.
@@ -81,7 +83,7 @@ func _input(_event: InputEvent) -> void:
 
 # What the tag over `hex` says, if it's shown at all
 func hover_text(hex: Vector2i) -> String:
-	if hex == Grid.OFF_GRID or swapping:
+	if hex == Grid.OFF_GRID or swapping or choosing:
 		return ""
 	return ROW_LABELS[hex.y] + str(hex.x)
 
@@ -230,7 +232,9 @@ func _set_up() -> void:
 			swapper.offer_replay(false, false)
 			await swapper.swap_done
 		if selections.size() <= player.player_num:
+			choosing = true
 			selections.append(await player.get_ship_selection())
+			choosing = false
 		await player.place_ships(selections[player.player_num])
 	setup = {"islands": grid.get_islands(), "selections": selections}
 	# Random, and unaffected by seed()

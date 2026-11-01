@@ -385,6 +385,12 @@ func test_hand_over_before_player_2_sets_up() -> void:
 
 func test_hovered_coordinate_tagged_over_markers_and_ships() -> void:
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var driver := GameDriver.new(game)
+	var dialog := await driver.find_dialog(game.players[0], "res://gui/ship_selection.tscn")
+	assert_eq(game.hover_text(Vector2i(17, 2)), "", "not while choosing ships")
+	driver.press(dialog.get_node("VBoxContainer/Buttons/Classic"))
+	driver.press(dialog.get_node("VBoxContainer/Buttons/OK"))
+	await driver.placing_ship(game.players[0])
 	assert_eq(game.hover_text(Vector2i(17, 2)), "C17")
 	assert_eq(game.hover_text(Grid.OFF_GRID), "", "not off the board")
 	game.swapping = true
