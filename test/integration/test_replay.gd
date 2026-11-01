@@ -34,12 +34,13 @@ func test_records_attacks_but_not_moves() -> void:
 	assert_eq(game.turn_replay.actions.size(), 1)
 	var action: TurnReplay.Action = game.turn_replay.actions[0]
 	assert_eq(action.hit_ships, [driver.ship_of(1, "destroyer")] as Array[Ship])
-	assert_eq(action.smoke.size(), 1)
+	assert_eq(action.damage.size(), 1)
+	assert_eq(action.smoke().size(), 1)
 
 
 func test_damage_appears_as_the_replay_lands() -> void:
 	await driver.act("battleship", "Fire", GameDriver.spot(1, "destroyer"))
-	var smoke: CPUParticles2D = game.turn_replay.actions[0].smoke[0]
+	var smoke: CPUParticles2D = game.turn_replay.actions[0].smoke()[0]
 	await driver.end_turn()
 	await driver.swap(true)
 	await wait_process_frames(1)
@@ -67,7 +68,7 @@ func test_sunk_ships_kept_until_replayed() -> void:
 
 func test_skip_jumps_to_the_end_result() -> void:
 	await driver.act("battleship", "Special", GameDriver.spot(1, "cruiser"))
-	var smoke: Array[CPUParticles2D] = game.turn_replay.actions[0].smoke
+	var smoke: Array[CPUParticles2D] = game.turn_replay.actions[0].smoke()
 	await driver.end_turn()
 	await driver.swap(true)
 	# Skip once the replayed shells are in the air

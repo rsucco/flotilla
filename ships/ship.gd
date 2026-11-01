@@ -34,7 +34,8 @@ var ship_type := ""
 var ship_name := ""
 var weapon := ""
 var hit_hexes: Array[bool] = []
-var smoke_nodes: Array[CPUParticles2D] = []
+# By the index of the hex it burns on
+var smoke_nodes: Dictionary[int, CPUParticles2D] = {}
 var special := SpecialAbility.new()
 var secondary := SpecialAbility.new()
 var passive := PassiveAbility.new()
@@ -213,7 +214,7 @@ func _add_smoke(index: int) -> void:
 			smoke.position.y -= 10
 		elif index == 4:
 			smoke.position.y += 15
-	smoke_nodes.append(smoke)
+	smoke_nodes[index] = smoke
 	add_child(smoke)
 
 
@@ -372,7 +373,7 @@ func use_secondary(_target: Vector2i) -> void:
 
 func heal() -> void:
 	hit_hexes.fill(false)
-	for smoke in smoke_nodes:
+	for smoke in smoke_nodes.values():
 		smoke.queue_free()
 	smoke_nodes.clear()
 

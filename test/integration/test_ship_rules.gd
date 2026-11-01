@@ -232,10 +232,12 @@ func test_damage_control_heals_a_hex_every_ten_turns() -> void:
 		tender.new_turn()
 	assert_eq(tender.hit_hexes.count(true), 2, "not after nine turns")
 	assert_eq(tender.ap, 2, "half speed while damaged")
+	var still_burning := tender.smoke_nodes[0]
 	tender.new_turn()
 	assert_eq(tender.hit_hexes.count(true), 1, "one hex healed on the tenth")
 	await wait_process_frames(1)
-	assert_eq(tender.smoke_nodes.size(), 1, "its smoke gone too")
+	assert_eq(tender.smoke_nodes.keys(), [0], "its smoke gone too")
+	assert_same(tender.smoke_nodes[0], still_burning, "the rest left burning")
 	for turn in 10:
 		tender.new_turn()
 	assert_false(tender.hit_hexes.has(true), "the other ten turns later")

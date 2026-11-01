@@ -37,14 +37,10 @@ func new_turn() -> void:
 	dc_timer -= 1
 	if dc_timer == 0:
 		dc_timer = 10
-		hit_hexes[hit_hexes.rfind(true)] = false
-		# Smoke isn't tied to a hex, so put back what's still burning
-		for smoke in smoke_nodes:
-			smoke.queue_free()
-		smoke_nodes.clear()
-		for index in hit_hexes.size():
-			if hit_hexes[index]:
-				_add_smoke(index)
+		var healed := hit_hexes.rfind(true)
+		hit_hexes[healed] = false
+		smoke_nodes[healed].queue_free()
+		smoke_nodes.erase(healed)
 		print("passive - damage control")
 	# Drawback - Flammable Cargo: lose 2 AP per turn if damaged
 	if hit_hexes.has(true):

@@ -46,11 +46,11 @@ class Action:
 	var kind: String
 	var target: Vector2i
 	# Defender state just before the hit was resolved
-	var smoke_before := {}
+	var hits_before := {}
 	var hp_before := {}
 	var history_before := {}
-	# What the hit changed
-	var smoke: Array[CPUParticles2D] = []
+	# What the hit changed: [ship, index of the hex] for each newly damaged hex
+	var damage: Array[Array] = []
 	var hit_ships: Array[Ship] = []
 	var hp_changes: Array[Array] = []
 	var sunk: Array[Ship] = []
@@ -59,6 +59,16 @@ class Action:
 	# Sonar Pulse), shown from the start of its replay
 	var revealed_before := 0
 	var revealed: Array[Ship] = []
+
+	# The smoke the damage added, by the hexes it burns on rather than the
+	# nodes, which a ship may have rebuilt since
+	func smoke() -> Array[CPUParticles2D]:
+		var nodes: Array[CPUParticles2D] = []
+		for hit in damage:
+			var ship: Ship = hit[0]
+			if is_instance_valid(ship) and ship.smoke_nodes.has(hit[1]):
+				nodes.append(ship.smoke_nodes[hit[1]])
+		return nodes
 
 
 func _exit_tree() -> void:
@@ -109,7 +119,7 @@ func land() -> void:
 		return
 	var defender := recording.player.opponent
 	for ship in defender.ships:
-		recording.smoke_before[ship] = ship.smoke_nodes.size()
+		recording.hits_before[ship] = ship.hit_hexes.duplicate()
 		if ship is CoastalBattery:
 			recording.hp_before[ship] = (ship as CoastalBattery).hp
 	for hex in _side_hexes(defender):
@@ -123,10 +133,12 @@ func end() -> void:
 	var action := recording
 	recording = null
 	var defender := action.player.opponent
-	for ship: Ship in action.smoke_before:
-		var added := ship.smoke_nodes.slice(action.smoke_before[ship])
-		action.smoke.append_array(added)
-		if not added.is_empty():
+	for ship: Ship in action.hits_before:
+		var before: Array[bool] = action.hits_before[ship]
+		for index in before.size():
+			if ship.hit_hexes[index] and not before[index]:
+				action.damage.append([ship, index])
+		if ship.hit_hexes != before:
 			action.hit_ships.append(ship)
 		if ship.sunk:
 			action.sunk.append(ship)
@@ -286,9 +298,8 @@ func _rewind() -> void:
 	# Backwards, so each battery ends up at its earliest HP
 	for i in range(actions.size() - 1, -1, -1):
 		var action := actions[i]
-		for smoke in action.smoke:
-			if is_instance_valid(smoke):
-				smoke.visible = false
+		for smoke in action.smoke():
+			smoke.visible = false
 		for change in action.hp_changes:
 			if is_instance_valid(change[0]):
 				change[0].hp_bar.value = change[1]
@@ -301,9 +312,8 @@ func _rewind() -> void:
 # Shows what an attack did; with `animate` false, just the end result
 func _apply(action: Action, animate: bool) -> void:
 	next_action += 1
-	for smoke in action.smoke:
-		if is_instance_valid(smoke):
-			smoke.visible = true
+	for smoke in action.smoke():
+		smoke.visible = true
 	for change in action.hp_changes:
 		if is_instance_valid(change[0]):
 			change[0].hp_bar.value = change[2]
