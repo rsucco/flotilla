@@ -276,7 +276,7 @@ const ALL := {
 	{
 		"name": "Marine Nationale",
 		"country": "France",
-		"prefix": "FS",
+		"prefix": "",
 		"ships":
 		{
 			"Aircraft Carrier":
@@ -379,7 +379,7 @@ const ALL := {
 	{
 		"name": "Marina Militare",
 		"country": "Italy",
-		"prefix": "ITS",
+		"prefix": "",
 		"ships":
 		{
 			"Aircraft Carrier":
