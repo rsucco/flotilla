@@ -83,6 +83,26 @@ func test_corvette_sinks_once_when_both_hexes_hit() -> void:
 	assert_eq(sunk_events.size(), 1)
 
 
+func test_strikes_log_a_ship_they_sink_as_sunk_on_every_hex() -> void:
+	for attacker: String in ["submarine", "battleship"]:
+		var from := spawn(p0, attacker, Vector2i(5, 7))
+		for i in 10:
+			var corvette := spawn(p1, "corvette", Vector2i(20, 5))
+			var hexes := corvette.get_occupied_hexes()
+			# Off the corvette, next to both its hexes
+			var center := Vector2i(21, 5)
+			assert_true(game.grid.get_all_hex_neighbors(center).has(hexes[0]))
+			assert_true(game.grid.get_all_hex_neighbors(center).has(hexes[1]))
+			p1.receive_special(center, from)
+			for h in hexes:
+				var last: String = game.grid.tile(h).history[-1][1]
+				assert_true(last.begins_with("Sunk"), "%s: %s at %s" % [from.special.name, last, h])
+				game.grid.tile(h).history.clear()
+			if not corvette.sunk:
+				remove(corvette)
+		remove(from)
+
+
 # Battleship: Salvo
 
 

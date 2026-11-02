@@ -368,6 +368,10 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 				var ship := get_ship_at_hex(h)
 				if ship != null:
 					ship.hit(h, from_ship)
+					# Sunk by this hit (say, a Fragile corvette): its other
+					# hexes aren't misses
+					if ship.sunk:
+						checked.append_array(ship.get_occupied_hexes())
 				else:
 					grid.log_event(h, "Miss (Nuclear Strike)")
 
@@ -398,10 +402,16 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 				dead_center.sink()
 			else:
 				dead_center.hit(hex, from_ship)
+			var sunk_hexes: Array[Vector2i] = []
 			for h in search:
+				if sunk_hexes.has(h):
+					continue
 				var ship := get_ship_at_hex(h)
 				if ship != null:
 					ship.hit(h, from_ship)
+					# Sunk by this hit: its other hexes aren't misses
+					if ship.sunk:
+						sunk_hexes.append_array(ship.get_occupied_hexes())
 				else:
 					grid.log_event(h, "Miss (Salvo)")
 
