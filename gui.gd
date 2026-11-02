@@ -20,7 +20,12 @@ const GLYPHS := {
 	"Starboard": "action_starboard",
 	"EndTurn": "action_end_turn",
 }
-const GLYPH_SIZE := 14
+# A glyph stands in for its button's own icon, at this size, except on End
+# Turn, whose text fills it, so its glyph sits beside it
+const GLYPH_SIZE := 24
+const END_TURN_GLYPH_SIZE := 22
+# Tints matching the port and starboard arrows the d-pad glyphs replace
+const GLYPH_TINTS := {"Port": Color(1.0, 0.3, 0.3), "Starboard": Color(0.3, 1.0, 0.4)}
 
 var ship_icons := {}
 # Whether the buttons show which button or key presses them: only while a
@@ -29,9 +34,13 @@ var hints := false:
 	set(value):
 		hints = value
 		for button: String in GLYPHS:
-			_glyph(button).visible = value
+			_show_glyph(button, value)
 # How far through End Turn's hold, 0 to 1
 var end_turn_hold := 0.0
+# Each button's own icon, while its glyph stands in
+var _icons := {}
+# Button name -> its glyph texture
+var _glyphs := {}
 
 @onready var special_info: Label = $GUIGrid/ShipInfo/AbilityInfo/SpecialAbility
 @onready var secondary_info: Label = $GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility
@@ -48,26 +57,24 @@ func _ready() -> void:
 	for ship_type in Ship.SHIP_TYPES:
 		ship_icons[ship_type] = load("res://gui/sprites/" + ship_type + "_icon.png")
 	for button: String in GLYPHS:
-		var glyph := TextureRect.new()
-		glyph.name = "Glyph"
 		var texture: Texture2D = load(GLYPH_SCRIPT).new()
 		texture.set("path", GLYPHS[button])
-		glyph.texture = texture
-		glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		glyph.visible = false
-		find_child(button).add_child(glyph)
-		# In the top-right corner, or beside End Turn, whose text fills it
-		glyph.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-		glyph.offset_left = -GLYPH_SIZE - 1
-		glyph.offset_top = 1
-		if button == "EndTurn":
-			glyph.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-			glyph.offset_left = -GLYPH_SIZE - 3
-			glyph.offset_top = -GLYPH_SIZE / 2.0
-		glyph.offset_right = glyph.offset_left + GLYPH_SIZE
-		glyph.offset_bottom = glyph.offset_top + GLYPH_SIZE
+		_glyphs[button] = texture
+		_icons[button] = (find_child(button) as Button).icon
+	# End Turn's beside it
+	var glyph := TextureRect.new()
+	glyph.name = "Glyph"
+	glyph.texture = _glyphs.EndTurn
+	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glyph.visible = false
+	find_child("EndTurn").add_child(glyph)
+	glyph.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+	glyph.offset_left = -END_TURN_GLYPH_SIZE - 3
+	glyph.offset_top = -END_TURN_GLYPH_SIZE / 2.0
+	glyph.offset_right = glyph.offset_left + END_TURN_GLYPH_SIZE
+	glyph.offset_bottom = glyph.offset_top + END_TURN_GLYPH_SIZE
 	find_child("EndTurn").draw.connect(_draw_end_turn_hold)
 	for button: Button in find_children("*", "Button"):
 		button.pressed.connect(func() -> void: action_pressed.emit(button.name))
@@ -79,12 +86,34 @@ func _ready() -> void:
 func set_buttons(enabled: Dictionary) -> void:
 	for button: String in enabled:
 		(find_child(button) as Button).disabled = not enabled[button]
-		if GLYPHS.has(button):
-			_glyph(button).modulate.a = 1.0 if enabled[button] else 0.4
+		if button == "EndTurn":
+			find_child(button).get_node("Glyph").modulate.a = 1.0 if enabled[button] else 0.4
 
 
-func _glyph(button: String) -> TextureRect:
-	return find_child(button).get_node("Glyph")
+# A button's own icon, shown unless its glyph is standing in
+func _set_icon(button: Button, icon: Texture2D) -> void:
+	_icons[button.name] = icon
+	if not hints:
+		button.icon = icon
+
+
+# The button's glyph in place of its own icon (beside End Turn), or back again
+func _show_glyph(button: String, shown: bool) -> void:
+	var node: Button = find_child(button)
+	if button == "EndTurn":
+		node.get_node("Glyph").visible = shown
+		return
+	node.icon = _glyphs[button] if shown else _icons[button]
+	if shown:
+		node.add_theme_constant_override("icon_max_width", GLYPH_SIZE)
+	else:
+		node.remove_theme_constant_override("icon_max_width")
+	if GLYPH_TINTS.has(button):
+		for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
+			if shown:
+				node.add_theme_color_override("icon_%s_color" % state, GLYPH_TINTS[button])
+			else:
+				node.remove_theme_color_override("icon_%s_color" % state)
 
 
 # A controller or a hotkey shows the hints; real mouse use hides them (the
@@ -151,7 +180,7 @@ func update_ship_info(ship: Ship) -> void:
 # Shows an ability's name, cooldown, and icon; null clears it
 func update_ability(button: Button, info: Label, kind: String, ability: SpecialAbility) -> void:
 	button.text = kind
-	button.icon = BUTTON_TEMPLATE
+	_set_icon(button, BUTTON_TEMPLATE)
 	if ability == null:
 		info.text = kind + " Ability: "
 		info.tooltip_text = ""
@@ -163,11 +192,14 @@ func update_ability(button: Button, info: Label, kind: String, ability: SpecialA
 			" (" + str(ability.cooldown_current) + "/" + str(ability.cooldown_interval) + ")"
 		)
 		button.text = ability.name
-		button.icon = load(
-			(
-				"res://gui/sprites/buttons/special_"
-				+ ability.name.to_lower().replace(" ", "_")
-				+ ".png"
+		_set_icon(
+			button,
+			load(
+				(
+					"res://gui/sprites/buttons/special_"
+					+ ability.name.to_lower().replace(" ", "_")
+					+ ".png"
+				)
 			)
 		)
 

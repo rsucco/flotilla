@@ -204,20 +204,22 @@ func test_placing_with_the_cursor_and_buttons() -> void:
 
 
 func test_button_hints_only_after_a_controller_or_hotkey() -> void:
-	var gui := game.gui
-	var glyph: Control = gui.find_child("Fire").get_node("Glyph")
+	var fire: Button = game.gui.find_child("Fire")
+	var own := fire.icon
 	var mouse := InputEventMouseMotion.new()
 	mouse.relative = Vector2(5, 0)
 	game.get_viewport().push_input(mouse)
-	assert_false(glyph.visible, "hidden for mouse players")
+	assert_eq(fire.icon, own, "its own icon for mouse players")
 	await pad(JOY_BUTTON_LEFT_SHOULDER)
-	assert_true(glyph.visible, "shown once a controller's used")
+	assert_ne(fire.icon, own, "the glyph once a controller's used")
 	game.cursor.move_to(Vector2i(20, 7))
-	assert_true(glyph.visible, "and kept while the cursor stands in for the mouse")
+	assert_ne(fire.icon, own, "and kept while the cursor stands in for the mouse")
 	game.get_viewport().push_input(mouse)
-	assert_false(glyph.visible, "hidden as the real mouse moves")
+	assert_eq(fire.icon, own, "its own again as the real mouse moves")
 	await key(KEY_TAB)
-	assert_true(glyph.visible, "shown for a hotkey too")
+	assert_ne(fire.icon, own, "the glyph for a hotkey too")
+	var end_turn: Control = game.gui.find_child("EndTurn").get_node("Glyph")
+	assert_true(end_turn.visible, "End Turn's beside it")
 
 
 func test_end_turn_shows_its_hold_filling() -> void:
