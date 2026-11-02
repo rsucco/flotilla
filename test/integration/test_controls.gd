@@ -151,6 +151,8 @@ func test_a_aims_then_fires_at_the_cursor() -> void:
 	assert_true(player.aiming.fire, "first A aims")
 	await pad(JOY_BUTTON_A)
 	await driver.wait_until(func() -> bool: return player.attacks == 1, 10, "the shot")
+	assert_false(player.aiming.values().has(true), "done aiming")
+	assert_eq(player.get_hover_hexes(Vector2i(22, 7)), [] as Array[Vector2i], "no target area")
 
 
 func test_a_on_our_ship_picks_it() -> void:

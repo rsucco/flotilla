@@ -230,6 +230,8 @@ func _act(action: String, target: Vector2i = Grid.OFF_GRID) -> void:
 		return
 	var attack := action in ["fire", "special", "secondary"]
 	if attack:
+		# Aimed and away: the target area stops following the pointer
+		_set_aiming("", -1)
 		_set_attack_buttons_disabled(true)
 	await perform(selected_ship, action, target)
 	if attack:
