@@ -171,6 +171,8 @@ static func revealed_state(copy: Ship) -> Dictionary:
 	}
 	if copy.has_node("Turret"):
 		state.turret = (copy.get_node("Turret") as Node2D).rotation
+	if copy.has_node("HPBar"):
+		state.hp = (copy.get_node("HPBar") as ProgressBar).value
 	return state
 
 
@@ -182,4 +184,7 @@ static func restore_revealed(state: Dictionary) -> Ship:
 	copy.rotation = state.rotation
 	if state.has("turret"):
 		(copy.get_node("Turret") as Node2D).rotation = state.turret
+	# Optional, so saves from before it still load
+	if state.has("hp"):
+		(copy.get_node("HPBar") as ProgressBar).value = state.hp
 	return copy

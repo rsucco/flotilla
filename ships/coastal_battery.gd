@@ -25,6 +25,18 @@ func _ready() -> void:
 	hit_sound = preload("res://audio/land_hit.wav")
 	sink_sound = preload("res://audio/battery_destroyed.wav")
 	sink_volume_db = 0.0
+	# Turned about our centre to undo our own turn, so it always reads level
+	hp_bar.pivot_offset = -hp_bar.position
+	_level_hp_bar()
+
+
+func set_grid_position(new_hex: Vector2i, new_direction: int) -> void:
+	super(new_hex, new_direction)
+	_level_hp_bar()
+
+
+func _level_hp_bar() -> void:
+	hp_bar.rotation = -rotation
 
 
 # Batteries track HP instead of hexes, so any lost HP counts as damage
@@ -80,6 +92,9 @@ func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 	Sfx.play(self, hit_sound)
 	hp -= 1
 	hp_bar.value = hp
+	# The opponent sees the damage on the copy we showed them
+	if is_instance_valid(revealed_buddy):
+		(revealed_buddy.get_node("HPBar") as ProgressBar).value = hp
 	grid.log_event(hit_hex, "Hit, " + called(str(hp) + "HP"))
 	if hp == 0:
 		sink()

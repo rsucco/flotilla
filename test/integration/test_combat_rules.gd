@@ -194,6 +194,25 @@ func test_battery_reveals_itself_when_firing() -> void:
 	await wait_process_frames(1)
 
 
+func test_battery_hp_bar_reads_level_and_its_copy_shows_damage() -> void:
+	var battery := spawn_battery(p0, Vector2i(5, 7))
+	battery.set_grid_position(Vector2i(5, 7), 120)
+	assert_almost_eq(battery.hp_bar.get_global_transform().get_rotation(), 0.0, 0.001, "level")
+	var under := battery.global_position + Vector2(0, 19.5)
+	assert_almost_eq(battery.hp_bar.get_global_rect().get_center(), under, Vector2.ONE, "below")
+	battery.ap = 2
+	battery.fire_remaining = 1
+	battery.fire(Vector2i(22, 7))
+	var copy: Ship = p1.temp_revealed_ships[0]
+	battery.hit(battery.hex, null)
+	assert_eq((copy.get_node("HPBar") as ProgressBar).value, 4.0, "the copy shows the hit")
+	var saved := SaveGame.restore_revealed(SaveGame.revealed_state(copy))
+	assert_eq((saved.get_node("HPBar") as ProgressBar).value, 4.0, "and keeps it when saved")
+	saved.free()
+	p1.finish_turn()
+	await wait_process_frames(1)
+
+
 func test_battery_sinks_cleanly() -> void:
 	# Its sink sound ends before the fade does, freeing the sound player first
 	var battery := spawn_battery(p0, Vector2i(5, 7))
