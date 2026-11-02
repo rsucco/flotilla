@@ -1,8 +1,8 @@
 class_name Root
 extends Node2D
 
-# Who's playing: LAN and online play will join these
-enum Mode { HOT_SEAT, VS_AI }
+# Who's playing: online play will join these
+enum Mode { HOT_SEAT, VS_AI, LAN }
 
 const ROW_LABELS := ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"]
 const FONT_SIZE := 11
@@ -21,11 +21,18 @@ static var replay := {}
 static var title_music_at := 0.0
 # A saved game to carry on with, set by the title screen before loading us
 static var loaded := {}
+# A LAN game's connection to the other game, and whether we're its host (who
+# sits as Player 1), set by the lobby before loading us
+static var link: Link
+static var hosting := false
 
 var grid: Grid
 var players: Array[Player] = []
-# Two players taking turns at one screen, rather than one against the AI
+# Two players taking turns at one screen, rather than one against the AI or
+# across the network
 var hot_seat := true
+# Our seat, unless in hot-seat: the AI's opponent, or our side of a LAN game
+var seat := 0
 var player_up := 0
 # Projectiles and other effects, drawn above the ships
 var effects: Node2D
@@ -60,8 +67,18 @@ func _ready() -> void:
 	if not loaded.is_empty():
 		mode = loaded.mode
 	hot_seat = mode == Mode.HOT_SEAT
-	var second: Player = LocalPlayer.new(1) if hot_seat else AIPlayer.new(1)
-	players = [LocalPlayer.new(0), second]
+	match mode:
+		Mode.HOT_SEAT:
+			players = [LocalPlayer.new(0), LocalPlayer.new(1)]
+		Mode.VS_AI:
+			players = [LocalPlayer.new(0), AIPlayer.new(1)]
+		Mode.LAN:
+			seat = 0 if hosting else 1
+			var theirs := RemotePlayer.new(1 - seat, link, hosting)
+			players.assign(
+				[LocalPlayer.new(0), theirs] if hosting else [theirs, LocalPlayer.new(1)]
+			)
+			link = null
 	players[0].opponent = players[1]
 	players[1].opponent = players[0]
 	for player in players:
@@ -165,7 +182,8 @@ func play_game() -> void:
 		await _set_up()
 	else:
 		_restore(resume)
-	pause_menu.can_replay = true
+	# A LAN game's replay would need the other player too
+	pause_menu.can_replay = mode != Mode.LAN
 	_update_fleets()
 	_start_battle_music()
 	# A resumed game starts at the swap screen of the turn it was saved in
@@ -205,13 +223,13 @@ func play_game() -> void:
 		if not carrying_on:
 			turn_replay.clear()
 		# Against the AI, at the start of each of the player's turns (hot-seat
-		# saves at the hand-off)
-		if not hot_seat and not resuming and players[player_up] is LocalPlayer:
+		# saves at the hand-off, and LAN games aren't saved)
+		if mode == Mode.VS_AI and not resuming and players[player_up] is LocalPlayer:
 			SaveGame.write(SaveGame.AUTOSAVE, save_state("swap"))
 		gui.update_turn(current_turn)
 		_update_fleets()
-		# The AI's turn plays out live in front of the player
-		if players[player_up] is AIPlayer:
+		# The AI's turn, or the other LAN player's, plays out live
+		if players[player_up] is HiddenPlayer:
 			turn_replay.watch(players[player_up])
 		if carrying_on:
 			# Carry on with the AP and fire actions it was saved with
@@ -240,7 +258,10 @@ func play_game() -> void:
 	# Nothing left to carry on with, though its saves can still be loaded
 	SaveGame.mark_finished(game_id)
 	var victory := VICTORY_SCENE.instantiate()
-	victory.names.assign([players[0].navy_name() if hot_seat else "You", players[1].navy_name()])
+	victory.names.assign(players.map(func(p: Player) -> String: return p.navy_name()))
+	if not hot_seat:
+		victory.names[seat] = "You"
+	victory.rematch = mode != Mode.LAN
 	if players[player_up].conceded:
 		victory.update_winner(2 - player_up, player_up + 1)
 	else:
@@ -251,6 +272,9 @@ func play_game() -> void:
 
 # Ship selection and placement for both players
 func _set_up() -> void:
+	if mode == Mode.LAN:
+		await _set_up_lan()
+		return
 	var selections: Array = []
 	var navies: Array = []
 	if not replay.is_empty():
@@ -275,6 +299,33 @@ func _set_up() -> void:
 		await player.place_ships(selections[player.player_num])
 	setup = {"islands": grid.get_islands(), "selections": selections, "navies": navies}
 	# Random, and unaffected by seed()
+	game_id = ResourceUID.create_id()
+
+
+# Both players choose and place their fleets at once, each on their own
+# machine, on the host's islands
+func _set_up_lan() -> void:
+	var ours: LocalPlayer = players[seat]
+	var theirs: RemotePlayer = players[1 - seat]
+	await theirs.share_islands()
+	var selections := [{}, {}]
+	choosing = true
+	selections[seat] = await ours.get_ship_selection()
+	theirs.send_fleet(selections[seat])
+	selections[1 - seat] = await theirs.get_ship_selection()
+	# Chosen at once: the host keeps the navy, and the guest chooses again
+	while ours.navy == theirs.navy:
+		selections[seat] = await ours.get_ship_selection()
+		theirs.send_fleet(selections[seat])
+	choosing = false
+	await ours.place_ships(selections[seat])
+	theirs.send_placements()
+	await theirs.place_ships(selections[1 - seat])
+	setup = {
+		"islands": grid.get_islands(),
+		"selections": selections,
+		"navies": [players[0].navy, players[1].navy]
+	}
 	game_id = ResourceUID.create_id()
 
 
@@ -407,7 +458,7 @@ func _update_fleets() -> void:
 # Whose side of the game the screen shows: whoever's turn it is in hot-seat,
 # otherwise always the local player's
 func viewer() -> int:
-	return player_up if hot_seat else 0
+	return player_up if hot_seat else seat
 
 
 # Only mid-turn, when it's clear who's at the screen (not during setup, swaps
@@ -416,7 +467,7 @@ func _on_pause_menu_opened() -> void:
 	var player := players[player_up]
 	var mid_turn := player is LocalPlayer and player.active and not player.animation_playing
 	pause_menu.can_concede = mid_turn
-	pause_menu.can_save = mid_turn
+	pause_menu.can_save = mid_turn and mode != Mode.LAN
 
 
 func _on_gui_action_pressed(action: String) -> void:

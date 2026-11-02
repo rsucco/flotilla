@@ -47,6 +47,8 @@ var enabled := {}
 var end_turn_held := 0.0
 # The hex under the last mouse event, from the mouse or the HexCursor
 var pointer_hex := Grid.OFF_GRID
+# A move is under way (in a LAN game, the guest's waits on the host's answer)
+var acting := false
 
 
 func _init(num: int) -> void:
@@ -172,7 +174,8 @@ func _process(delta: float) -> void:
 
 # A GUI button (by name) was pressed
 func press(action: String) -> void:
-	if not awaiting_move:
+	# Next Ship works while an attack is in the air
+	if not awaiting_move or (acting and action != "NextShip"):
 		return
 	match action:
 		"Fire":
@@ -184,6 +187,8 @@ func press(action: String) -> void:
 		"NextShip":
 			_next_ship()
 		"EndTurn":
+			if opponent is RemotePlayer:
+				(opponent as RemotePlayer).tell("end")
 			end_turn()
 			_made_move()
 		"Forward", "Reverse", "Port", "Starboard":
@@ -227,14 +232,20 @@ func _set_attack_buttons_disabled(disabled: bool) -> void:
 
 # The selected ship makes a move, if it may
 func _act(action: String, target: Vector2i = Grid.OFF_GRID) -> void:
-	if selected_ship == null or not can_perform(selected_ship, action, target):
+	if acting or selected_ship == null or not can_perform(selected_ship, action, target):
 		return
+	acting = true
 	var attack := action in ["fire", "special", "secondary"]
 	if attack:
 		# Aimed and away: the target area stops following the pointer
 		_set_aiming("", -1)
 		_set_attack_buttons_disabled(true)
-	await perform(selected_ship, action, target)
+	# In a LAN game, by way of the host, which rolls the dice for it
+	if opponent is RemotePlayer:
+		await (opponent as RemotePlayer).relay(selected_ship, action, target)
+	else:
+		await perform(selected_ship, action, target)
+	acting = false
 	# Whichever ship is selected now: maybe another, picked while it flew
 	if selected_ship != null:
 		_update_buttons(selected_ship)
@@ -373,6 +384,12 @@ func _take_the_helm() -> void:
 	on_hex_time = 0
 	active = true
 	pips.visible = true
+
+
+func concede() -> void:
+	if opponent is RemotePlayer:
+		(opponent as RemotePlayer).tell("concede")
+	super()
 
 
 # Testing cheat (Root's C key): every ability of ours ready now

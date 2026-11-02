@@ -1,5 +1,5 @@
 class_name AIPlayer
-extends Player
+extends HiddenPlayer
 # The computer opponent. It plays fair, knowing only what a player would (see
 # HeatMap): it makes the attack it expects to do the most damage, then moves
 # ships out of trouble, and the tender towards ships it can repair.
@@ -91,37 +91,6 @@ func _place(ship: Ship) -> void:
 	var spot: Array = spots.pick_random()
 	ship.set_grid_position(spot[0], spot[1])
 	ship.visible = false
-
-
-func new_turn() -> void:
-	super()
-	_take_the_helm()
-
-
-func resume_turn() -> void:
-	_take_the_helm()
-
-
-# Our turn plays out in front of the opponent with our ships cloaked
-func _take_the_helm() -> void:
-	for ship in ships:
-		ship.cloaked = true
-		ship.visible = true
-	active = true
-
-
-# Copies of the opponent's ships we've seen are for us to know about, not to
-# put on the opponent's screen
-func show_revealed(_ship: Ship) -> void:
-	pass
-
-
-func finish_turn() -> void:
-	super()
-	for ship in ships:
-		ship.cloaked = false
-		ship.visible = false
-	active = false
 
 
 func get_move() -> void:

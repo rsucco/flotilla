@@ -2,10 +2,16 @@ extends PanelContainer
 
 # What to call each player, set by Root before update_winner()
 var names: Array[String] = ["Player 1", "Player 2"]
+# Whether a rematch can start from here (a LAN game's needs the other player)
+var rematch := true
 
 
 func _ready() -> void:
-	$VBoxContainer/HBoxContainer/Rematch.grab_focus(true)
+	var button: Button = $VBoxContainer/HBoxContainer/Rematch
+	button.visible = rematch
+	if not rematch:
+		button = $VBoxContainer/HBoxContainer/Title
+	button.grab_focus(true)
 
 
 # `winner` and `conceded` (the player who gave up, if one did) count from 1
