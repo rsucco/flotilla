@@ -6,7 +6,7 @@ enum Mode { HOT_SEAT, VS_AI, LAN }
 
 const ROW_LABELS := ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"]
 const FONT_SIZE := 11
-const FONT := preload("res://opensans.ttf")
+const FONT := preload("res://gui/opensans.ttf")
 const MINE_TEXTURE := preload("res://ships/sprites/projectiles/mine.png")
 const HITMISS_TEXTURE := preload("res://gui/sprites/hitmiss.png")
 const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")

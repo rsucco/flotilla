@@ -1,7 +1,7 @@
 extends GutTest
 # The Esc menu and replaying a game's setup
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
 

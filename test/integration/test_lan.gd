@@ -3,7 +3,7 @@ extends GutTest
 # plays its own seat, sees the other's turn live, and the two games stay the
 # same move for move (the host rolling every move's dice)
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 const SELECTION := "res://gui/ship_selection.tscn"
 

@@ -1,9 +1,9 @@
 extends GutTest
 # Settings: volume buses, fullscreen, saving, and where the page opens from
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const SETTINGS_SCENE := preload("res://gui/settings.tscn")
-const TITLE_SCENE := preload("res://title_screen.tscn")
+const TITLE_SCENE := preload("res://gui/title_screen.tscn")
 const TEST_PATH := "user://test_settings.cfg"
 
 var saved_path: String

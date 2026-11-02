@@ -161,7 +161,7 @@ func _on_concede_pressed() -> void:
 
 
 func _on_title_pressed() -> void:
-	ask(get_tree().change_scene_to_file.bind("res://title_screen.tscn"))
+	ask(get_tree().change_scene_to_file.bind("res://gui/title_screen.tscn"))
 
 
 func _on_quit_pressed() -> void:

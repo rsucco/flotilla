@@ -1,8 +1,8 @@
 [gd_scene format=3]
 
-[ext_resource type="FontVariation" path="res://font.tres" id="1"]
+[ext_resource type="FontVariation" path="res://gui/font.tres" id="1"]
 [ext_resource type="Texture2D" path="res://ships/sprites/preview/carrier.png" id="2"]
-[ext_resource type="FontFile" path="res://opensans.ttf" id="3"]
+[ext_resource type="FontFile" path="res://gui/opensans.ttf" id="3"]
 [ext_resource type="Script" path="res://gui/ship_selection.gd" id="4"]
 [ext_resource type="Texture2D" path="res://ships/sprites/preview/cruiser.png" id="5"]
 [ext_resource type="Texture2D" path="res://ships/sprites/preview/battleship.png" id="6"]

@@ -1,7 +1,7 @@
 extends GutTest
 # Ship rules from the README, exercised against the real game scene
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const Timed := preload("res://test/timed.gd")
 
 var game: Root

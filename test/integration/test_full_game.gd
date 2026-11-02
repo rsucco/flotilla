@@ -3,7 +3,7 @@ extends GutTest
 # placement, every weapon and ability, movement, a mine, turn swaps, and
 # victory. Engine errors at any point fail the test.
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
 var game: Root

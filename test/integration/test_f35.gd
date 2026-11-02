@@ -1,7 +1,7 @@
 extends GutTest
 # The F-35's planned flight paths
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 const Timed := preload("res://test/timed.gd")
 const HEADINGS: Array[int] = [0, 60, 120, 180, 240, 300]

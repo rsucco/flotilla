@@ -2,7 +2,7 @@ extends GutTest
 # Single player against the AI: no hand-offs, the player's fleet stays in
 # view, and the AI's turn plays out live with its ships unseen
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
 var game: Root

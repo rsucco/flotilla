@@ -1,7 +1,7 @@
 extends GutTest
 # Passive - Missile Defense: cruisers shooting down missiles and nukes
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const MISSILE_SCENE := preload("res://ships/projectiles/missile.tscn")
 const Timed := preload("res://test/timed.gd")
 

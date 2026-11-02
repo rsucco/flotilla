@@ -1,7 +1,7 @@
 extends GutTest
 # Turrets and projectiles point where they're going
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const MISSILE_SCENE := preload("res://ships/projectiles/missile.tscn")
 const TORPEDO_SCENE := preload("res://ships/projectiles/torpedo.tscn")
 const SHELL_SCENE := preload("res://ships/projectiles/battleship_projectile.tscn")

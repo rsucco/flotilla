@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
-[ext_resource type="FontVariation" path="res://font.tres" id="1"]
-[ext_resource type="Script" path="res://gui.gd" id="2"]
+[ext_resource type="FontVariation" path="res://gui/font.tres" id="1"]
+[ext_resource type="Script" path="res://gui/gui.gd" id="2"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/button_template.png" id="3"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/fire.png" id="4"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/end_turn.png" id="5"]

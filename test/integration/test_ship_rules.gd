@@ -2,7 +2,7 @@ extends GutTest
 # Each ship's passives, drawbacks and abilities from the README, beyond the
 # combat basics in test_combat_rules.gd
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 
 var game: Root
 var p0: LocalPlayer

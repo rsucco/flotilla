@@ -1,7 +1,7 @@
 extends GutTest
 # The AI's picture of the opponent's fleet (HeatMap) and how it picks attacks
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 
 var game: Root
 var grid: Grid

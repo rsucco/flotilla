@@ -2,7 +2,7 @@ extends GutTest
 # Playing from the keyboard and a controller: each shortcut does what its
 # button would, and only when that button could be pressed
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
 var game: Root

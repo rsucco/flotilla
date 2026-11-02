@@ -3,7 +3,7 @@ extends GutTest
 # control to act on (its focus ring hidden from mouse players), A and Enter
 # press it, and B and Esc go back
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 
 
 func before_each() -> void:
@@ -28,7 +28,7 @@ func focused() -> Control:
 func test_each_screen_starts_on_something_to_press() -> void:
 	var expected := {
 		# Continue, when earlier tests left a save to carry on with
-		"res://title_screen.tscn": "Continue" if SaveGame.latest() != "" else "SinglePlayer",
+		"res://gui/title_screen.tscn": "Continue" if SaveGame.latest() != "" else "SinglePlayer",
 		"res://gui/how_to_play.tscn": "Back",
 		"res://gui/settings.tscn": "Master",
 		"res://gui/local_turn_swap.tscn": "OK",
@@ -68,7 +68,7 @@ func test_the_esc_menu_from_a_controller() -> void:
 
 
 func test_title_screen_overlays_hand_the_focus_back() -> void:
-	var title: Node = add_child_autofree(load("res://title_screen.tscn").instantiate())
+	var title: Node = add_child_autofree(load("res://gui/title_screen.tscn").instantiate())
 	await wait_process_frames(1)
 	title.get_node("TextureRect/PanelContainer/Buttons/Settings").pressed.emit()
 	await wait_process_frames(1)

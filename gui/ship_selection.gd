@@ -172,7 +172,7 @@ func _on_OK_pressed() -> void:
 func _on_Title_pressed() -> void:
 	ask(
 		"Return to the title screen?",
-		get_tree().change_scene_to_file.bind("res://title_screen.tscn")
+		get_tree().change_scene_to_file.bind("res://gui/title_screen.tscn")
 	)
 
 

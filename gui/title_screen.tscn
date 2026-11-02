@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Texture2D" path="res://gui/sprites/logo.png" id="1"]
-[ext_resource type="Script" path="res://title_screen.gd" id="2"]
+[ext_resource type="Script" path="res://gui/title_screen.gd" id="2"]
 [ext_resource type="Texture2D" path="res://gui/sprites/title_screen_background.png" id="3"]
 [ext_resource type="AudioStream" path="res://audio/title_music.ogg" id="4"]
 

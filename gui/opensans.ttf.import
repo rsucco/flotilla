@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cjfmkmoc5feyg"
-path="res://.godot/imported/opensans.ttf-1dbdbec1ae692b2af8a1cd4ca23846a8.fontdata"
+path="res://.godot/imported/opensans.ttf-288942f4a4d4926819748c95762411e5.fontdata"
 
 [deps]
 
-source_file="res://opensans.ttf"
-dest_files=["res://.godot/imported/opensans.ttf-1dbdbec1ae692b2af8a1cd4ca23846a8.fontdata"]
+source_file="res://gui/opensans.ttf"
+dest_files=["res://.godot/imported/opensans.ttf-288942f4a4d4926819748c95762411e5.fontdata"]
 
 [params]
 

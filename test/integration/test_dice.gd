@@ -3,7 +3,7 @@ extends GutTest
 # from the same seed, whatever else draws random numbers meanwhile (a networked
 # game relies on this)
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 
 
 func outcomes(game: Root, noise: bool) -> Array[bool]:

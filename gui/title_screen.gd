@@ -44,7 +44,7 @@ func _on_lan_pressed() -> void:
 func _start(mode: Root.Mode) -> void:
 	Root.mode = mode
 	Root.title_music_at = $Music.get_playback_position()
-	get_tree().change_scene_to_file("res://root.tscn")
+	get_tree().change_scene_to_file("res://game/root.tscn")
 
 
 func _on_continue_pressed() -> void:
@@ -62,7 +62,7 @@ func _load(slot: String) -> void:
 	if Root.loaded.is_empty():
 		return
 	Root.title_music_at = $Music.get_playback_position()
-	get_tree().change_scene_to_file("res://root.tscn")
+	get_tree().change_scene_to_file("res://game/root.tscn")
 
 
 func _on_how_to_play_pressed() -> void:

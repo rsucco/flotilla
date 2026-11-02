@@ -3,7 +3,7 @@ extends GutTest
 # (Player.can_perform() and perform()): the same for every kind of player,
 # whether its choices come from input, an AI or the network
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 
 var game: Root
 var p0: LocalPlayer

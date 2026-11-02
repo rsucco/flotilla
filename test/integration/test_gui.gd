@@ -1,7 +1,7 @@
 extends GutTest
 # GUI state that only shows up in play
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const SELECTION_SCENE := preload("res://gui/ship_selection.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
@@ -52,7 +52,7 @@ func test_ship_selection_shows_ship_details() -> void:
 
 
 func test_how_to_play_opens_from_the_title_screen() -> void:
-	var title: Node = add_child_autofree(load("res://title_screen.tscn").instantiate())
+	var title: Node = add_child_autofree(load("res://gui/title_screen.tscn").instantiate())
 	title.get_node("TextureRect/PanelContainer/Buttons/HowToPlay").pressed.emit()
 	var how: Node = title.get_node("TextureRect/HowToPlay")
 	assert_string_contains(how.get_node("Margin/VBoxContainer/Scroll/Rules").text, "action points")

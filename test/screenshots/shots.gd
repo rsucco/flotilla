@@ -49,14 +49,14 @@ func act_shot(
 
 
 func run() -> void:
-	var title: Node = load("res://title_screen.tscn").instantiate()
+	var title: Node = load("res://gui/title_screen.tscn").instantiate()
 	root.add_child(title)
 	await wait(1.0)
 	await shot("01_title")
 	title.free()
 
 	seed(3)
-	game = load("res://root.tscn").instantiate()
+	game = load("res://game/root.tscn").instantiate()
 	root.add_child(game)
 	d = GameDriver.new(game)
 	d.prepare_board()

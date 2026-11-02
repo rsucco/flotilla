@@ -1,7 +1,7 @@
 extends GutTest
 # Replaying a player's attacks for the opponent at the hot-seat swap
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
 var game: Root

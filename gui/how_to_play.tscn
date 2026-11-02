@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://gui/how_to_play.gd" id="1"]
 [ext_resource type="StyleBox" path="res://gui/popup.tres" id="2"]
-[ext_resource type="FontFile" path="res://opensans.ttf" id="3"]
+[ext_resource type="FontFile" path="res://gui/opensans.ttf" id="3"]
 
 [node name="HowToPlay" type="PanelContainer"]
 anchors_preset = 15

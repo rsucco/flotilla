@@ -1,7 +1,7 @@
 extends GutTest
 # The V cheat that shows both fleets (fl-7q4)
 
-const ROOT_SCENE := preload("res://root.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 
 

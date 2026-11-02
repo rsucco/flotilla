@@ -3,8 +3,8 @@ extends GutTest
 # slots, and carrying on from the title screen. test/pre_run.gd keeps these
 # saves out of the player's own.
 
-const ROOT_SCENE := preload("res://root.tscn")
-const TITLE_SCENE := preload("res://title_screen.tscn")
+const ROOT_SCENE := preload("res://game/root.tscn")
+const TITLE_SCENE := preload("res://gui/title_screen.tscn")
 const LOAD_SCENE := preload("res://gui/load_game.tscn")
 const GameDriver := preload("res://test/game_driver.gd")
 

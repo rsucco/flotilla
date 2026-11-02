@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://turn_replay.gd" id="1"]
+[ext_resource type="Script" path="res://game/turn_replay.gd" id="1"]
 [ext_resource type="StyleBox" path="res://gui/popup.tres" id="2"]
 
 [node name="TurnReplay" type="CanvasLayer"]
