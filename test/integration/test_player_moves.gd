@@ -91,6 +91,37 @@ func test_ships_named_from_their_navy_once_each() -> void:
 		assert_eq(titles.count(title), 1, title + " only once")
 
 
+func tap(ship: Ship, hex: Vector2i) -> void:
+	var event := InputEventMouseButton.new()
+	# How touch screens' taps arrive
+	event.device = InputEvent.DEVICE_ID_EMULATION
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = true
+	event.position = game.grid.get_hex_center(hex)
+	ship._input(event)
+	# Taken as a while later, unless the test says otherwise
+	ship._tapped_at -= Ship.DOUBLE_TAP_MS
+
+
+func test_placed_by_touch_with_taps() -> void:
+	var ship := unplaced(p0, "destroyer")
+	watch_signals(ship)
+	ship.place()
+	tap(ship, Vector2i(5, 7))
+	assert_eq(ship.hex, Vector2i(5, 7), "a tap moves it there")
+	assert_true(ship.visible)
+	tap(ship, Vector2i(9, 7))
+	assert_eq(ship.hex, Vector2i(9, 7), "and another moves it again")
+	tap(ship, Vector2i(9, 7))
+	assert_eq(ship.direction, 60, "a tap on it turns it")
+	tap(ship, Vector2i(9, 7))
+	ship._tapped_at += Ship.DOUBLE_TAP_MS
+	tap(ship, Vector2i(9, 7))
+	assert_signal_emit_count(ship, "placed", 1, "a double tap places it")
+	assert_eq(ship.direction, 60, "the first of the two doesn't turn it")
+	assert_false(ship.placing)
+
+
 func test_batteries_go_on_land() -> void:
 	var battery := unplaced(p0, "coastal_battery")
 	assert_false(battery.can_place(Vector2i(3, 3), 0), "not on water")

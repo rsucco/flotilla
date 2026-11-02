@@ -17,6 +17,8 @@ const SHIP_TYPES: Array[String] = [
 	"carrier"
 ]
 const UNPLACED := Vector2i(-10, -10)
+# Two taps on a hex this close together are a double tap (Android's timeout)
+const DOUBLE_TAP_MS := 300
 
 var hit_sound: AudioStream = preload("res://audio/water_hit1.wav")
 var sink_sound: AudioStream = preload("res://audio/ship_destroyed.wav")
@@ -82,6 +84,10 @@ var effects: Node2D
 var movement_audio_player: AudioStreamPlayer2D
 # What cloaking hid, to show again
 var _cloaked_children: Array[CanvasItem] = []
+# The last tap while placing: when, where, and how far it turned us
+var _tapped_at := -DOUBLE_TAP_MS
+var _tapped_hex := UNPLACED
+var _tap_turn := 0
 
 
 # Subclasses must call super() first
@@ -101,6 +107,9 @@ func _input(event: InputEvent) -> void:
 			set_grid_position(mouse_hex, direction)
 			visible = true
 	elif event is InputEventMouseButton and event.pressed:
+		if event.device == InputEvent.DEVICE_ID_EMULATION:
+			_tap(grid.get_hex_from_coords(event.position))
+			return
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
 				turn_by(-60)
@@ -110,6 +119,30 @@ func _input(event: InputEvent) -> void:
 				if hex != UNPLACED:
 					placing = false
 					placed.emit()
+
+
+# Placing by touch, which has no hover or wheel: a tap moves us there, a tap
+# on us turns us, and a double tap places us. Touch sends no motion before a
+# tap, and not every platform flags double taps, so we time them ourselves.
+func _tap(at: Vector2i) -> void:
+	var now := Time.get_ticks_msec()
+	if at == _tapped_hex and now - _tapped_at < DOUBLE_TAP_MS and hex != UNPLACED:
+		# The first tap of the two wasn't meant to turn us
+		if _tap_turn != 0:
+			turn_by(-_tap_turn)
+		placing = false
+		placed.emit()
+		return
+	_tapped_at = now
+	_tapped_hex = at
+	_tap_turn = 0
+	if get_occupied_hexes().has(at):
+		var before := direction
+		turn_by(60)
+		_tap_turn = direction - before
+	elif can_place(at, direction):
+		set_grid_position(at, direction)
+		visible = true
 
 
 # Whether we can be placed for the start of the game centred on `at`, facing
