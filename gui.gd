@@ -159,6 +159,7 @@ func update_ship_info(ship: Ship) -> void:
 		drawback_info.tooltip_text = ""
 		ship_name.text = ""
 		ship_name.tooltip_text = ""
+		$GUIGrid/Actions/Fire.tooltip_text = ""
 		ship_icon.modulate = Color.TRANSPARENT
 		ap_label.text = "AP:     "
 		update_ability(special_button, special_info, "Special", null)
@@ -172,6 +173,12 @@ func update_ship_info(ship: Ship) -> void:
 	drawback_info.tooltip_text = ship.drawback.desc
 	ship_name.text = ship.ship_name
 	ship_name.tooltip_text = "Weapon: " + ship.weapon
+	# EW Strike: it can still move, but not fire
+	$GUIGrid/Actions/Fire.tooltip_text = ""
+	if ship.jammed_this_turn:
+		ship_name.text += " (Jammed)"
+		ship_name.tooltip_text += "\nJammed by EW Strike: can't fire this turn"
+		$GUIGrid/Actions/Fire.tooltip_text = "Jammed by EW Strike: can't fire this turn"
 	ship_icon.texture = ship_icons[ship.ship_type]
 	ship_icon.modulate = Color.WHITE
 	ap_label.text = "AP: " + str(ship.ap) + "/" + str(ship.default_ap)

@@ -72,6 +72,8 @@ var cloaked := false:
 			_cloaked_children.clear()
 # Set by EW Strike; blocks firing on the ship's next turn
 var jammed := false
+# Jammed for the turn under way, so it can't fire (shown to the player)
+var jammed_this_turn := false
 # Set as each attack starts: whether the opponent's cruisers will shoot it down
 var intercepted := false
 # Where the cruiser shooting it down is

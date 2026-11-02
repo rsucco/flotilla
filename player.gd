@@ -68,8 +68,8 @@ func new_turn() -> void:
 	for ship in ships:
 		ship.new_turn()
 		# After new_turn so it also overrides the carrier's extra fire action
+		ship.jammed_this_turn = ship.jammed
 		if ship.jammed:
-			print("ew strike - jammed")
 			ship.fire_remaining = 0
 			ship.jammed = false
 	for revealed in temp_revealed_ships:

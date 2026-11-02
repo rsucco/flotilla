@@ -113,6 +113,7 @@ static func ship_state(ship: Ship) -> Dictionary:
 		"special": ship.special.cooldown_current,
 		"secondary": ship.secondary.cooldown_current,
 		"jammed": ship.jammed,
+		"jammed_this_turn": ship.jammed_this_turn,
 		# Whether the opponent can see it (revealed this turn)
 		"shown": ship.visible,
 		# Where its guns were last aimed
@@ -147,6 +148,8 @@ static func restore_ship(state: Dictionary, player: Player) -> Ship:
 	ship.special.cooldown_current = state.special
 	ship.secondary.cooldown_current = state.secondary
 	ship.jammed = state.jammed
+	# Optional, so saves from before it still load
+	ship.jammed_this_turn = state.get("jammed_this_turn", false)
 	for turret: String in state.turrets:
 		(ship.get_node(turret) as Node2D).rotation = state.turrets[turret]
 	if ship is CoastalBattery:
