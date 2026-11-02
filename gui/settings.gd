@@ -23,6 +23,7 @@ func _ready() -> void:
 	%Video.visible = not OS.has_feature("mobile")
 	fullscreen.button_pressed = Settings.is_fullscreen()
 	fullscreen.toggled.connect(Settings.set_fullscreen)
+	Focus.first(self)
 
 
 func _unhandled_input(event: InputEvent) -> void:

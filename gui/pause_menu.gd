@@ -69,6 +69,7 @@ func open() -> void:
 	visible = true
 	get_tree().paused = true
 	opened.emit()
+	Focus.first(main)
 
 
 func close() -> void:
@@ -84,6 +85,8 @@ func ask(action: Callable, text: String = "Abandon this game?", from: Control = 
 	question.text = text
 	from.visible = false
 	confirm.visible = true
+	# The safe answer first
+	$Panel/Confirm/Buttons/No.grab_focus(true)
 
 
 func _on_resume_pressed() -> void:
@@ -110,7 +113,12 @@ func _on_settings_pressed() -> void:
 func _show_overlay(scene: PackedScene) -> void:
 	var overlay := scene.instantiate()
 	panel.visible = false
-	overlay.tree_exited.connect(func() -> void: panel.visible = true)
+	overlay.tree_exited.connect(
+		func() -> void:
+			panel.visible = true
+			if is_inside_tree():
+				Focus.first(main)
+	)
 	add_child(overlay)
 
 
@@ -126,6 +134,7 @@ func _on_save_game_pressed() -> void:
 		slots.add_child(button)
 	main.visible = false
 	saves.visible = true
+	Focus.first(saves)
 
 
 func _on_slot_pressed(slot: String) -> void:
@@ -144,6 +153,7 @@ func _save(slot: String) -> void:
 func _on_saves_back_pressed() -> void:
 	saves.visible = false
 	main.visible = true
+	Focus.first(main)
 
 
 func _on_concede_pressed() -> void:
@@ -170,3 +180,4 @@ func _on_yes_pressed() -> void:
 func _on_no_pressed() -> void:
 	back.visible = true
 	confirm.visible = false
+	Focus.first(back)

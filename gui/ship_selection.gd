@@ -67,7 +67,9 @@ func _ready() -> void:
 		$VBoxContainer/Navies.add_child(flag)
 	# Start on any navy that's free
 	var free := Navies.ALL.keys().filter(func(key: String) -> bool: return key != taken)
-	($VBoxContainer/Navies.get_node(free.pick_random()) as Button).button_pressed = true
+	var flag: Button = $VBoxContainer/Navies.get_node(free.pick_random())
+	flag.button_pressed = true
+	flag.grab_focus(true)
 
 
 # The ship's size, weapon, abilities, passive and drawback
@@ -188,6 +190,8 @@ func ask(question: String, action: Callable) -> void:
 	$VBoxContainer/Buttons.visible = false
 	$VBoxContainer/Confirm/Label.text = question
 	$VBoxContainer/Confirm.visible = true
+	# The safe answer first
+	$VBoxContainer/Confirm/No.grab_focus(true)
 
 
 func _start() -> void:
@@ -202,6 +206,7 @@ func _on_Yes_pressed() -> void:
 func _on_No_pressed() -> void:
 	$VBoxContainer/Confirm.visible = false
 	$VBoxContainer/Buttons.visible = true
+	$VBoxContainer/Buttons/OK.grab_focus(true)
 
 
 func set_island_tiles(count: int) -> void:

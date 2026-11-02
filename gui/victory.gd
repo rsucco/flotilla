@@ -4,6 +4,10 @@ extends PanelContainer
 var names: Array[String] = ["Player 1", "Player 2"]
 
 
+func _ready() -> void:
+	$VBoxContainer/HBoxContainer/Rematch.grab_focus(true)
+
+
 # `winner` and `conceded` (the player who gave up, if one did) count from 1
 func update_winner(winner: int, conceded: int = 0) -> void:
 	var who := names[winner - 1]

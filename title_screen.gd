@@ -16,6 +16,7 @@ func _ready() -> void:
 	var has_saves := SaveGame.latest() != ""
 	$TextureRect/PanelContainer/Buttons/Continue.visible = has_saves
 	$TextureRect/PanelContainer/Buttons/Load.disabled = not has_saves
+	Focus.first($TextureRect/PanelContainer/Buttons)
 
 
 func _on_single_player_pressed() -> void:
@@ -39,7 +40,7 @@ func _on_continue_pressed() -> void:
 func _on_load_pressed() -> void:
 	var dialog := LOAD_SCENE.instantiate()
 	dialog.slot_chosen.connect(_load)
-	$TextureRect.add_child(dialog)
+	_show_overlay(dialog)
 
 
 func _load(slot: String) -> void:
@@ -51,11 +52,21 @@ func _load(slot: String) -> void:
 
 
 func _on_how_to_play_pressed() -> void:
-	$TextureRect.add_child(HOW_TO_PLAY_SCENE.instantiate())
+	_show_overlay(HOW_TO_PLAY_SCENE.instantiate())
 
 
 func _on_settings_pressed() -> void:
-	$TextureRect.add_child(SETTINGS_SCENE.instantiate())
+	_show_overlay(SETTINGS_SCENE.instantiate())
+
+
+# Over the menu, which takes the focus back when it closes
+func _show_overlay(overlay: Node) -> void:
+	overlay.tree_exited.connect(
+		func() -> void:
+			if is_inside_tree():
+				Focus.first($TextureRect/PanelContainer/Buttons)
+	)
+	$TextureRect.add_child(overlay)
 
 
 func _on_Exit_pressed() -> void:

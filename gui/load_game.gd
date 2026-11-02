@@ -12,6 +12,7 @@ func _ready() -> void:
 		button.disabled = SaveGame.read(slot).is_empty()
 		button.pressed.connect(func() -> void: slot_chosen.emit(slot))
 		%Slots.add_child(button)
+	Focus.first(self)
 
 
 func _unhandled_input(event: InputEvent) -> void:

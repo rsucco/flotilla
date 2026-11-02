@@ -6,6 +6,10 @@ signal swap_done(watch_replay: bool)
 @onready var watch: CheckBox = $VBoxContainer/WatchReplay
 
 
+func _ready() -> void:
+	$VBoxContainer/OK.grab_focus(true)
+
+
 # In place of "Switching turns", under the flag of whoever's up, if any
 func set_heading(text: String, flag: Texture2D = null) -> void:
 	$VBoxContainer/Label.text = text
