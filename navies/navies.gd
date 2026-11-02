@@ -760,15 +760,15 @@ const ALL := {
 			],
 			"Submarine":
 			[
-				"Changzhegh 1",
-				"Changzhegh 2",
-				"Changzhegh 7",
-				"Changzhegh 11",
-				"Changzhegh 17",
-				"Changzhegh 23",
-				"Changzhegh 31",
-				"Changzhegh 43",
-				"Changzhegh 59",
+				"Changzheng 1",
+				"Changzheng 2",
+				"Changzheng 7",
+				"Changzheng 11",
+				"Changzheng 17",
+				"Changzheng 23",
+				"Changzheng 31",
+				"Changzheng 43",
+				"Changzheng 59",
 			],
 			"Supply Tender":
 			[
