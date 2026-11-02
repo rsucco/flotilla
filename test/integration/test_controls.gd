@@ -17,6 +17,8 @@ func before_each() -> void:
 	driver.prepare_board()
 	await driver.start_game()
 	player = game.players[0]
+	# GUT's own output panel holds the focus, which the cursor leaves alone
+	get_viewport().gui_release_focus()
 
 
 func after_each() -> void:
@@ -68,8 +70,11 @@ func test_bumpers_and_tab_go_between_ships() -> void:
 func test_face_buttons_arm_attacks_and_b_backs_out() -> void:
 	driver.ready_abilities(player)
 	await driver.select("battleship")
+	# Off our own ships, where A would pick the ship instead
+	game.cursor.move_to(Vector2i(22, 7))
 	await pad(JOY_BUTTON_X)
 	assert_true(player.aiming.special, "X arms the special")
+	await pad(JOY_BUTTON_B)
 	await pad(JOY_BUTTON_A)
 	assert_true(player.aiming.fire, "A arms the guns")
 	await pad(JOY_BUTTON_B)
@@ -107,3 +112,90 @@ func test_start_opens_the_menu_and_b_does_not() -> void:
 	assert_true(game.pause_menu.visible, "Start opens it")
 	await pad(JOY_BUTTON_START)
 	assert_false(game.pause_menu.visible, "and closes it")
+
+
+func test_held_the_cursor_steps_then_repeats() -> void:
+	game.cursor.steer(Vector2.ZERO, 0.0)
+	game.cursor.move_to(Vector2i(20, 7))
+	game.cursor.steer(Vector2.RIGHT, 0.016)
+	assert_eq(game.cursor.hex, Vector2i(21, 7), "one hex at once")
+	game.cursor.steer(Vector2.RIGHT, 0.2)
+	assert_eq(game.cursor.hex, Vector2i(21, 7), "a pause")
+	for i in 3:
+		game.cursor.steer(Vector2.RIGHT, 0.1)
+	assert_eq(game.cursor.hex, Vector2i(24, 7), "then on while held")
+	game.cursor.steer(Vector2.ZERO, 0.1)
+	game.cursor.steer(Vector2(0.3, 0.9), 0.016)
+	assert_eq(game.cursor.hex, Vector2i(24, 8), "mostly down is down")
+	await wait_process_frames(1)
+	assert_eq(game.grid.get_hex_from_coords(game.pointer), game.cursor.hex, "hovered")
+
+
+func test_arrow_keys_and_left_stick_steer_the_cursor() -> void:
+	var keys := {KEY_LEFT: "cursor_left", KEY_RIGHT: "cursor_right", KEY_UP: "cursor_up"}
+	keys[KEY_DOWN] = "cursor_down"
+	for keycode: Key in keys:
+		var event := InputEventKey.new()
+		event.keycode = keycode
+		assert_true(event.is_action(keys[keycode]), keys[keycode])
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_LEFT_Y
+	stick.axis_value = -1.0
+	assert_true(stick.is_action("cursor_up"), "the left stick")
+
+
+func test_a_aims_then_fires_at_the_cursor() -> void:
+	await driver.select("battleship")
+	game.cursor.move_to(driver.ship_of(1, "destroyer").hex)
+	await pad(JOY_BUTTON_A)
+	assert_true(player.aiming.fire, "first A aims")
+	await pad(JOY_BUTTON_A)
+	await driver.wait_until(func() -> bool: return player.attacks == 1, 10, "the shot")
+
+
+func test_a_on_our_ship_picks_it() -> void:
+	await driver.select("battleship")
+	var cruiser := driver.ship_of(0, "cruiser")
+	game.cursor.move_to(cruiser.hex)
+	await pad(JOY_BUTTON_A)
+	assert_eq(player.selected_ship, cruiser)
+	assert_false(player.aiming.values().has(true), "without aiming")
+
+
+func test_enter_clicks_at_the_cursor() -> void:
+	await driver.select("battleship")
+	await key(KEY_F)
+	assert_true(player.aiming.fire, "F aims")
+	game.cursor.move_to(driver.ship_of(1, "destroyer").hex)
+	await key(KEY_ENTER)
+	await driver.wait_until(func() -> bool: return player.attacks == 1, 10, "the shot")
+
+
+func test_placing_with_the_cursor_and_buttons() -> void:
+	var setup: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var setting_up := GameDriver.new(setup)
+	setting_up.prepare_board()
+	var dialog := await setting_up.find_dialog(setup.players[0], "res://gui/ship_selection.tscn")
+	dialog.set_island_tiles(setup.grid.get_num_island_tiles(0))
+	setting_up.press(dialog.get_node("VBoxContainer/Buttons/Classic"))
+	setting_up.press(dialog.get_node("VBoxContainer/Buttons/OK"))
+	var turned := false
+	while not turned:
+		var ship := await setting_up.placing_ship(setup.players[0])
+		var spot := GameDriver.spot(0, ship.ship_type)
+		setup.cursor.move_to(spot)
+		await wait_process_frames(1)
+		assert_eq(ship.hex, spot, ship.ship_type + " follows the cursor")
+		# Batteries don't turn
+		if not ship is CoastalBattery:
+			var event := InputEventJoypadButton.new()
+			event.button_index = JOY_BUTTON_DPAD_RIGHT
+			event.pressed = true
+			setup.get_viewport().push_input(event)
+			assert_eq(ship.direction, 60, "the d-pad turns it")
+			turned = true
+		var a := InputEventJoypadButton.new()
+		a.button_index = JOY_BUTTON_A
+		a.pressed = true
+		setup.get_viewport().push_input(a)
+		assert_false(ship.placing, "A places it")

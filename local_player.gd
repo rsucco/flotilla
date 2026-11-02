@@ -42,6 +42,8 @@ var pips: APPips
 # Which buttons can be pressed, as last sent to the GUI; shortcuts follow them
 var enabled := {}
 var end_turn_held := 0.0
+# The hex under the last mouse event, from the mouse or the HexCursor
+var pointer_hex := Grid.OFF_GRID
 
 
 func _init(num: int) -> void:
@@ -66,21 +68,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_shortcut(event)
 		return
 	var on_hex := grid.get_hex_from_coords(event.position)
+	pointer_hex = on_hex
 	var side := grid.side_of(on_hex)
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			if side == player_num:
-				var ship := get_ship_at_hex(on_hex)
-				if aiming["unrep"]:
-					# UNREP targets an adjacent friendly ship instead of selecting it
-					_act("special", on_hex)
-				elif ship != null and not animation_playing:
-					_select_ship(ship)
-			elif side == 1 - player_num:
-				# If aiming a shot or ability, use it
-				for kind in ["fire", "special", "secondary"]:
-					if aiming[kind]:
-						_act(kind, on_hex)
+			_click(on_hex)
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_select_ship(null)
 	elif event is InputEventMouseMotion:
@@ -96,9 +88,41 @@ func _unhandled_input(event: InputEvent) -> void:
 			tile_history.visible = false
 
 
+# What a click on `on_hex` does: selects our ship there, or uses the shot or
+# ability being aimed
+func _click(on_hex: Vector2i) -> void:
+	var side := grid.side_of(on_hex)
+	if side == player_num:
+		var ship := get_ship_at_hex(on_hex)
+		if aiming["unrep"]:
+			# UNREP targets an adjacent friendly ship instead of selecting it
+			_act("special", on_hex)
+		elif ship != null and not animation_playing:
+			_select_ship(ship)
+	elif side == 1 - player_num:
+		# If aiming a shot or ability, use it
+		for kind in ["fire", "special", "secondary"]:
+			if aiming[kind]:
+				_act(kind, on_hex)
+
+
 # Keyboard and controller: each shortcut does what its button would, when its
 # button could be pressed. Exact matches, so Shift+Tab isn't also Tab.
 func _shortcut(event: InputEvent) -> void:
+	# Enter and Space click at the cursor. A does too when that means
+	# something there (confirming an attack, picking our ship); else it's Fire.
+	var on_ours := grid.side_of(pointer_hex) == player_num and get_ship_at_hex(pointer_hex) != null
+	if (
+		event.is_action_pressed("action_confirm")
+		or (
+			event.is_action_pressed("action_fire")
+			and (aiming.values().has(true) or on_ours)
+			and (event is InputEventJoypadButton)
+		)
+	):
+		get_viewport().set_input_as_handled()
+		_click(pointer_hex)
+		return
 	for action: String in SHORTCUTS:
 		if event.is_action_pressed(action, false, true) and enabled.get(SHORTCUTS[action], false):
 			get_viewport().set_input_as_handled()

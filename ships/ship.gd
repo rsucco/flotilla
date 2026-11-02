@@ -106,6 +106,15 @@ func _input(event: InputEvent) -> void:
 		if can_place(mouse_hex, direction):
 			set_grid_position(mouse_hex, direction)
 			visible = true
+	elif event.is_action_pressed("action_port"):
+		turn_by(-60)
+	elif event.is_action_pressed("action_starboard"):
+		turn_by(60)
+	elif event.is_action_pressed("action_confirm") or event.is_action_pressed("action_fire"):
+		# The keyboard and controller's click, at the HexCursor
+		if hex != UNPLACED:
+			placing = false
+			placed.emit()
 	elif event is InputEventMouseButton and event.pressed:
 		if event.device == InputEvent.DEVICE_ID_EMULATION:
 			_tap(grid.get_hex_from_coords(event.position))

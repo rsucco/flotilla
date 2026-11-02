@@ -31,6 +31,10 @@ var player_up := 0
 var effects: Node2D
 # Above the ships and effects: the hovered hex's coordinate, which they may cover
 var hover_label: Node2D
+# Where the last mouse event was, from the mouse or the HexCursor standing in
+# for it
+var pointer := Vector2.ZERO
+var cursor: HexCursor
 var current_turn := 0
 var swapping := false
 # The ship selection dialog is up
@@ -81,13 +85,18 @@ func _ready() -> void:
 	hover_label = Node2D.new()
 	add_child(hover_label)
 	hover_label.draw.connect(_draw_hover_label)
+	pointer = get_viewport().get_mouse_position()
+	cursor = HexCursor.new()
+	add_child(cursor)
 	$TitleMusic.play(title_music_at)
 	# New Game and replays start it from the top
 	title_music_at = 0.0
 	play_game()
 
 
-func _input(_event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouse:
+		pointer = (event as InputEventMouse).position
 	queue_redraw()
 	hover_label.queue_redraw()
 
@@ -101,7 +110,7 @@ func hover_text(hex: Vector2i) -> String:
 
 # The coordinate on a dark tag, readable over markers and ships
 func _draw_hover_label() -> void:
-	var hex := grid.get_hex_from_coords(get_viewport().get_mouse_position())
+	var hex := grid.get_hex_from_coords(pointer)
 	var text := hover_text(hex)
 	if text.is_empty():
 		return
@@ -146,6 +155,7 @@ func play_game() -> void:
 	for player in players:
 		player.grid = grid
 	$TileHistory.grid = grid
+	cursor.grid = grid
 	turn_replay.grid = grid
 	player_up = 0
 	var resume := loaded
@@ -438,7 +448,7 @@ func get_ship_at_hex(hex: Vector2i) -> Ship:
 
 
 func _draw() -> void:
-	var mouse_hex := grid.get_hex_from_coords(get_viewport().get_mouse_position())
+	var mouse_hex := grid.get_hex_from_coords(pointer)
 	var hover_hexes := players[viewer()].get_hover_hexes(mouse_hex)
 	var selected_hexes: Array[Vector2i] = []
 	var selected_center := Grid.OFF_GRID
