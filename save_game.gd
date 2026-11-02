@@ -57,14 +57,19 @@ static func delete(slot: String) -> void:
 		DirAccess.remove_absolute(path(slot))
 
 
-# Marks the slots saved from `game` as finished, keeping when they were saved.
-# They can still be loaded, but aren't continued.
+# Marks the saves from `game` as finished, autosave included, keeping when they
+# were saved. They can still be loaded, but aren't continued.
 static func mark_finished(game: int) -> void:
-	for slot in SLOTS:
+	for slot in [AUTOSAVE] + SLOTS:
 		var data := read(slot)
 		if data.get("game") == game:
 			data.finished = true
 			_store(slot, data)
+
+
+# Whether there's anything to load, finished or not
+static func any() -> bool:
+	return ([AUTOSAVE] + SLOTS).any(func(slot: String) -> bool: return not read(slot).is_empty())
 
 
 # The most recently saved slot of a game still in play, autosave included, or

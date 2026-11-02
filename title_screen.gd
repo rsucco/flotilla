@@ -12,10 +12,10 @@ func _ready() -> void:
 		# The window's close button quits cleanly too
 		get_tree().auto_accept_quit = false
 		get_tree().root.close_requested.connect(Sfx.quit.bind(get_tree()))
-	# Carries on with the latest save, autosave included
-	var has_saves := SaveGame.latest() != ""
-	$TextureRect/PanelContainer/Buttons/Continue.visible = has_saves
-	$TextureRect/PanelContainer/Buttons/Load.disabled = not has_saves
+	# Carries on with the latest unfinished save, autosave included; finished
+	# games can still be loaded
+	$TextureRect/PanelContainer/Buttons/Continue.visible = SaveGame.latest() != ""
+	$TextureRect/PanelContainer/Buttons/Load.disabled = not SaveGame.any()
 	Focus.first($TextureRect/PanelContainer/Buttons)
 
 

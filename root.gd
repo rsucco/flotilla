@@ -237,8 +237,7 @@ func play_game() -> void:
 		if not players[1 - player_up].ships.is_empty():
 			player_up = 1 - player_up
 
-	# Nothing left to carry on with
-	SaveGame.delete(SaveGame.AUTOSAVE)
+	# Nothing left to carry on with, though its saves can still be loaded
 	SaveGame.mark_finished(game_id)
 	var victory := VICTORY_SCENE.instantiate()
 	victory.names.assign([players[0].navy_name() if hot_seat else "You", players[1].navy_name()])

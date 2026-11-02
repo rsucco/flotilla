@@ -245,7 +245,7 @@ func test_overwriting_a_slot_asks_first() -> void:
 	menu.close()
 
 
-func test_finished_game_leaves_no_autosave_and_isnt_continued() -> void:
+func test_finished_game_is_kept_but_not_continued() -> void:
 	await start()
 	await driver.end_turn()
 	await driver.swap()
@@ -258,12 +258,18 @@ func test_finished_game_leaves_no_autosave_and_isnt_continued() -> void:
 	SaveGame.write("slot2", other)
 	game.players[1].concede()
 	await driver.find_dialog(game, "res://gui/victory.tscn")
-	assert_true(SaveGame.read(SaveGame.AUTOSAVE).is_empty())
+	assert_true(SaveGame.read(SaveGame.AUTOSAVE).finished, "the autosave, kept")
 	assert_true(SaveGame.read("slot1").finished, "this game's slot")
 	assert_eq(SaveGame.read("slot1").saved_at, saved_at, "keeps when it was saved")
 	assert_string_ends_with(SaveGame.describe("slot1"), " (finished)")
 	assert_false(SaveGame.read("slot2").has("finished"), "another game's slot")
 	assert_eq(SaveGame.latest(), "slot2", "Continue skips the finished game")
+	SaveGame.delete("slot2")
+	var title: Node = add_child_autofree(TITLE_SCENE.instantiate())
+	var buttons := title.get_node("TextureRect/PanelContainer/Buttons")
+	assert_false(buttons.get_node("Continue").visible, "nothing to continue")
+	assert_false(buttons.get_node("Load").disabled, "but the finished game loads")
+	title.free()
 	await reload(SaveGame.read("slot1"))
 	assert_false(game.save_state("turn").has("finished"), "saving it again carries on")
 
