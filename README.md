@@ -91,6 +91,8 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - [Lorc](https://lorcblog.blogspot.com/) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
 - [Delapouite](https://delapouite.com/) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
 - [Japan Maritime Self-Defense Force](https://www.mod.go.jp/msdf/) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
+- [David Newton](https://commons.wikimedia.org/wiki/File:Ensign_of_France.svg) [(CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/deed.en)
+- [Wikimedia Commons](https://commons.wikimedia.org/) [(Public domain)](https://commons.wikimedia.org/wiki/Commons:Public_domain)
 - Ryan Succo
 
 ###### Sound
