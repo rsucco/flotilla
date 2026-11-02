@@ -47,15 +47,18 @@ func _ready() -> void:
 	replay.disabled = not can_replay
 
 
+# Esc or Start opens it; once open, either one or ui_cancel goes back
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		get_viewport().set_input_as_handled()
-		if saves.visible:
-			_on_saves_back_pressed()
-		elif visible:
-			close()
-		else:
-			open()
+	var menu := event.is_action_pressed("action_menu")
+	if not (menu or (visible and event.is_action_pressed("ui_cancel"))):
+		return
+	get_viewport().set_input_as_handled()
+	if saves.visible:
+		_on_saves_back_pressed()
+	elif visible:
+		close()
+	else:
+		open()
 
 
 func open() -> void:

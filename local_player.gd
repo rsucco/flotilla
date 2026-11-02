@@ -13,6 +13,19 @@ const ACTION_BUTTONS: Array[String] = [
 	"Fire", "Special", "Secondary", "NextShip", "Forward", "Reverse", "Port", "Starboard"
 ]
 const ATTACK_BUTTONS: Array[String] = ["Fire", "Special", "Secondary", "NextShip", "EndTurn"]
+# Input actions (keyboard and controller) -> the button each one presses
+const SHORTCUTS := {
+	"action_fire": "Fire",
+	"action_special": "Special",
+	"action_secondary": "Secondary",
+	"action_forward": "Forward",
+	"action_reverse": "Reverse",
+	"action_port": "Port",
+	"action_starboard": "Starboard",
+	"action_next_ship": "NextShip",
+}
+# How long End Turn must be held, so it isn't pressed by accident
+const END_TURN_HOLD := 1.0
 
 var aiming := {"fire": false, "special": false, "secondary": false, "recon": false, "unrep": false}
 var ships_with_moves: Array[Ship] = []
@@ -26,6 +39,9 @@ var tile_history: TileHistory
 # Sharing the screen with another local player, so our fleet hides between turns
 var hot_seat := true
 var pips: APPips
+# Which buttons can be pressed, as last sent to the GUI; shortcuts follow them
+var enabled := {}
+var end_turn_held := 0.0
 
 
 func _init(num: int) -> void:
@@ -33,6 +49,7 @@ func _init(num: int) -> void:
 
 
 func _ready() -> void:
+	buttons_changed.connect(func(now: Dictionary) -> void: enabled.merge(now, true))
 	pips = APPips.new()
 	pips.ships = ships
 	# Above the ships
@@ -42,8 +59,11 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Only pay attention to the mouse, and only on our turn (after any replay)
-	if not active or not (event is InputEventMouse):
+	# Only on our turn (after any replay)
+	if not active:
+		return
+	if not (event is InputEventMouse):
+		_shortcut(event)
 		return
 	var on_hex := grid.get_hex_from_coords(event.position)
 	var side := grid.side_of(on_hex)
@@ -76,7 +96,35 @@ func _unhandled_input(event: InputEvent) -> void:
 			tile_history.visible = false
 
 
+# Keyboard and controller: each shortcut does what its button would, when its
+# button could be pressed. Exact matches, so Shift+Tab isn't also Tab.
+func _shortcut(event: InputEvent) -> void:
+	for action: String in SHORTCUTS:
+		if event.is_action_pressed(action, false, true) and enabled.get(SHORTCUTS[action], false):
+			get_viewport().set_input_as_handled()
+			press(SHORTCUTS[action])
+			return
+	if event.is_action_pressed("action_previous_ship", false, true) and enabled.get("NextShip"):
+		get_viewport().set_input_as_handled()
+		_previous_ship()
+	elif event.is_action_pressed("action_cancel"):
+		get_viewport().set_input_as_handled()
+		# Stop aiming first, then let go of the ship
+		if aiming.values().has(true):
+			_set_aiming("", -1)
+		else:
+			_select_ship(null)
+
+
 func _process(delta: float) -> void:
+	# End Turn by holding its shortcut down; once per hold, even across turns
+	if not Input.is_action_pressed("action_end_turn"):
+		end_turn_held = 0.0
+	elif active and awaiting_move:
+		end_turn_held += delta
+		if end_turn_held >= END_TURN_HOLD and enabled.get("EndTurn", false):
+			end_turn_held = -INF
+			press("EndTurn")
 	if current_on_hex != Grid.OFF_GRID:
 		on_hex_time += delta
 	else:
@@ -173,6 +221,12 @@ func _made_move() -> void:
 func _next_ship() -> void:
 	if selected_ship == ships_with_moves[0]:
 		ships_with_moves.push_back(ships_with_moves.pop_front())
+	_select_ship(ships_with_moves[0])
+
+
+# The other way round: the last ship with AP left
+func _previous_ship() -> void:
+	ships_with_moves.push_front(ships_with_moves.pop_back())
 	_select_ship(ships_with_moves[0])
 
 

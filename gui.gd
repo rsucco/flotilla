@@ -24,6 +24,8 @@ func _ready() -> void:
 		ship_icons[ship_type] = load("res://gui/sprites/" + ship_type + "_icon.png")
 	for button: Button in find_children("*", "Button"):
 		button.pressed.connect(func() -> void: action_pressed.emit(button.name))
+		# Or a clicked button would keep the focus, and with it Tab, Space and Enter
+		button.focus_mode = Control.FOCUS_NONE
 
 
 # Button name -> whether it can be pressed; buttons not listed are unchanged
