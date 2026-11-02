@@ -36,10 +36,14 @@ var hex_size: float
 var turn := 0
 # Indexed [x][y]
 var tiles: Array[Array] = []
+# The rules' rolls for this game, seeded from the global generator so seed()
+# still decides them
+var dice := Dice.new()
 
 
 func _init(size: float = 50.0) -> void:
 	hex_size = size
+	dice.reseed(randi())
 	for x in COLUMNS:
 		var column: Array[Tile] = []
 		for _y in ROWS:

@@ -39,7 +39,7 @@ func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 	super(hit_hex, from_ship)
 	if already_hit or sunk:
 		return
-	if Dice.roll() < 0.75:
+	if grid.dice.roll() < 0.75:
 		print("drawback - fragile")
 		sink()
 

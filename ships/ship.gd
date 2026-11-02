@@ -446,7 +446,7 @@ func check_for_mine() -> void:
 			tile.is_mined = false
 			mine_hit.emit(h)
 			# A random hex takes the hit (no effect if it's already damaged)
-			hit(Dice.pick(get_occupied_hexes()), self)
+			hit(grid.dice.pick(get_occupied_hexes()), self)
 
 
 # fire/use_special/use_secondary are awaited by the caller until their

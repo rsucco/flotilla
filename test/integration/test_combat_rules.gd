@@ -226,7 +226,7 @@ func test_battery_sinks_cleanly() -> void:
 
 func test_mines_hit_a_random_hex() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var hit_indexes := {}
 	for i in 60:
 		var ship := spawn(p1, "battleship", Vector2i(22, 7))

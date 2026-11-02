@@ -16,7 +16,6 @@ func before_each() -> void:
 	# Animations are the slow part
 	Engine.time_scale = 4.0
 	seed(3)
-	Dice.reseed(3)
 	game = add_child_autofree(ROOT_SCENE.instantiate())
 	driver = GameDriver.new(game)
 	driver.prepare_board()

@@ -34,7 +34,7 @@ func remove(ship: Ship) -> void:
 
 func test_cruiser_intercepts_about_quarter_of_nukes_and_cancels_them() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var sub := spawn(p0, "submarine", Vector2i(5, 7))
 	var intercepts := 0
 	for i in 200:
@@ -52,7 +52,7 @@ func test_cruiser_intercepts_about_quarter_of_nukes_and_cancels_them() -> void:
 
 func test_cruiser_intercepts_about_half_of_missiles() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var destroyer := spawn(p0, "destroyer", Vector2i(5, 7))
 	var intercepts := 0
 	for i in 200:
@@ -191,7 +191,7 @@ func test_replay_shows_the_intercepting_cruisers_ciws() -> void:
 
 func test_intercepting_cruiser_recorded_for_the_replay() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var cruiser := spawn(p1, "cruiser", Vector2i(24, 7))
 	spawn(p1, "corvette", Vector2i(24, 9))
 	var destroyer := spawn(p0, "destroyer", Vector2i(5, 7))

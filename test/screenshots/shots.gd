@@ -56,7 +56,6 @@ func run() -> void:
 	title.free()
 
 	seed(3)
-	Dice.reseed(3)
 	game = load("res://root.tscn").instantiate()
 	root.add_child(game)
 	d = GameDriver.new(game)

@@ -54,7 +54,7 @@ func test_corvette_gets_an_extra_move_next_to_an_island() -> void:
 
 func test_corvette_sinks_on_about_three_quarters_of_first_hits() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var attacker := spawn(p0, "destroyer", Vector2i(5, 7))
 	var sunk := 0
 	for i in 200:
@@ -168,7 +168,7 @@ func test_salvo_sinks_a_ship_hit_on_a_damaged_hex() -> void:
 
 func test_battleship_armor_blocks_about_a_quarter_of_hits() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var attacker := spawn(p0, "destroyer", Vector2i(5, 7))
 	var blocked := 0
 	for i in 400:
@@ -182,7 +182,7 @@ func test_battleship_armor_blocks_about_a_quarter_of_hits() -> void:
 
 func test_armor_never_blocks_a_hit_on_a_damaged_hex() -> void:
 	seed(1)
-	Dice.reseed(1)
+	game.grid.dice.reseed(1)
 	var attacker := spawn(p0, "destroyer", Vector2i(5, 7))
 	var battleship := spawn(p1, "battleship", Vector2i(22, 7))
 	battleship.hit_hexes = [false, false, true, false]
