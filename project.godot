@@ -18,6 +18,10 @@ config/icon="res://icon.png"
 config/macos_native_icon="res://icon.icns"
 config/windows_native_icon="res://icon.ico"
 
+[autoload]
+
+ControllerIcons="*res://addons/controller_icons/ControllerIcons.gd"
+
 [display]
 
 window/size/viewport_width=1280
@@ -26,7 +30,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+enabled=PackedStringArray("res://addons/controller_icons/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [global]
 

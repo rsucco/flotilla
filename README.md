@@ -92,6 +92,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - [Delapouite](https://delapouite.com/) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
 - [Japan Maritime Self-Defense Force](https://www.mod.go.jp/msdf/) [(CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.en)
 - [David Newton](https://commons.wikimedia.org/wiki/File:Ensign_of_France.svg) [(CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/deed.en)
+- [Nicolae Berbece (Xelu)](https://thoseawesomeguys.com/prompts/) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
 - [Wikimedia Commons](https://commons.wikimedia.org/) [(Public domain)](https://commons.wikimedia.org/wiki/Commons:Public_domain)
 - Ryan Succo
 
@@ -115,3 +116,4 @@ Basic gameplay is similar to Battleship, with some exceptions:
 ###### Programming
 - Ryan Succo
 - [Claude Code](https://claude.ai)
+- [Ricardo Subtil](https://github.com/rsubtil/controller_icons) [(MIT)](https://opensource.org/license/mit)
