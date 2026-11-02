@@ -29,7 +29,7 @@ var exhaust: CPUParticles2D
 # Set by the firing ship: shot down by the defender's CIWS on the way in
 var intercepted := false
 # Set by the firing ship: where the cruiser shooting it down is, and whether to
-# show its fire all the way (to the defender, in the replay)
+# show its fire all the way (to the defender, watching live or in the replay)
 var ciws_at := Vector2.INF
 var ciws_shown := false
 var launched_from: Vector2

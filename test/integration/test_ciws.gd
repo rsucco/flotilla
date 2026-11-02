@@ -233,3 +233,23 @@ func test_missile_released_over_no_mans_land_dies_on_the_way_in() -> void:
 	missile.launch(release, Vector2i(29, 7), 0.0, true)
 	assert_almost_eq(missile.kill_at.distance_to(release), Missile.RELEASE_KILL, 0.1)
 	await wait_seconds(2.0)
+
+
+func test_shown_from_the_cruiser_when_watched_live() -> void:
+	# The AI's turn, played out in front of the defender
+	var cruiser := spawn(p1, "cruiser", Vector2i(24, 7))
+	var destroyer := spawn(p0, "destroyer", Vector2i(5, 7))
+	destroyer.cloaked = true
+	destroyer.intercepted = true
+	destroyer.ciws_at = cruiser.global_position
+	# At the cruiser itself, where tracers from no-man's-land would come out of
+	# the missile's own path
+	destroyer.fire(cruiser.hex)
+	var missile: Missile
+	for node in game.effects.get_children():
+		if node is Missile:
+			missile = node
+	assert_not_null(missile)
+	assert_true(missile.ciws_shown, "the defender's watching")
+	assert_eq(missile.gun_at, game.effects.to_local(cruiser.global_position), "from the cruiser")
+	await wait_for_signal(missile.done, 5)
