@@ -217,6 +217,13 @@ func test_end_turn_ends_the_whole_fleet_with_nothing_selected() -> void:
 	assert_eq(game.player_up, 1)
 	var navy: String = Navies.ALL[game.players[1].navy].name
 	assert_eq(swap.get_node("VBoxContainer/Label").text, "Pass to " + navy, "by their navy")
+	var flag := Navies.ensign(game.players[1].navy)
+	assert_eq(swap.get_node("VBoxContainer/Flag").texture, flag, "under their flag")
+	var headings := ["YourFleet/YourFleetHeading", "OpponentFleet/OpponentFleetHeading"]
+	var flags := headings.map(
+		func(h: String) -> Texture2D: return game.gui.get_node("GUIGrid/" + h + "/Flag").texture
+	)
+	assert_eq(flags, [flag, Navies.ensign(game.players[0].navy)], "each fleet's flag")
 	assert_true(driver.action_button("EndTurn").disabled, "disabled between turns")
 	get_node("/root/GutRunner/GutLayer").visible = true
 
@@ -238,7 +245,8 @@ func test_victory_shows_attack_stats() -> void:
 		ship.sink()
 	await driver.end_turn()
 	var victory := await driver.find_dialog(game, "res://gui/victory.tscn")
-	var cells: Array = victory.get_node("VBoxContainer/Stats").get_children().map(
+	# After the row of flags
+	var cells: Array = victory.get_node("VBoxContainer/Stats").get_children().slice(3).map(
 		func(label: Label) -> String: return label.text
 	)
 	assert_eq(cells.slice(3, 6), ["Attacks", "2", "0"])

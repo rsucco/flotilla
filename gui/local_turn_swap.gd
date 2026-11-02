@@ -6,9 +6,11 @@ signal swap_done(watch_replay: bool)
 @onready var watch: CheckBox = $VBoxContainer/WatchReplay
 
 
-# In place of "Switching turns"
-func set_heading(text: String) -> void:
+# In place of "Switching turns", under the flag of whoever's up, if any
+func set_heading(text: String, flag: Texture2D = null) -> void:
 	$VBoxContainer/Label.text = text
+	$VBoxContainer/Flag.texture = flag
+	$VBoxContainer/Flag.visible = flag != null
 
 
 func offer_replay(available: bool, default: bool) -> void:

@@ -85,6 +85,11 @@ func show_revealed(ship: Ship) -> void:
 	ship.modulate = Color(1.0, 1.0, 1.0, 0.8)
 
 
+# Our navy's flag, or null without a navy (in tests)
+func ensign() -> Texture2D:
+	return Navies.ensign(navy) if not navy.is_empty() else null
+
+
 # What to call us: our navy's name
 func navy_name() -> String:
 	return Navies.ALL[navy].name if not navy.is_empty() else "Player " + str(player_num + 1)

@@ -16,6 +16,13 @@ func update_winner(winner: int, conceded: int = 0) -> void:
 # this scene, a dependency of its own victory screen
 func show_stats(players: Array, turns: int) -> void:
 	$VBoxContainer/Turns.text = "Turns: " + str(turns)
+	# Each side's flag heads its column
+	$VBoxContainer/Stats.add_child(Control.new())
+	for player in players:
+		var flag := TextureRect.new()
+		flag.texture = player.ensign()
+		flag.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		$VBoxContainer/Stats.add_child(flag)
 	var rows := [["", names[0], names[1]], ["Attacks"], ["Hit rate"], ["Ships left"]]
 	for player in players:
 		rows[1].append(str(player.attacks))

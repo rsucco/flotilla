@@ -179,7 +179,7 @@ func play_game() -> void:
 			var swapper := TURN_SWAP_SCENE.instantiate()
 			add_child(swapper)
 			# Who's up, which a loaded game otherwise leaves unsaid
-			swapper.set_heading("Pass to " + player.navy_name())
+			swapper.set_heading("Pass to " + player.navy_name(), player.ensign())
 			var replayable: bool = turn_replay.has_actions() and not carrying_on
 			swapper.offer_replay(replayable, player.watch_replay)
 			var watch: bool = await swapper.swap_done
@@ -391,6 +391,7 @@ func _update_fleets() -> void:
 	ours.append_array(turn_replay.held_ships(players[seat]))
 	# Our damage is part of what the replay shows
 	gui.update_fleets(ours, players[1 - seat].ships, not swapping)
+	gui.set_flags(players[seat].ensign(), players[1 - seat].ensign())
 
 
 # Whose side of the game the screen shows: whoever's turn it is in hot-seat,

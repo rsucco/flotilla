@@ -281,7 +281,17 @@ offset_bottom = 84.0
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="YourFleetText" type="Label" parent="GUIGrid/YourFleet"]
+[node name="YourFleetHeading" type="HBoxContainer" parent="GUIGrid/YourFleet"]
+layout_mode = 2
+alignment = 1
+
+[node name="Flag" type="TextureRect" parent="GUIGrid/YourFleet/YourFleetHeading"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="YourFleetText" type="Label" parent="GUIGrid/YourFleet/YourFleetHeading"]
 offset_right = 292.0
 offset_bottom = 14.0
 text = "Your Fleet:"
@@ -308,7 +318,17 @@ offset_right = 1256.0
 offset_bottom = 84.0
 size_flags_horizontal = 3
 
-[node name="OpponentFleetText" type="Label" parent="GUIGrid/OpponentFleet"]
+[node name="OpponentFleetHeading" type="HBoxContainer" parent="GUIGrid/OpponentFleet"]
+layout_mode = 2
+alignment = 1
+
+[node name="Flag" type="TextureRect" parent="GUIGrid/OpponentFleet/OpponentFleetHeading"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="OpponentFleetText" type="Label" parent="GUIGrid/OpponentFleet/OpponentFleetHeading"]
 offset_right = 292.0
 offset_bottom = 14.0
 text = "Opponent's Fleet:"

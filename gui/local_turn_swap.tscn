@@ -18,6 +18,11 @@ offset_right = 109.0
 offset_bottom = 59.0
 alignment = 1
 
+[node name="Flag" type="TextureRect" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+stretch_mode = 3
+
 [node name="Label" type="Label" parent="VBoxContainer"]
 offset_left = 2.0
 offset_top = 10.0

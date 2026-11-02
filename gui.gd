@@ -87,6 +87,12 @@ func update_turn(turn: int) -> void:
 
 
 # With `our_damage` false, our hits stay hidden (until the replay has shown them)
+# Each fleet panel's heading carries its navy's flag
+func set_flags(ours: Texture2D, theirs: Texture2D) -> void:
+	$GUIGrid/YourFleet/YourFleetHeading/Flag.texture = ours
+	$GUIGrid/OpponentFleet/OpponentFleetHeading/Flag.texture = theirs
+
+
 func update_fleets(ours: Array[Ship], theirs: Array[Ship], our_damage: bool = true) -> void:
 	fill_fleet($GUIGrid/YourFleet/YourFleetIcons, ours, our_damage)
 	fill_fleet($GUIGrid/OpponentFleet/OpponentFleetIcons, theirs, true)
