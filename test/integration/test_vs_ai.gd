@@ -11,6 +11,7 @@ var driver: GameDriver
 
 func before_each() -> void:
 	seed(7)
+	Dice.reseed(7)
 	Root.mode = Root.Mode.VS_AI
 	# GUT's own window would catch the board clicks
 	get_node("/root/GutRunner/GutLayer").visible = false

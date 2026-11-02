@@ -304,7 +304,7 @@ func cruiser_intercepts(hex: Vector2i, chance: float) -> bool:
 	for h in grid.get_all_hex_neighbors(hex, 2):
 		var cruiser := get_ship_at_hex(h)
 		if cruiser != null and cruiser.ship_type == "cruiser":
-			if randf() >= chance:
+			if Dice.roll() >= chance:
 				return false
 			print("passive - missile defense")
 			interceptor = cruiser
