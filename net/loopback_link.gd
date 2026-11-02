@@ -4,7 +4,7 @@ extends Link
 # receives on its next poll()
 
 var other: LoopbackLink
-var _inbox: Array[Dictionary] = []
+var _wire: Array[Dictionary] = []
 var _closed := false
 var _greeted := false
 
@@ -20,7 +20,7 @@ static func pair() -> Array[LoopbackLink]:
 func send(message: Dictionary) -> void:
 	if not _closed:
 		# A copy, as if it had crossed the network
-		other._inbox.append(message.duplicate(true))
+		other._wire.append(message.duplicate(true))
 
 
 func poll() -> void:
@@ -28,8 +28,8 @@ func poll() -> void:
 	if not _greeted:
 		_greeted = true
 		_say_hello()
-	while not _inbox.is_empty():
-		_deliver(_inbox.pop_front())
+	while not _wire.is_empty():
+		_deliver(_wire.pop_front())
 	if other._closed and linked:
 		linked = false
 		dropped.emit()

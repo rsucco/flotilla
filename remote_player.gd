@@ -8,13 +8,9 @@ extends HiddenPlayer
 # and send_placements(). Each move carries a checksum of the game as its
 # sender had it, to catch the two drifting apart.
 
-# A message arrived for _take()
-signal arrived
-
 var link: Link
 # Whether this game is the host's
 var hosting := false
-var _inbox: Array[Dictionary] = []
 # Where each of our ships goes, as sent from the other end
 var _placements: Array = []
 
@@ -26,11 +22,6 @@ func _init(num: int, with: Link, host: bool) -> void:
 
 
 func _ready() -> void:
-	link.received.connect(
-		func(message: Dictionary) -> void:
-			_inbox.append(message)
-			arrived.emit()
-	)
 	# Every frame, even under the Esc menu (which pauses the tree), or the
 	# connection would time out
 	get_tree().process_frame.connect(link.poll)
@@ -150,9 +141,9 @@ func _play() -> void:
 
 # The next message, which should be one of `types`, once it's arrived
 func _take(types: Array[String]) -> Dictionary:
-	while _inbox.is_empty():
-		await arrived
-	var message: Dictionary = _inbox.pop_front()
+	while link.inbox.is_empty():
+		await link.received
+	var message: Dictionary = link.inbox.pop_front()
 	if not message.get("type") in types:
 		push_error("Expected %s from the other game, not %s" % [types, message.get("type")])
 	return message

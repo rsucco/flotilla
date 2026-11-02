@@ -231,6 +231,8 @@ func play_game() -> void:
 		# The AI's turn, or the other LAN player's, plays out live
 		if players[player_up] is HiddenPlayer:
 			turn_replay.watch(players[player_up])
+		if players[player_up] is RemotePlayer:
+			_banner(players[player_up].navy_name() + "'s turn")
 		if carrying_on:
 			# Carry on with the AP and fire actions it was saved with
 			players[player_up].resume_turn()
@@ -247,6 +249,7 @@ func play_game() -> void:
 			# For hits and repairs, which don't change the fleet
 			_update_fleets()
 		players[player_up].finish_turn()
+		_banner("")
 		if turn_replay.watching != null:
 			turn_replay.stop_watching()
 		if players[player_up].conceded:
@@ -307,12 +310,16 @@ func _set_up() -> void:
 func _set_up_lan() -> void:
 	var ours: LocalPlayer = players[seat]
 	var theirs: RemotePlayer = players[1 - seat]
+	_banner("Waiting for the " + ("guest" if hosting else "host") + "…")
 	await theirs.share_islands()
+	_banner("")
 	var selections := [{}, {}]
 	choosing = true
 	selections[seat] = await ours.get_ship_selection()
 	theirs.send_fleet(selections[seat])
+	_banner("Waiting for the other player to choose their fleet…")
 	selections[1 - seat] = await theirs.get_ship_selection()
+	_banner("")
 	# Chosen at once: the host keeps the navy, and the guest chooses again
 	while ours.navy == theirs.navy:
 		selections[seat] = await ours.get_ship_selection()
@@ -320,13 +327,21 @@ func _set_up_lan() -> void:
 	choosing = false
 	await ours.place_ships(selections[seat])
 	theirs.send_placements()
+	_banner("Waiting for " + theirs.navy_name() + " to place their ships…")
 	await theirs.place_ships(selections[1 - seat])
+	_banner("")
 	setup = {
 		"islands": grid.get_islands(),
 		"selections": selections,
 		"navies": [players[0].navy, players[1].navy]
 	}
 	game_id = ResourceUID.create_id()
+
+
+# What a LAN game is waiting on, if anything, over the top of the board
+func _banner(text: String) -> void:
+	$Banner/Label.text = text
+	$Banner.visible = not text.is_empty()
 
 
 # Everything needed to carry on with this game: at the swap screen before

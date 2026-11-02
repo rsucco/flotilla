@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://turn_replay.tscn" id="6"]
 [ext_resource type="AudioStream" path="res://audio/title_music.ogg" id="7"]
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/menu.svg" id="8"]
+[ext_resource type="StyleBox" path="res://gui/popup.tres" id="9"]
 
 [node name="Root" type="Node2D"]
 script = ExtResource("4")
@@ -27,6 +28,20 @@ tooltip_text = "Menu (Esc)"
 theme_override_constants/icon_max_width = 16
 icon = ExtResource("8")
 icon_alignment = 1
+
+[node name="Banner" type="PanelContainer" parent="."]
+visible = false
+offset_left = 440.0
+offset_top = 4.0
+offset_right = 840.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("9")
+
+[node name="Label" type="Label" parent="Banner"]
+layout_mode = 2
+text = "Waiting"
+horizontal_alignment = 1
 
 [node name="TileHistory" parent="." instance=ExtResource("2")]
 visible = false

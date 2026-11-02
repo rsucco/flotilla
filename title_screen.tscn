@@ -71,7 +71,6 @@ text = "Settings"
 offset_top = 48.0
 offset_right = 138.0
 offset_bottom = 68.0
-disabled = true
 text = "LAN Multiplayer"
 
 [node name="Online" type="Button" parent="TextureRect/PanelContainer/Buttons"]
@@ -104,6 +103,7 @@ bus = &"Music"
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Load" to="." method="_on_load_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/SinglePlayer" to="." method="_on_single_player_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Hotseat" to="." method="_on_Hotseat_pressed"]
+[connection signal="pressed" from="TextureRect/PanelContainer/Buttons/LAN" to="." method="_on_lan_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/HowToPlay" to="." method="_on_how_to_play_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="TextureRect/PanelContainer/Buttons/Exit" to="." method="_on_Exit_pressed"]

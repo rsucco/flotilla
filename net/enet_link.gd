@@ -44,12 +44,17 @@ func send(message: Dictionary) -> void:
 
 
 func poll() -> void:
+	if _peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
+		return
 	_peer.poll()
 	while _peer.get_available_packet_count() > 0:
 		# No objects, so a malicious packet can't run code
 		var message: Variant = bytes_to_var(_peer.get_packet())
 		if message is Dictionary:
 			_deliver(message)
+	# A guest whose connection gave up before the hello
+	if _peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED and not linked:
+		failed.emit("No game answered there")
 
 
 func close() -> void:

@@ -3,6 +3,7 @@ extends Node2D
 const HOW_TO_PLAY_SCENE := preload("res://gui/how_to_play.tscn")
 const SETTINGS_SCENE := preload("res://gui/settings.tscn")
 const LOAD_SCENE := preload("res://gui/load_game.tscn")
+const LOBBY_SCENE := preload("res://gui/lan_lobby.tscn")
 
 
 func _ready() -> void:
@@ -16,6 +17,8 @@ func _ready() -> void:
 	# games can still be loaded
 	$TextureRect/PanelContainer/Buttons/Continue.visible = SaveGame.latest() != ""
 	$TextureRect/PanelContainer/Buttons/Load.disabled = not SaveGame.any()
+	# Browsers can't open the connections LAN play needs
+	$TextureRect/PanelContainer/Buttons/LAN.visible = not OS.has_feature("web")
 	Focus.first($TextureRect/PanelContainer/Buttons)
 
 
@@ -25,6 +28,17 @@ func _on_single_player_pressed() -> void:
 
 func _on_Hotseat_pressed() -> void:
 	_start(Root.Mode.HOT_SEAT)
+
+
+func _on_lan_pressed() -> void:
+	var lobby := LOBBY_SCENE.instantiate()
+	lobby.linked.connect(
+		func(link: Link, hosting: bool) -> void:
+			Root.link = link
+			Root.hosting = hosting
+			_start(Root.Mode.LAN)
+	)
+	_show_overlay(lobby)
 
 
 func _start(mode: Root.Mode) -> void:

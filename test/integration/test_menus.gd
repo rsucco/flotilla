@@ -33,6 +33,7 @@ func test_each_screen_starts_on_something_to_press() -> void:
 		"res://gui/settings.tscn": "Master",
 		"res://gui/local_turn_swap.tscn": "OK",
 		"res://gui/victory.tscn": "Rematch",
+		"res://gui/lan_lobby.tscn": "Host",
 	}
 	for scene: String in expected:
 		var screen: Node = add_child_autofree(load(scene).instantiate())
