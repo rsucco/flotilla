@@ -5,6 +5,8 @@ extends Player
 signal ship_shown(ship: Ship)
 # Button name -> whether it can be pressed
 signal buttons_changed(enabled: Dictionary)
+# How far through End Turn's hold, 0 to 1 (0 once let go or done)
+signal end_turn_holding(fraction: float)
 
 const TILE_HIST_HOVER_TIME := 0.5
 # Ships with no AP left; opaque, since translucent means revealed
@@ -142,13 +144,16 @@ func _shortcut(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	# End Turn by holding its shortcut down; once per hold, even across turns
+	var was := end_turn_held
 	if not Input.is_action_pressed("action_end_turn"):
 		end_turn_held = 0.0
-	elif active and awaiting_move:
+	elif active and awaiting_move and enabled.get("EndTurn", false):
 		end_turn_held += delta
-		if end_turn_held >= END_TURN_HOLD and enabled.get("EndTurn", false):
+		if end_turn_held >= END_TURN_HOLD:
 			end_turn_held = -INF
 			press("EndTurn")
+	if end_turn_held != was:
+		end_turn_holding.emit(clampf(end_turn_held / END_TURN_HOLD, 0.0, 1.0))
 	if current_on_hex != Grid.OFF_GRID:
 		on_hex_time += delta
 	else:

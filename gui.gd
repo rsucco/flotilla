@@ -5,8 +5,33 @@ extends PanelContainer
 signal action_pressed(action: String)
 
 const BUTTON_TEMPLATE := preload("res://gui/sprites/buttons/button_template.png")
+# The Controller Icons addon's texture, loaded rather than named so that
+# --check-only can compile this script (see CLAUDE.md)
+const GLYPH_SCRIPT := "res://addons/controller_icons/objects/ControllerIconTexture.gd"
+# HUD button -> the input action whose button or key it shows
+const GLYPHS := {
+	"Fire": "action_fire",
+	"Special": "action_special",
+	"Secondary": "action_secondary",
+	"NextShip": "action_next_ship",
+	"Forward": "action_forward",
+	"Reverse": "action_reverse",
+	"Port": "action_port",
+	"Starboard": "action_starboard",
+	"EndTurn": "action_end_turn",
+}
+const GLYPH_SIZE := 14
 
 var ship_icons := {}
+# Whether the buttons show which button or key presses them: only while a
+# controller, or a hotkey, was the last thing used; the mouse hides them
+var hints := false:
+	set(value):
+		hints = value
+		for button: String in GLYPHS:
+			_glyph(button).visible = value
+# How far through End Turn's hold, 0 to 1
+var end_turn_hold := 0.0
 
 @onready var special_info: Label = $GUIGrid/ShipInfo/AbilityInfo/SpecialAbility
 @onready var secondary_info: Label = $GUIGrid/ShipInfo/AbilityInfo/SecondaryAbility
@@ -22,6 +47,28 @@ var ship_icons := {}
 func _ready() -> void:
 	for ship_type in Ship.SHIP_TYPES:
 		ship_icons[ship_type] = load("res://gui/sprites/" + ship_type + "_icon.png")
+	for button: String in GLYPHS:
+		var glyph := TextureRect.new()
+		glyph.name = "Glyph"
+		var texture: Texture2D = load(GLYPH_SCRIPT).new()
+		texture.set("path", GLYPHS[button])
+		glyph.texture = texture
+		glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		glyph.visible = false
+		find_child(button).add_child(glyph)
+		# In the top-right corner, or beside End Turn, whose text fills it
+		glyph.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		glyph.offset_left = -GLYPH_SIZE - 1
+		glyph.offset_top = 1
+		if button == "EndTurn":
+			glyph.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+			glyph.offset_left = -GLYPH_SIZE - 3
+			glyph.offset_top = -GLYPH_SIZE / 2.0
+		glyph.offset_right = glyph.offset_left + GLYPH_SIZE
+		glyph.offset_bottom = glyph.offset_top + GLYPH_SIZE
+	find_child("EndTurn").draw.connect(_draw_end_turn_hold)
 	for button: Button in find_children("*", "Button"):
 		button.pressed.connect(func() -> void: action_pressed.emit(button.name))
 		# Or a clicked button would keep the focus, and with it Tab, Space and Enter
@@ -32,6 +79,47 @@ func _ready() -> void:
 func set_buttons(enabled: Dictionary) -> void:
 	for button: String in enabled:
 		(find_child(button) as Button).disabled = not enabled[button]
+		if GLYPHS.has(button):
+			_glyph(button).modulate.a = 1.0 if enabled[button] else 0.4
+
+
+func _glyph(button: String) -> TextureRect:
+	return find_child(button).get_node("Glyph")
+
+
+# A controller or a hotkey shows the hints; real mouse use hides them (the
+# HexCursor's stand-in mouse moves have no relative motion, so don't count)
+func _input(event: InputEvent) -> void:
+	if event is InputEventJoypadButton or event is InputEventKey:
+		if event.is_pressed() and not hints:
+			hints = true
+	elif event is InputEventJoypadMotion:
+		if absf((event as InputEventJoypadMotion).axis_value) > 0.5 and not hints:
+			hints = true
+	elif (
+		event is InputEventMouseButton
+		or (
+			event is InputEventMouseMotion
+			and (event as InputEventMouseMotion).relative != Vector2.ZERO
+		)
+	):
+		if hints:
+			hints = false
+
+
+# Shows how far through the End Turn hold the player is
+func show_end_turn_hold(fraction: float) -> void:
+	end_turn_hold = fraction
+	find_child("EndTurn").queue_redraw()
+
+
+# A bar filling along the bottom of End Turn while it's held
+func _draw_end_turn_hold() -> void:
+	if end_turn_hold <= 0.0:
+		return
+	var button: Button = find_child("EndTurn")
+	var bar := Rect2(0, button.size.y - 4, button.size.x * end_turn_hold, 4)
+	button.draw_rect(bar, Color.WHITE)
 
 
 func update_ship_info(ship: Ship) -> void:

@@ -73,6 +73,7 @@ func _ready() -> void:
 			local.tile_history = $TileHistory
 			local.ship_shown.connect(gui.update_ship_info)
 			local.buttons_changed.connect(gui.set_buttons)
+			local.end_turn_holding.connect(gui.show_end_turn_hold)
 		player.fleet_changed.connect(_update_fleets)
 		player.attack_started.connect(turn_replay.begin)
 		player.attack_landed.connect(turn_replay.land)

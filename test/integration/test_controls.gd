@@ -199,3 +199,31 @@ func test_placing_with_the_cursor_and_buttons() -> void:
 		a.pressed = true
 		setup.get_viewport().push_input(a)
 		assert_false(ship.placing, "A places it")
+
+
+func test_button_hints_only_after_a_controller_or_hotkey() -> void:
+	var gui := game.gui
+	var glyph: Control = gui.find_child("Fire").get_node("Glyph")
+	var mouse := InputEventMouseMotion.new()
+	mouse.relative = Vector2(5, 0)
+	game.get_viewport().push_input(mouse)
+	assert_false(glyph.visible, "hidden for mouse players")
+	await pad(JOY_BUTTON_LEFT_SHOULDER)
+	assert_true(glyph.visible, "shown once a controller's used")
+	game.cursor.move_to(Vector2i(20, 7))
+	assert_true(glyph.visible, "and kept while the cursor stands in for the mouse")
+	game.get_viewport().push_input(mouse)
+	assert_false(glyph.visible, "hidden as the real mouse moves")
+	await key(KEY_TAB)
+	assert_true(glyph.visible, "shown for a hotkey too")
+
+
+func test_end_turn_shows_its_hold_filling() -> void:
+	var fills: Array[float] = []
+	player.end_turn_holding.connect(func(fraction: float) -> void: fills.append(fraction))
+	Input.action_press("action_end_turn")
+	await wait_seconds(0.5)
+	assert_almost_eq(game.gui.end_turn_hold, 0.5, 0.15, "half way")
+	await wait_seconds(0.7)
+	assert_eq(game.gui.end_turn_hold, 0.0, "empty once the turn ends")
+	assert_gt(fills.max(), 0.9, "filled up first")
