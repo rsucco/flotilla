@@ -104,6 +104,8 @@ func test_the_victory_screen_says_you_and_the_ai() -> void:
 	var victory := await driver.find_dialog(game, "res://gui/victory.tscn")
 	var ai := game.players[1].navy_name()
 	assert_eq(victory.get_node("VBoxContainer/Label").text, ai + " wins! You conceded.")
+	assert_true(game.get_node("DefeatMusic").playing, "the defeat music")
+	assert_false(game.get_node("VictoryMusic").playing)
 	# After the row of flags
 	var stats := victory.get_node("VBoxContainer/Stats").get_children().slice(3)
 	assert_eq([stats[1].text, stats[2].text], ["You", ai])

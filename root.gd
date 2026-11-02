@@ -281,15 +281,29 @@ func play_game() -> void:
 
 	# Nothing left to carry on with, though its saves can still be loaded
 	SaveGame.mark_finished(game_id)
-	var victory := _victory()
+	var winner := 0 if players[0].ships.size() > players[1].ships.size() else 1
 	if players[player_up].conceded:
-		victory.update_winner(2 - player_up, player_up + 1)
+		winner = 1 - player_up
+	var victory := _victory(winner)
+	if players[player_up].conceded:
+		victory.update_winner(winner + 1, player_up + 1)
 	else:
-		victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
+		victory.update_winner(winner + 1)
 	victory.show_stats(players, current_turn)
 
 
-func _victory() -> Node:
+# The end-of-game screen, and its music: victory for whoever's at the screen
+# when `winner` (a seat, or -1 if no one) is them, and in hot-seat, where
+# someone at the screen always won
+func _victory(winner: int) -> Node:
+	# The title music, if a LAN game ended during setup
+	var playing: AudioStreamPlayer = $Music if $Music.playing else $TitleMusic
+	if winner == -1:
+		_crossfade(playing, null)
+	elif hot_seat or winner == seat:
+		_crossfade(playing, $VictoryMusic)
+	else:
+		_crossfade(playing, $DefeatMusic)
 	var victory := VICTORY_SCENE.instantiate()
 	victory.names.assign(players.map(func(p: Player) -> String: return p.navy_name()))
 	if not hot_seat:
@@ -307,7 +321,7 @@ func _on_back_in_touch() -> void:
 # They left, or never came back: as good as conceding
 func _on_gone(left: bool) -> void:
 	if _end_early():
-		var victory := _victory()
+		var victory := _victory(seat)
 		var how := "left the game" if left else "dropped out"
 		victory.update_winner(seat + 1, 2 - seat, how)
 		victory.show_stats(players, current_turn)
@@ -316,7 +330,7 @@ func _on_gone(left: bool) -> void:
 func _on_out_of_step(why: String) -> void:
 	if _end_early():
 		players[1 - seat].link.close()
-		var victory := _victory()
+		var victory := _victory(-1)
 		victory.say("The two games stopped matching, so this one can't go on. (%s)" % why)
 		victory.show_stats(players, current_turn)
 
@@ -510,17 +524,21 @@ func _restore(data: Dictionary) -> void:
 	turn_replay.restore(data.replay, players, fleets)
 
 
-# Crossfades from the title music to the battle music as the first turn starts
+# From the title music to the battle music as the first turn starts
 func _start_battle_music() -> void:
-	var title: AudioStreamPlayer = $TitleMusic
-	var battle: AudioStreamPlayer = $Music
-	var volume := battle.volume_db
-	battle.volume_db = -60.0
-	battle.play()
+	_crossfade($TitleMusic, $Music)
+
+
+# Fades `from` out and `to` (if any) in from the start
+func _crossfade(from: AudioStreamPlayer, to: AudioStreamPlayer) -> void:
 	var fade := create_tween().set_parallel()
-	fade.tween_property(battle, "volume_db", volume, MUSIC_FADE)
-	fade.tween_property(title, "volume_db", -60.0, MUSIC_FADE)
-	fade.chain().tween_callback(title.stop)
+	if to != null:
+		var volume := to.volume_db
+		to.volume_db = -60.0
+		to.play()
+		fade.tween_property(to, "volume_db", volume, MUSIC_FADE)
+	fade.tween_property(from, "volume_db", -60.0, MUSIC_FADE)
+	fade.chain().tween_callback(from.stop)
 
 
 func _update_fleets() -> void:

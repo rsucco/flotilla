@@ -153,6 +153,8 @@ func test_conceding_ends_both_games() -> void:
 	var victory: Node = drivers[1]._dialog(guest, "res://gui/victory.tscn")
 	assert_string_contains(victory.get_node("VBoxContainer/Label").text, "You win!")
 	assert_false(victory.get_node("VBoxContainer/HBoxContainer/Rematch").visible, "no rematch yet")
+	assert_true(guest.get_node("VictoryMusic").playing, "the winner's music")
+	assert_true(host.get_node("DefeatMusic").playing, "and the loser's")
 
 
 func test_lan_games_are_never_saved() -> void:

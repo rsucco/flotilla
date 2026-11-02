@@ -112,6 +112,8 @@ Basic gameplay is similar to Battleship, with some exceptions:
 ###### Music
 - [Matthew Pablo](https://opengameart.org/content/blackmoor-tides-epic-pirate-battle-theme) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
 - [yd](https://opengameart.org/content/enemy-ship-approaching) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Jonathan Shaw](https://opengameart.org/content/cant-stop-winning-rpg-orchestral-essentials-battle-victory-music) [(CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/deed.en)
+- [Eldritch Grim](https://opengameart.org/content/the-sad-battle) [(CC0 1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
 
 ###### Programming
 - Ryan Succo

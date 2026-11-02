@@ -99,5 +99,6 @@ func test_full_game() -> void:
 	if victory:
 		var navy := game.players[0].navy_name()
 		assert_eq(victory.get_node("VBoxContainer/Label").text, navy + " wins!")
+		assert_true(game.get_node("VictoryMusic").playing, "someone at the screen won")
 		var stats := victory.get_node("VBoxContainer/Stats")
 		assert_eq((stats.get_child(1) as TextureRect).texture, game.players[0].ensign(), "flags")
