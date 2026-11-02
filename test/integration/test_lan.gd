@@ -161,3 +161,65 @@ func test_lan_games_are_never_saved() -> void:
 	host.pause_menu.opened.emit()
 	assert_false(host.pause_menu.can_save, "nor a save from the menu")
 	assert_true(host.pause_menu.can_concede)
+
+
+func victory_text(game: Root) -> String:
+	await drivers[0].wait_until(
+		func() -> bool: return drivers[0]._dialog(game, "res://gui/victory.tscn") != null,
+		5,
+		"the end of the game"
+	)
+	var victory: Node = drivers[0]._dialog(game, "res://gui/victory.tscn")
+	return victory.get_node("VBoxContainer/Label").text if victory != null else ""
+
+
+func test_leaving_counts_as_conceding() -> void:
+	await start()
+	# Mid-way through the host's turn, the guest quits
+	guest.free()
+	var them: String = host.players[1].navy_name()
+	assert_eq(await victory_text(host), "You win! " + them + " left the game.")
+	assert_true(host.over)
+	assert_false(host.players[0].active, "no more moves")
+
+
+func test_a_blip_is_waited_out() -> void:
+	await start()
+	var link: Link = host.players[1].link
+	link.quiet_after = 0.2
+	guest.players[0].link.muted = true
+	# They move while we can't hear them
+	await drivers[0].wait_until(func() -> bool: return link.is_quiet, 5, "the silence")
+	await drivers[0].wait_until(
+		func() -> bool: return host.get_node("Banner").visible, 5, "the banner"
+	)
+	assert_string_contains(host.get_node("Banner/Label").text, "Lost touch with")
+	guest.players[0].link.muted = false
+	await drivers[0].wait_until(func() -> bool: return not link.is_quiet, 5, "word again")
+	assert_false(host.get_node("Banner").visible, "back as it was: our turn, no banner")
+	await act(host, "carrier", "Forward")
+	assert_true(in_step(), "carrying on")
+	assert_false(host.over)
+
+
+func test_a_minutes_silence_is_dropping_out() -> void:
+	await start()
+	host.players[1].link.give_up_after = 0.5
+	guest.players[0].link.muted = true
+	var them: String = host.players[1].navy_name()
+	assert_eq(await victory_text(host), "You win! " + them + " dropped out.")
+
+
+func test_games_out_of_step_both_stop() -> void:
+	await start()
+	# Something the guest's game got wrong
+	guest.players[0].ships[0].ap = 1
+	await drivers[0].act("carrier", "Forward")
+	for game in [host, guest]:
+		assert_string_contains(await victory_text(game), "stopped matching")
+
+
+func test_leaving_during_setup() -> void:
+	await choose(host, "usa")
+	guest.free()
+	assert_string_contains(await victory_text(host), "left the game")

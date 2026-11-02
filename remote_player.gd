@@ -8,6 +8,13 @@ extends HiddenPlayer
 # and send_placements(). Each move carries a checksum of the game as its
 # sender had it, to catch the two drifting apart.
 
+# Word from them again after a few seconds' silence (`link.is_quiet`)
+signal back_in_touch
+# They're gone: left the game, or silent for a minute
+signal gone(left: bool)
+# The two games no longer agree, so this one can't go on
+signal out_of_step(why: String)
+
 var link: Link
 # Whether this game is the host's
 var hosting := false
@@ -22,6 +29,14 @@ func _init(num: int, with: Link, host: bool) -> void:
 
 
 func _ready() -> void:
+	link.heard.connect(back_in_touch.emit)
+	link.dropped.connect(gone.emit)
+	link.received.connect(
+		func() -> void:
+			var last: Dictionary = link.inbox.back()
+			if last.get("type") == "stop":
+				out_of_step.emit(str(last.get("why")))
+	)
 	# Every frame, even under the Esc menu (which pauses the tree), or the
 	# connection would time out
 	get_tree().process_frame.connect(link.poll)
@@ -78,7 +93,7 @@ func _place(ship: Ship) -> void:
 	var spot: Array = _placements.pop_front()
 	ship.title = spot[2]
 	if not ship.can_place(spot[0], spot[1]):
-		push_error("They placed a ship where it can't go")
+		_stop("They placed a ship where it can't go")
 	ship.set_grid_position(spot[0], spot[1])
 	ship.visible = false
 
@@ -117,7 +132,7 @@ func get_move() -> void:
 func _play() -> void:
 	var move := await _take(["ask" if hosting else "move", "end", "concede"])
 	if move.sum != checksum():
-		push_error("Out of sync with the other game")
+		_stop("The games no longer match")
 	match move.type:
 		"end":
 			end_turn()
@@ -129,7 +144,7 @@ func _play() -> void:
 			var ship: Ship = ships[move.ship] if move.ship in range(ships.size()) else null
 			if hosting:
 				if not can_perform(ship, move.action, move.target):
-					push_error("They asked for a move they can't make")
+					_stop("They asked for a move they can't make")
 					return
 				move.type = "move"
 				move.seed = randi()
@@ -145,7 +160,7 @@ func _take(types: Array[String]) -> Dictionary:
 		await link.received
 	var message: Dictionary = link.inbox.pop_front()
 	if not message.get("type") in types:
-		push_error("Expected %s from the other game, not %s" % [types, message.get("type")])
+		_stop("Expected %s from them, not %s" % [types, message.get("type")])
 	return message
 
 
@@ -167,3 +182,9 @@ func checksum() -> int:
 			var tile := grid.tile(Vector2i(x, y))
 			state.append([tile.history, tile.is_mined])
 	return hash(state)
+
+
+# The games no longer agree: tells the other end, which stops too
+func _stop(why: String) -> void:
+	link.send({"type": "stop", "why": why})
+	out_of_step.emit(why)

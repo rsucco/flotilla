@@ -5,6 +5,9 @@ extends Link
 # packets, rather than through RPCs, so nothing depends on node paths.
 
 const PORT := 43210
+# ENet's own limit on silence (msec), past Link's minute so it's Link that
+# gives up, and ENet holds on through a blip, resending what was held up
+const TIMEOUT := 90000
 
 var _peer := ENetMultiplayerPeer.new()
 
@@ -29,13 +32,12 @@ static func join(address: String, port: int = PORT) -> EnetLink:
 
 func _listen() -> void:
 	_peer.transfer_mode = MultiplayerPeer.TRANSFER_MODE_RELIABLE
-	_peer.peer_connected.connect(func(_id: int) -> void: _say_hello())
-	_peer.peer_disconnected.connect(
-		func(_id: int) -> void:
-			if linked:
-				linked = false
-				dropped.emit()
+	_peer.peer_connected.connect(
+		func(id: int) -> void:
+			_peer.get_peer(id).set_timeout(0, TIMEOUT, TIMEOUT)
+			_say_hello()
 	)
+	_peer.peer_disconnected.connect(func(_id: int) -> void: _drop(true))
 
 
 func send(message: Dictionary) -> void:
@@ -43,7 +45,7 @@ func send(message: Dictionary) -> void:
 	_peer.put_packet(var_to_bytes(message))
 
 
-func poll() -> void:
+func _pump() -> void:
 	if _peer.get_connection_status() == MultiplayerPeer.CONNECTION_DISCONNECTED:
 		return
 	_peer.poll()
@@ -58,4 +60,7 @@ func poll() -> void:
 
 
 func close() -> void:
+	# Sends what's queued first: closing throws it away
+	if _peer.get_connection_status() != MultiplayerPeer.CONNECTION_DISCONNECTED:
+		_peer.host.flush()
 	_peer.close()

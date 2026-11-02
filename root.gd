@@ -46,6 +46,9 @@ var current_turn := 0
 var swapping := false
 # The ship selection dialog is up
 var choosing := false
+# Ended early, in a LAN game: the other player left or the games fell out of
+# step. Whatever was waiting on them stops there.
+var over := false
 # The board and fleets this game started with, once both players have chosen
 var setup := {}
 # Tells this game's saves from others', to mark them finished when it ends.
@@ -54,6 +57,8 @@ var game_id := 0
 # Testing cheats (debug builds): V shows both fleets, C readies every ability
 # of the player whose turn it is
 var reveal_all := false
+# The banner as it was before we lost touch, to put back
+var _banner_before := ""
 
 @onready var gui: GUI = $GUI
 @onready var pause_menu: PauseMenu = $PauseMenu
@@ -79,6 +84,9 @@ func _ready() -> void:
 				[LocalPlayer.new(0), theirs] if hosting else [theirs, LocalPlayer.new(1)]
 			)
 			link = null
+			theirs.back_in_touch.connect(_on_back_in_touch)
+			theirs.gone.connect(_on_gone)
+			theirs.out_of_step.connect(_on_out_of_step)
 	players[0].opponent = players[1]
 	players[1].opponent = players[0]
 	for player in players:
@@ -161,6 +169,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	# Counting down to giving up on them
+	if mode == Mode.LAN and players[1 - seat].link.is_quiet and not over:
+		var link: Link = players[1 - seat].link
+		var left := ceili(link.give_up_after - link.silence())
+		$Banner/Label.text = (
+			"Lost touch with %s. Waiting for them… %d:%02d"
+			% [players[1 - seat].navy_name(), left / 60, left % 60]
+		)
+		$Banner.visible = true
 	# Ships hide and show themselves all turn, so keep overriding them
 	if reveal_all:
 		for player in players:
@@ -180,6 +197,8 @@ func play_game() -> void:
 	loaded = {}
 	if resume.is_empty():
 		await _set_up()
+		if over:
+			return
 	else:
 		_restore(resume)
 	# A LAN game's replay would need the other player too
@@ -246,6 +265,8 @@ func play_game() -> void:
 		while players[player_up].has_moves():
 			players[player_up].get_move()
 			await players[player_up].made_move
+			if over:
+				return
 			# For hits and repairs, which don't change the fleet
 			_update_fleets()
 		players[player_up].finish_turn()
@@ -260,17 +281,58 @@ func play_game() -> void:
 
 	# Nothing left to carry on with, though its saves can still be loaded
 	SaveGame.mark_finished(game_id)
+	var victory := _victory()
+	if players[player_up].conceded:
+		victory.update_winner(2 - player_up, player_up + 1)
+	else:
+		victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
+	victory.show_stats(players, current_turn)
+
+
+func _victory() -> Node:
 	var victory := VICTORY_SCENE.instantiate()
 	victory.names.assign(players.map(func(p: Player) -> String: return p.navy_name()))
 	if not hot_seat:
 		victory.names[seat] = "You"
 	victory.rematch = mode != Mode.LAN
-	if players[player_up].conceded:
-		victory.update_winner(2 - player_up, player_up + 1)
-	else:
-		victory.update_winner(1 if players[0].ships.size() > players[1].ships.size() else 2)
 	add_child(victory)
-	victory.show_stats(players, current_turn)
+	return victory
+
+
+# Heard from them again after a blip (_process() counted it down meanwhile)
+func _on_back_in_touch() -> void:
+	_banner(_banner_before)
+
+
+# They left, or never came back: as good as conceding
+func _on_gone(left: bool) -> void:
+	if _end_early():
+		var victory := _victory()
+		var how := "left the game" if left else "dropped out"
+		victory.update_winner(seat + 1, 2 - seat, how)
+		victory.show_stats(players, current_turn)
+
+
+func _on_out_of_step(why: String) -> void:
+	if _end_early():
+		players[1 - seat].link.close()
+		var victory := _victory()
+		victory.say("The two games stopped matching, so this one can't go on. (%s)" % why)
+		victory.show_stats(players, current_turn)
+
+
+# Stops the game where it is; false if it already had
+func _end_early() -> bool:
+	if over:
+		return false
+	over = true
+	_banner("")
+	pause_menu.close()
+	if players[seat].active:
+		players[seat].finish_turn()
+	if turn_replay.watching != null:
+		turn_replay.stop_watching()
+	return true
 
 
 # Ship selection and placement for both players
@@ -340,6 +402,7 @@ func _set_up_lan() -> void:
 
 # What a LAN game is waiting on, if anything, over the top of the board
 func _banner(text: String) -> void:
+	_banner_before = text
 	$Banner/Label.text = text
 	$Banner.visible = not text.is_empty()
 

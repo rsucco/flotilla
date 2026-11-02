@@ -14,12 +14,13 @@ func _ready() -> void:
 	button.grab_focus(true)
 
 
-# `winner` and `conceded` (the player who gave up, if one did) count from 1
-func update_winner(winner: int, conceded: int = 0) -> void:
+# `winner` and `conceded` (the player who gave up, if one did) count from 1.
+# `how` they gave up: conceded, or in a LAN game left or dropped out.
+func update_winner(winner: int, conceded: int = 0, how: String = "conceded") -> void:
 	var who := names[winner - 1]
 	$VBoxContainer/Label.text = who + (" win!" if who == "You" else " wins!")
 	if conceded != 0:
-		$VBoxContainer/Label.text += " " + names[conceded - 1] + " conceded."
+		$VBoxContainer/Label.text += " " + names[conceded - 1] + " " + how + "."
 
 
 # `players` is untyped: naming Player here would make Root, which preloads
@@ -58,3 +59,8 @@ func _on_Title_pressed() -> void:
 
 func _on_Rematch_pressed() -> void:
 	get_tree().reload_current_scene()
+
+
+# Instead of a winner, when a game couldn't be finished
+func say(text: String) -> void:
+	$VBoxContainer/Label.text = text
