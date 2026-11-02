@@ -229,3 +229,32 @@ func test_end_turn_shows_its_hold_filling() -> void:
 	await wait_seconds(0.7)
 	assert_eq(game.gui.end_turn_hold, 0.0, "empty once the turn ends")
 	assert_gt(fills.max(), 0.9, "filled up first")
+
+
+func test_next_ship_goes_to_ships_that_can_still_fire() -> void:
+	for ship in player.ships:
+		ship.fire_remaining = 1 if ship.ship_type == "carrier" else 0
+	await driver.select("destroyer")
+	await pad(JOY_BUTTON_RIGHT_SHOULDER)
+	assert_eq(player.selected_ship.ship_type, "carrier", "past those that can't")
+	var carrier := player.selected_ship
+	await pad(JOY_BUTTON_RIGHT_SHOULDER)
+	assert_ne(player.selected_ship, carrier, "then on round the rest")
+
+
+func test_switching_ships_while_a_shot_is_in_the_air() -> void:
+	await driver.select("battleship")
+	await key(KEY_F)
+	game.cursor.move_to(driver.ship_of(1, "destroyer").hex)
+	await key(KEY_ENTER)
+	assert_true(player.animation_playing, "the shell's in the air")
+	await pad(JOY_BUTTON_RIGHT_SHOULDER)
+	var next := player.selected_ship
+	assert_ne(next.ship_type, "battleship", "picked another ship")
+	var fire: Button = driver.action_button("Fire")
+	assert_true(fire.disabled, "which waits for the shell to land")
+	assert_false(driver.action_button("NextShip").disabled, "though Next Ship still works")
+	await driver.wait_until(func() -> bool: return not player.animation_playing, 10, "landing")
+	await wait_process_frames(1)
+	assert_eq(player.selected_ship, next, "still the ship picked")
+	assert_eq(fire.disabled, not next.can_fire(), "its buttons back")

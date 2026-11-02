@@ -14,7 +14,8 @@ const DONE_TINT := Color(0.7, 0.7, 0.7)
 const ACTION_BUTTONS: Array[String] = [
 	"Fire", "Special", "Secondary", "NextShip", "Forward", "Reverse", "Port", "Starboard"
 ]
-const ATTACK_BUTTONS: Array[String] = ["Fire", "Special", "Secondary", "NextShip", "EndTurn"]
+# Disabled while an attack is in the air (Next Ship stays, to line up the next)
+const ATTACK_BUTTONS: Array[String] = ["Fire", "Special", "Secondary", "EndTurn"]
 # Input actions (keyboard and controller) -> the button each one presses
 const SHORTCUTS := {
 	"action_fire": "Fire",
@@ -99,7 +100,7 @@ func _click(on_hex: Vector2i) -> void:
 		if aiming["unrep"]:
 			# UNREP targets an adjacent friendly ship instead of selecting it
 			_act("special", on_hex)
-		elif ship != null and not animation_playing:
+		elif ship != null:
 			_select_ship(ship)
 	elif side == 1 - player_num:
 		# If aiming a shot or ability, use it
@@ -234,11 +235,12 @@ func _act(action: String, target: Vector2i = Grid.OFF_GRID) -> void:
 		_set_aiming("", -1)
 		_set_attack_buttons_disabled(true)
 	await perform(selected_ship, action, target)
-	if attack:
-		_set_attack_buttons_disabled(false)
+	# Whichever ship is selected now: maybe another, picked while it flew
 	if selected_ship != null:
 		_update_buttons(selected_ship)
 		ship_shown.emit(selected_ship)
+	elif attack:
+		buttons_changed.emit({"EndTurn": true})
 	_made_move()
 
 
@@ -248,11 +250,19 @@ func _made_move() -> void:
 	made_move.emit()
 
 
-# Selects the next ship with AP left, coming back around to this one later
+# Selects the next ship with AP left, coming back around to this one later.
+# Ships that can still fire come first, while there are any.
 func _next_ship() -> void:
 	if selected_ship == ships_with_moves[0]:
 		ships_with_moves.push_back(ships_with_moves.pop_front())
-	_select_ship(ships_with_moves[0])
+	var next := ships_with_moves[0]
+	for ship in ships_with_moves:
+		if ship != selected_ship and ship.can_fire():
+			next = ship
+			break
+	while ships_with_moves[0] != next:
+		ships_with_moves.push_back(ships_with_moves.pop_front())
+	_select_ship(next)
 
 
 # The other way round: the last ship with AP left
@@ -298,22 +308,22 @@ func _select_ship(ship: Ship) -> void:
 
 
 func _update_buttons(ship: Ship) -> void:
-	(
-		buttons_changed
-		. emit(
-			{
-				"Forward": ship.can_move(),
-				"Reverse": ship.can_move(true),
-				"Port": ship.can_rotate(-60),
-				"Starboard": ship.can_rotate(60),
-				"Fire": ship.can_fire(),
-				"Special": ship.can_special(),
-				"Secondary": ship.can_secondary(),
-				"NextShip": true,
-				"EndTurn": true,
-			}
-		)
-	)
+	var enabled := {
+		"Forward": ship.can_move(),
+		"Reverse": ship.can_move(true),
+		"Port": ship.can_rotate(-60),
+		"Starboard": ship.can_rotate(60),
+		"Fire": ship.can_fire(),
+		"Special": ship.can_special(),
+		"Secondary": ship.can_secondary(),
+		"NextShip": true,
+		"EndTurn": true,
+	}
+	# A ship picked while an attack is in the air waits for it to land
+	if animation_playing:
+		for button: String in enabled:
+			enabled[button] = button == "NextShip"
+	buttons_changed.emit(enabled)
 
 
 func place_ships(counts: Dictionary) -> void:

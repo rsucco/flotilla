@@ -190,6 +190,10 @@ func test_next_ship_keeps_ap_and_wraps_around() -> void:
 	var player := game.players[0]
 	var done := driver.ship_of(0, "battleship")
 	done.ap = 0
+	# All fired, so Next Ship goes round them all (it otherwise prefers those
+	# that can still fire)
+	for ship in player.ships:
+		ship.fire_remaining = 0
 	# As the turn loop does after a move used it up
 	player.get_move()
 	await driver.select("cruiser")
