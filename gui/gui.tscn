@@ -12,16 +12,15 @@
 [ext_resource type="Texture2D" path="res://gui/sprites/buttons/forward.png" id="10"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0, 0.137255, 0.423529, 1)
-draw_center = false
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0, 0, 0, 1)
-border_blend = true
+bg_color = Color(0.0196, 0.0706, 0.102, 0.933)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.122, 0.714, 0.788, 1)
 
 [sub_resource type="StyleBoxLine" id="2"]
+color = Color(0.122, 0.714, 0.788, 0.6)
 vertical = true
 
 [node name="GUI" type="PanelContainer"]

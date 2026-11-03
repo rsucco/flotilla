@@ -17,6 +17,7 @@ func _ready() -> void:
 	tooltip_text = ships[0].ship_name
 	var rect := TextureRect.new()
 	rect.texture = icon
+	rect.self_modulate = GUI.ICON_TINT
 	add_child(rect)
 	var count := Label.new()
 	count.text = "x" + str(ships.size())
@@ -52,6 +53,7 @@ func _make_custom_tooltip(for_text: String) -> Object:
 		var row := HBoxContainer.new()
 		var rect := TextureRect.new()
 		rect.texture = icon
+		rect.self_modulate = GUI.ICON_TINT
 		rect.draw.connect(_draw_hits.bind(rect, ship))
 		row.add_child(rect)
 		var called := Label.new()

@@ -26,6 +26,9 @@ const GLYPH_SIZE := 24
 const END_TURN_GLYPH_SIZE := 22
 # Tints matching the port and starboard arrows the d-pad glyphs replace
 const GLYPH_TINTS := {"Port": Color(1.0, 0.3, 0.3), "Starboard": Color(0.3, 1.0, 0.4)}
+# The ship type icons are dark grey, drawn for a light panel: brightened to
+# stand out on the dark one
+const ICON_TINT := Color(2.2, 2.2, 2.2)
 
 var ship_icons := {}
 # Whether the buttons show which button or key presses them: only while a
@@ -54,6 +57,7 @@ var _glyphs := {}
 
 
 func _ready() -> void:
+	ship_icon.self_modulate = ICON_TINT
 	for ship_type in Ship.SHIP_TYPES:
 		ship_icons[ship_type] = load("res://gui/sprites/" + ship_type + "_icon.png")
 	for button: String in GLYPHS:
