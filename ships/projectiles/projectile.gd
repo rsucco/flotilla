@@ -58,55 +58,24 @@ func explode(pos: Vector2) -> void:
 	var last_event := tile.get_last_event()
 	if last_event.is_empty():
 		return
+	var struck: bool = last_event[1] in ["Hit", "Sunk"]
 	if tile.island:
-		await boom(pos, not last_event[1] in ["Hit", "Sunk"])
+		await boom(pos, not struck)
+	elif struck:
+		await boom(pos, false)
 	else:
 		await splash(pos)
 
 
+# An explosion: on a ship, or on land (with the land-miss sound if nothing
+# was there)
 func boom(pos: Vector2, land_miss: bool) -> void:
 	var sound: AudioStreamPlayer2D
 	if land_miss:
 		sound = Sfx.play(self, LAND_MISS_SOUND)
-
-	var fire := CPUParticles2D.new()
-	fire.spread = 180.0
-	fire.gravity = Vector2.ZERO
-	fire.initial_velocity_min = 15.0
-	fire.initial_velocity_max = 15.0
-	fire.damping_min = 10.0
-	fire.damping_max = 10.0
-	fire.color = Color.CORAL
-	fire.scale_amount_min = 0.03
-	fire.scale_amount_max = 0.03
-	fire.texture = FIRE_TEXTURE
-	fire.amount = 200
-	fire.lifetime = 0.7
-	fire.one_shot = true
-	fire.explosiveness = 1.0
-	fire.position = pos
-	add_sibling(fire)
-
-	var smoke := CPUParticles2D.new()
-	smoke.spread = 180.0
-	smoke.gravity = Vector2.ZERO
-	smoke.initial_velocity_min = 30.0
-	smoke.initial_velocity_max = 30.0
-	smoke.damping_min = 15.0
-	smoke.damping_max = 15.0
-	smoke.scale_amount_min = 0.03
-	smoke.scale_amount_max = 0.03
-	smoke.texture = SMOKE_TEXTURE
-	smoke.amount = 300
-	smoke.lifetime = 0.9
-	smoke.one_shot = true
-	smoke.explosiveness = 1.0
-	smoke.position = pos
-	add_sibling(smoke)
-
+	# The fireball's done well before the smoke has drifted off
+	Explosion.blast(get_parent(), pos)
 	await get_tree().create_timer(0.9, false).timeout
-	fire.queue_free()
-	smoke.queue_free()
 	fading = true
 	if is_instance_valid(sound) and sound.playing:
 		await sound.finished
@@ -114,27 +83,7 @@ func boom(pos: Vector2, land_miss: bool) -> void:
 
 func splash(pos: Vector2) -> void:
 	var sound := Sfx.play(self, WATER_MISS_SOUND)
-	var ripples := CPUParticles2D.new()
-	ripples.emission_shape = CPUParticles2D.EMISSION_SHAPE_RING
-	ripples.emission_ring_radius = 1.0
-	ripples.spread = 180.0
-	ripples.gravity = Vector2.ZERO
-	ripples.initial_velocity_min = 35.0
-	ripples.initial_velocity_max = 35.0
-	ripples.damping_min = 35.0
-	ripples.damping_max = 35.0
-	ripples.color = Color(0.65, 1.0, 1.0, 0.5)
-	ripples.scale_amount_min = 3.0
-	ripples.scale_amount_max = 3.0
-	ripples.amount = 1000
-	ripples.lifetime = 0.75
-	ripples.one_shot = true
-	ripples.explosiveness = 1.0
-	ripples.position = pos
-	add_sibling(ripples)
-
-	await get_tree().create_timer(ripples.lifetime, false).timeout
-	ripples.queue_free()
+	await get_tree().create_timer(Explosion.splash(get_parent(), pos), false).timeout
 	fading = true
 	if is_instance_valid(sound) and sound.playing:
 		await sound.finished

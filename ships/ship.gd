@@ -270,18 +270,8 @@ func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 
 
 func _add_smoke(index: int) -> void:
-	var smoke := CPUParticles2D.new()
-	smoke.local_coords = true
-	smoke.emission_shape = CPUParticles2D.EMISSION_SHAPE_RING
-	smoke.emission_ring_radius = _get_size() * 3 - 3
-	smoke.direction = Vector2.LEFT
-	smoke.gravity = Vector2(0, 150)
-	smoke.spread = 25.0
-	smoke.scale_amount_min = 2.5
-	smoke.scale_amount_max = 2.5
-	smoke.color = Color.BLACK
-	smoke.amount = _get_size() ** 2 * 10
-	smoke.lifetime = 0.5
+	# Burning where it was hit, its smoke trailing downwind
+	var smoke := Explosion.burning(_get_size())
 	smoke.position.y -= grid.hex_size * (index - len_aft)
 	if len_fore == 0:
 		smoke.position.y -= 10
@@ -325,20 +315,37 @@ func copy_as_seen() -> Ship:
 	return copy
 
 
-# Fades out with the sinking sound; returns when both are done
+# Goes up in a blast, with smaller ones along the hull, then settles and
+# fades into a spreading slick, with the sinking sound; returns when both are
+# done
 func sink_effect() -> void:
 	var sound := Sfx.play(self, sink_sound)
 	sound.volume_db = sink_volume_db
 	# Make visible to the opponent while it sinks
 	visible = true
-	var tween := create_tween()
+	# (Tests sink ships that have no effects layer)
+	if effects != null:
+		Explosion.blast(effects, effects.to_local(global_position), 1.6)
+		_slick()
+	var tween := create_tween().set_parallel()
 	(
 		tween
-		. tween_property(self, "modulate", Color(0.0, 0.5, 0.62, 0.5), 3.0)
+		. tween_property(self, "modulate", Color(0.2, 0.25, 0.3, 0.0), 3.0)
 		. from(Color.WHITE)
 		. set_trans(Tween.TRANS_SINE)
-		. set_ease(Tween.EASE_IN_OUT)
+		. set_ease(Tween.EASE_IN)
 	)
+	tween.tween_property(self, "scale", scale * 0.85, 3.0)
+	# Secondary explosions along the hull, one after another (a visual
+	# shuffle: the global generator, not the rules' dice)
+	var along: Array[Vector2i] = []
+	if effects != null:
+		along = get_occupied_hexes()
+	along.shuffle()
+	for i in mini(along.size(), 3):
+		if along[i] != Grid.OFF_GRID:
+			var at := effects.to_local(grid.get_hex_center(along[i]))
+			tween.tween_callback(_secondary_blast.bind(at)).set_delay(0.35 + 0.4 * i)
 	await tween.finished
 	visible = false
 	if is_instance_valid(sound) and sound.playing:
@@ -373,10 +380,31 @@ func _animate_move(property: String, target: Variant, duration: float) -> void:
 	if wake != null:
 		# The foam already in the water fades out first
 		wake.emitting = false
-		get_tree().create_timer(wake.lifetime, false).timeout.connect(wake.queue_free)
+		wake.create_tween().tween_callback(wake.queue_free).set_delay(wake.lifetime)
 	moves_queued -= 1
 	if moves_queued == 0:
 		movement_audio_player.stop()
+
+
+# One of the smaller explosions along the hull as we go down
+func _secondary_blast(at: Vector2) -> void:
+	Explosion.blast(effects, at, 0.7)
+
+
+# Oil and debris spreading where we went down, then fading
+func _slick() -> void:
+	var slick := Sprite2D.new()
+	slick.texture = Explosion.SMOKE_TEXTURE
+	slick.modulate = Color(0.05, 0.07, 0.08, 0.6)
+	slick.position = effects.to_local(global_position)
+	slick.scale = Vector2.ONE * 0.04 * _get_size()
+	effects.add_child(slick)
+	# Under the fire and smoke
+	effects.move_child(slick, 0)
+	var spread := slick.create_tween().set_parallel()
+	spread.tween_property(slick, "scale", slick.scale * 2.2, 6.0).set_ease(Tween.EASE_OUT)
+	spread.tween_property(slick, "modulate:a", 0.0, 6.0).set_ease(Tween.EASE_IN)
+	spread.chain().tween_callback(slick.queue_free)
 
 
 # Foam from the stern, left in the water behind us as we move or turn

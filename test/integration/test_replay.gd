@@ -74,7 +74,10 @@ func test_skip_jumps_to_the_end_result() -> void:
 	# Skip once the replayed shells are in the air
 	await driver.wait_until(
 		func() -> bool:
-			return game.turn_replay.spawned.any(func(n: Node) -> bool: return n is Projectile),
+			# Effects free themselves, so some may be gone already
+			return game.turn_replay.spawned.any(
+				func(n: Variant) -> bool: return is_instance_valid(n) and n is Projectile
+			),
 		20,
 		"replayed shells"
 	)
@@ -179,9 +182,9 @@ func test_hidden_muzzle_flash_is_freed() -> void:
 	await driver.wait_until(
 		func() -> bool: return game.turn_replay.next_action > 0, 20, "the shot to land"
 	)
-	# Past the explosion's particles too
+	# Past the explosion's particles too, smoke included
 	var waited := 0.0
-	while waited < 1.5:
+	while waited < 3.0:
 		await get_tree().process_frame
 		waited += get_process_delta_time()
 	var particles := game.turn_replay.spawned.filter(
@@ -192,7 +195,9 @@ func test_hidden_muzzle_flash_is_freed() -> void:
 
 
 func test_replay_ends_with_the_visuals_and_sounds_play_on() -> void:
-	await driver.act("coastal_battery", "Fire", GameDriver.spot(1, "destroyer"))
+	# Into open water: a miss splashes, with a sound of its own (a hit's is
+	# the ship's)
+	await driver.act("coastal_battery", "Fire", Vector2i(20, 12))
 	await driver.end_turn()
 	await driver.swap(true)
 	await driver.wait_until(func() -> bool: return first_shell() != null, 20, "the shell")
