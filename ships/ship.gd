@@ -354,21 +354,62 @@ func turn_by(offset: int) -> void:
 	await _animate_move("rotation_degrees", direction, 1.0)
 
 
-# Plays the movement sound for the duration of a (possibly overlapping) move
+# Plays the movement sound and leaves a wake for the duration of a (possibly
+# overlapping) move
 func _animate_move(property: String, target: Variant, duration: float) -> void:
 	moves_queued += 1
 	if not movement_audio_player.playing and not cloaked:
 		# Here rather than at placement, which loaded ships skip
 		movement_audio_player.stream = move_sound
 		movement_audio_player.play()
+	# Only where the viewer can see us: a wake would give away a cloaked ship
+	# (the AI's or the other LAN player's, mid-turn) or a hidden one
+	var wake: CPUParticles2D = _make_wake() if visible and not cloaked and not ghost else null
 	var tween := create_tween()
 	tween.tween_property(self, property, target, duration).set_trans(Tween.TRANS_SINE).set_ease(
 		Tween.EASE_IN_OUT
 	)
 	await tween.finished
+	if wake != null:
+		# The foam already in the water fades out first
+		wake.emitting = false
+		get_tree().create_timer(wake.lifetime, false).timeout.connect(wake.queue_free)
 	moves_queued -= 1
 	if moves_queued == 0:
 		movement_audio_player.stop()
+
+
+# Foam from the stern, left in the water behind us as we move or turn
+func _make_wake() -> CPUParticles2D:
+	var wake := CPUParticles2D.new()
+	wake.texture = Projectile.SMOKE_TEXTURE
+	wake.show_behind_parent = true
+	# The sprite points up (-y), so its stern is the bottom of its rect
+	wake.position = Vector2(0, get_rect().end.y - 6)
+	wake.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	wake.emission_rect_extents = Vector2(5, 2)
+	# Astern and spreading out to the sides
+	wake.direction = Vector2.DOWN
+	wake.spread = 30.0
+	wake.gravity = Vector2.ZERO
+	wake.initial_velocity_min = 10.0
+	wake.initial_velocity_max = 20.0
+	wake.damping_min = 4.0
+	wake.damping_max = 6.0
+	wake.amount = 48
+	wake.lifetime = 2.4
+	wake.scale_amount_min = 0.035
+	wake.scale_amount_max = 0.055
+	var grow := Curve.new()
+	grow.add_point(Vector2(0, 0.6))
+	grow.add_point(Vector2(1, 1.5))
+	wake.scale_amount_curve = grow
+	var fade := Gradient.new()
+	fade.set_color(0, Color(1, 1, 1, 0.8))
+	fade.set_color(1, Color(1, 1, 1, 0))
+	wake.color_ramp = fade
+	add_child(wake)
+	return wake
 
 
 # True if none of the hexes are land or occupied by another ship
