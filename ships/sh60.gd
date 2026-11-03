@@ -22,6 +22,8 @@ var dest: Vector2
 var audio_player: AudioStreamPlayer2D
 # Set by the ship that carries it
 var ship: Ship
+# The Ambient beat the idling rotor last turned on
+var _idle_beat := 0
 
 @onready var path: Path2D = $Path2D
 @onready var path_follow: PathFollow2D = $Path2D/PathFollow2D
@@ -36,7 +38,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	rotor.rotation += rotor_speed * delta
+	if flying or rotor_speed > IDLE_ROTOR_SPEED:
+		rotor.rotation += rotor_speed * delta
+	else:
+		# Idling on deck: turned on the Ambient beat, which looks the same at
+		# this speed and lets a still board skip frames
+		if Ambient.beat() != _idle_beat:
+			_idle_beat = Ambient.beat()
+			rotor.rotation += rotor_speed * Ambient.STEP
 	if not flying:
 		# Spin down, then stop the sound once the rotors are idle
 		if rotor_speed > IDLE_ROTOR_SPEED:

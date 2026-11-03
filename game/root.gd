@@ -13,9 +13,6 @@ const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")
 const VICTORY_SCENE := preload("res://gui/victory.tscn")
 const MUSIC_FADE := 2.0
 const SEA_SHADER := preload("res://game/sea.gdshader")
-# How often the water's light moves on: slow enough water looks the same
-# stepped, and each step costs a redraw (a handheld's battery)
-const SEA_STEP := 1.0 / 12.0
 
 # Set by the title screen before loading us
 static var mode := Mode.HOT_SEAT
@@ -65,8 +62,10 @@ var game_id := 0
 var reveal_all := false
 # The banner as it was before we lost touch, to put back
 var _banner_before := ""
-# How far the water's light has moved on (seconds, paused with the game)
+# How far the water's light has moved on (seconds, paused with the game), and
+# on which Ambient beat it last did
 var _sea_phase := 0.0
+var _sea_beat := 0
 
 @onready var gui: GUI = $GUI
 @onready var pause_menu: PauseMenu = $PauseMenu
@@ -125,20 +124,8 @@ func _ready() -> void:
 	move_child(shore, 0)
 	shore.draw.connect(_draw_shore)
 	pointer = get_viewport().get_mouse_position()
-	var sea := ShaderMaterial.new()
-	sea.shader = SEA_SHADER
-	material = sea
-	var waves := Timer.new()
-	waves.wait_time = SEA_STEP
-	waves.autostart = true
-	waves.timeout.connect(
-		func() -> void:
-			_sea_phase += SEA_STEP
-			sea.set_shader_parameter("phase", _sea_phase)
-			# The foam swells and ebbs (only its opacity, so it isn't redrawn)
-			shore.modulate.a = 0.75 + 0.25 * sin(_sea_phase * 1.3)
-	)
-	add_child(waves)
+	material = ShaderMaterial.new()
+	(material as ShaderMaterial).shader = SEA_SHADER
 	cursor = HexCursor.new()
 	add_child(cursor)
 	$TitleMusic.play(title_music_at)
@@ -228,6 +215,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	# The water's light moves on in steps, on the Ambient beat
+	if Ambient.beat() != _sea_beat:
+		_sea_beat = Ambient.beat()
+		_sea_phase += Ambient.STEP
+		(material as ShaderMaterial).set_shader_parameter("phase", _sea_phase)
+		# The foam swells and ebbs (only its opacity, so it isn't redrawn)
+		shore.modulate.a = 0.75 + 0.25 * sin(_sea_phase * 1.3)
 	# Counting down to giving up on them
 	if mode == Mode.LAN and players[1 - seat].link.is_quiet and not over:
 		var link: Link = players[1 - seat].link
