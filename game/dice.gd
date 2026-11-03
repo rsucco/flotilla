@@ -17,5 +17,6 @@ func pick(from: Array) -> Variant:
 
 
 func reseed(new_seed: int) -> void:
+	# Setting the seed sets the state from it; setting the state afterwards would
+	# undo that, and every seed would roll the same
 	_rng.seed = new_seed
-	_rng.state = 0

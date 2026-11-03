@@ -45,3 +45,14 @@ func test_each_game_rolls_its_own() -> void:
 	var first := one.grid.dice.roll()
 	other.grid.dice.roll()
 	assert_eq([first, one.grid.dice.roll()] as Array[float], alone, "the other game's rolls aside")
+
+
+# A LAN game reseeds before every move, so each move's rolls must follow its seed
+func test_each_seed_rolls_differently() -> void:
+	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
+	var low := 0
+	for i in 400:
+		game.grid.dice.reseed(i)
+		if game.grid.dice.roll() <= 0.25:
+			low += 1
+	assert_between(low, 70, 130, "~25% of first rolls under a quarter")
