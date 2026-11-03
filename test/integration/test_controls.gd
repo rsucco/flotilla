@@ -23,6 +23,8 @@ func before_each() -> void:
 
 func after_each() -> void:
 	Input.action_release("action_end_turn")
+	Input.action_release("action_steer")
+	Input.action_release("cursor_right")
 	get_node("/root/GutRunner/GutLayer").visible = true
 
 
@@ -48,6 +50,7 @@ func test_shortcuts_need_a_ship_selected() -> void:
 	await pad(JOY_BUTTON_B)
 	assert_null(player.selected_ship)
 	await pad(JOY_BUTTON_A)
+	Input.action_press("action_steer")
 	await pad(JOY_BUTTON_DPAD_UP)
 	assert_false(player.aiming.values().has(true), "nothing to fire with")
 	assert_true(player.ships.all(func(s: Ship) -> bool: return s.ap == s.default_ap), "nor move")
@@ -84,10 +87,20 @@ func test_face_buttons_arm_attacks_and_b_backs_out() -> void:
 	assert_null(player.selected_ship, "then lets it go")
 
 
-func test_d_pad_moves_the_ship() -> void:
+func test_d_pad_alone_leaves_the_ship_be() -> void:
+	await driver.select("battleship")
+	var ship := player.selected_ship
+	await pad(JOY_BUTTON_DPAD_UP)
+	await pad(JOY_BUTTON_DPAD_RIGHT)
+	await wait_seconds(0.3)
+	assert_eq(ship.ap, ship.default_ap, "it's the cursor's")
+
+
+func test_rt_and_d_pad_steer_the_ship() -> void:
 	await driver.select("battleship")
 	var ship := player.selected_ship
 	var at := ship.hex
+	Input.action_press("action_steer")
 	await pad(JOY_BUTTON_DPAD_UP)
 	await driver.wait_until(func() -> bool: return ship.hex != at, 5, "moving")
 	assert_eq(ship.ap, ship.default_ap - 1, "forward")
@@ -142,6 +155,20 @@ func test_arrow_keys_and_left_stick_steer_the_cursor() -> void:
 	stick.axis = JOY_AXIS_LEFT_Y
 	stick.axis_value = -1.0
 	assert_true(stick.is_action("cursor_up"), "the left stick")
+	var d_pad := InputEventJoypadButton.new()
+	d_pad.button_index = JOY_BUTTON_DPAD_UP
+	assert_true(d_pad.is_action("cursor_up"), "the d-pad")
+
+
+func test_the_cursor_holds_still_while_steering() -> void:
+	game.cursor.move_to(Vector2i(20, 7))
+	Input.action_press("action_steer")
+	Input.action_press("cursor_right")
+	await wait_process_frames(3)
+	assert_eq(game.cursor.hex, Vector2i(20, 7), "RT held")
+	Input.action_release("action_steer")
+	await wait_process_frames(3)
+	assert_eq(game.cursor.hex, Vector2i(21, 7), "let go")
 
 
 func test_a_aims_then_fires_at_the_cursor() -> void:
@@ -194,7 +221,11 @@ func test_placing_with_the_cursor_and_buttons() -> void:
 			event.button_index = JOY_BUTTON_DPAD_RIGHT
 			event.pressed = true
 			setup.get_viewport().push_input(event)
-			assert_eq(ship.direction, 60, "the d-pad turns it")
+			assert_eq(ship.direction, 0, "the d-pad alone doesn't turn it")
+			Input.action_press("action_steer")
+			setup.get_viewport().push_input(event)
+			Input.action_release("action_steer")
+			assert_eq(ship.direction, 60, "RT and the d-pad do")
 			turned = true
 		var a := InputEventJoypadButton.new()
 		a.button_index = JOY_BUTTON_A
@@ -220,6 +251,26 @@ func test_button_hints_only_after_a_controller_or_hotkey() -> void:
 	assert_ne(fire.icon, own, "the glyph for a hotkey too")
 	var end_turn: Control = game.gui.find_child("EndTurn").get_node("Glyph")
 	assert_true(end_turn.visible, "End Turn's beside it")
+
+
+func test_helm_glyphs_show_while_rt_is_held() -> void:
+	var forward: Button = game.gui.find_child("Forward")
+	var own := forward.icon
+	var steer: Control = game.gui.find_child("Starboard").get_node("SteerGlyph")
+	await pad(JOY_BUTTON_LEFT_SHOULDER)
+	assert_eq(forward.icon, own, "its own arrow on a controller")
+	assert_true(steer.visible, "with RT beside it")
+	var trigger := InputEventJoypadMotion.new()
+	trigger.axis = JOY_AXIS_TRIGGER_RIGHT
+	trigger.axis_value = 1.0
+	game.get_viewport().push_input(trigger)
+	assert_ne(forward.icon, own, "the d-pad while RT is held")
+	trigger.axis_value = 0.0
+	game.get_viewport().push_input(trigger)
+	assert_eq(forward.icon, own, "and its arrow again once let go")
+	await key(KEY_TAB)
+	assert_ne(forward.icon, own, "W shows on the keyboard, which needs no RT")
+	assert_false(steer.visible, "nor RT")
 
 
 func test_end_turn_shows_its_hold_filling() -> void:

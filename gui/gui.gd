@@ -24,8 +24,12 @@ const GLYPHS := {
 # Turn, whose text fills it, so its glyph sits beside it
 const GLYPH_SIZE := 24
 const END_TURN_GLYPH_SIZE := 22
+const STEER_GLYPH_SIZE := 20
 # Tints matching the port and starboard arrows the d-pad glyphs replace
 const GLYPH_TINTS := {"Port": Color(1.0, 0.3, 0.3), "Starboard": Color(0.3, 1.0, 0.4)}
+# On a controller these take RT as well, so their d-pad glyphs show only while
+# it's held, and an RT glyph sits beside them
+const HELM := ["Forward", "Reverse", "Port", "Starboard"]
 # The ship type icons are dark grey, drawn for a light panel: brightened to
 # stand out on the dark one
 const ICON_TINT := Color(2.2, 2.2, 2.2)
@@ -36,8 +40,11 @@ var ship_icons := {}
 var hints := false:
 	set(value):
 		hints = value
-		for button: String in GLYPHS:
-			_show_glyph(button, value)
+		_show_glyphs()
+# Whether the hints are for a controller rather than the keyboard
+var pad := false
+# RT is held
+var steering := false
 # How far through End Turn's hold, 0 to 1
 var end_turn_hold := 0.0
 # Each button's own icon, while its glyph stands in
@@ -80,6 +87,21 @@ func _ready() -> void:
 	glyph.offset_right = glyph.offset_left + END_TURN_GLYPH_SIZE
 	glyph.offset_bottom = glyph.offset_top + END_TURN_GLYPH_SIZE
 	find_child("EndTurn").draw.connect(_draw_end_turn_hold)
+	# RT's at the hub of the four helm buttons: on Starboard's top-left corner,
+	# as Starboard draws over the other three
+	var steer := TextureRect.new()
+	steer.name = "SteerGlyph"
+	steer.texture = load(GLYPH_SCRIPT).new()
+	steer.texture.set("path", "action_steer")
+	steer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	steer.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	steer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	steer.visible = false
+	find_child("Starboard").add_child(steer)
+	steer.offset_left = -2 - STEER_GLYPH_SIZE / 2.0
+	steer.offset_top = steer.offset_left
+	steer.offset_right = steer.offset_left + STEER_GLYPH_SIZE
+	steer.offset_bottom = steer.offset_top + STEER_GLYPH_SIZE
 	for button: Button in find_children("*", "Button"):
 		button.pressed.connect(func() -> void: action_pressed.emit(button.name))
 		# Or a clicked button would keep the focus, and with it Tab, Space and Enter
@@ -99,6 +121,12 @@ func _set_icon(button: Button, icon: Texture2D) -> void:
 	_icons[button.name] = icon
 	if not hints:
 		button.icon = icon
+
+
+func _show_glyphs() -> void:
+	for button: String in GLYPHS:
+		_show_glyph(button, hints and (not pad or steering or button not in HELM))
+	find_child("Starboard").get_node("SteerGlyph").visible = hints and pad
 
 
 # The button's glyph in place of its own icon (beside End Turn), or back again
@@ -124,11 +152,15 @@ func _show_glyph(button: String, shown: bool) -> void:
 # HexCursor's stand-in mouse moves have no relative motion, so don't count)
 func _input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton or event is InputEventKey:
-		if event.is_pressed() and not hints:
-			hints = true
+		if event.is_pressed():
+			_hint(event is InputEventJoypadButton)
 	elif event is InputEventJoypadMotion:
-		if absf((event as InputEventJoypadMotion).axis_value) > 0.5 and not hints:
-			hints = true
+		var held := event.is_action_pressed("action_steer")
+		if event.is_action("action_steer") and held != steering:
+			steering = held
+			_show_glyphs()
+		if absf((event as InputEventJoypadMotion).axis_value) > 0.5:
+			_hint(true)
 	elif (
 		event is InputEventMouseButton
 		or (
@@ -138,6 +170,13 @@ func _input(event: InputEvent) -> void:
 	):
 		if hints:
 			hints = false
+
+
+# Shows the hints, for a controller (`controller`) or the keyboard
+func _hint(controller: bool) -> void:
+	if not hints or pad != controller:
+		pad = controller
+		hints = true
 
 
 # Shows how far through the End Turn hold the player is

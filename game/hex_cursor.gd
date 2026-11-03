@@ -4,16 +4,29 @@ extends Node
 # arrow keys or left stick step it a hex at a time, and each step sends the
 # mouse motion a real mouse would, so hovering, aiming and placing work
 # unchanged. Held, it steps again after a moment, then faster. It leaves the
-# arrows to any dialog with focus.
+# arrows to any dialog with focus. The d-pad moves it too, except while RT is
+# held: then the d-pad steers the ship.
 
 const FIRST_REPEAT := 0.3
 const REPEAT := 0.08
+const HELM: Array[String] = ["action_forward", "action_reverse", "action_port", "action_starboard"]
 
 # Set by Root once the board exists
 var grid: Grid
 var hex := Vector2i(7, 7)
 var _wait := 0.0
 var _held := false
+
+
+static func steering() -> bool:
+	return Input.is_action_pressed("action_steer")
+
+
+# Whether `event` presses `action`; the d-pad only steers while RT is held
+static func presses(event: InputEvent, action: String) -> bool:
+	if not event.is_action_pressed(action, false, true):
+		return false
+	return not (action in HELM and event is InputEventJoypadButton) or steering()
 
 
 # Carries on from wherever the real mouse last was
@@ -27,7 +40,7 @@ func _input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	var dir := Input.get_vector("cursor_left", "cursor_right", "cursor_up", "cursor_down")
-	if grid == null or get_viewport().gui_get_focus_owner() != null:
+	if grid == null or get_viewport().gui_get_focus_owner() != null or steering():
 		dir = Vector2.ZERO
 	steer(dir, delta)
 

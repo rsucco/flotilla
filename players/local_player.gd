@@ -129,7 +129,7 @@ func _shortcut(event: InputEvent) -> void:
 		_click(pointer_hex)
 		return
 	for action: String in SHORTCUTS:
-		if event.is_action_pressed(action, false, true) and enabled.get(SHORTCUTS[action], false):
+		if HexCursor.presses(event, action) and enabled.get(SHORTCUTS[action], false):
 			get_viewport().set_input_as_handled()
 			press(SHORTCUTS[action])
 			return
