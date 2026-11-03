@@ -13,6 +13,7 @@ config_version=5
 config/name="Flotilla"
 config/version="0.2.1"
 run/main_scene="res://gui/title_screen.tscn"
+run/low_processor_mode=true
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.png"
 config/macos_native_icon="res://icon.icns"

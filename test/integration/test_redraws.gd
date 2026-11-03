@@ -17,7 +17,7 @@ func before_each() -> void:
 	await driver.start_game()
 	await wait_process_frames(5)
 	draws.clear()
-	for item: CanvasItem in [game]:
+	for item: CanvasItem in [game, game.players[0].pips]:
 		item.draw.connect(func() -> void: draws[item] = draws.get(item, 0) + 1)
 
 
@@ -34,4 +34,12 @@ func test_stick_motion_doesnt_redraw_the_board() -> void:
 		game.get_viewport().push_input(motion)
 		await wait_process_frames(1)
 	assert_eq(draws.get(game, 0), 0)
+
+
+func test_ap_dots_only_redraw_when_something_changes() -> void:
+	await wait_process_frames(10)
+	assert_eq(draws.get(game.players[0].pips, 0), 0, "nothing's moved")
+	await GameDriver.new(game).act("battleship", "Forward")
+	await wait_process_frames(2)
+	assert_gt(draws.get(game.players[0].pips, 0), 0, "a ship moved and spent AP")
 

@@ -8,11 +8,24 @@ const GAP := 10.0
 const LIFT := 8.0
 
 var ships: Array[Ship] = []
+# What the dots were last drawn from: each ship's place, heading, AP and
+# whether it's shown
+var _drawn := []
 
 
+# Ships move and spend AP between redraws. Only redrawn when that changes, so
+# an idle board doesn't keep the screen redrawing (and a handheld's battery
+# draining).
 func _process(_delta: float) -> void:
-	# Ships move and spend AP between redraws
-	queue_redraw()
+	var now := ships.map(
+		func(ship: Ship) -> Array:
+			if not is_instance_valid(ship):
+				return []
+			return [ship.global_position, ship.global_rotation, ship.ap, ship.visible]
+	)
+	if now != _drawn:
+		_drawn = now
+		queue_redraw()
 
 
 func _draw() -> void:

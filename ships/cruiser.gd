@@ -44,7 +44,10 @@ func _process(delta: float) -> void:
 		# The mount's sprite points up (-y)
 		aim = ciws.global_position.direction_to(tracking.global_position).angle() + PI / 2
 		aim = wrapf(aim - global_rotation, -PI, PI)
-	ciws.rotation = rotate_toward(ciws.rotation, aim, CIWS_SLEW * delta)
+	var turned := rotate_toward(ciws.rotation, aim, CIWS_SLEW * delta)
+	# Only when it turns: setting it at all redraws the screen
+	if turned != ciws.rotation:
+		ciws.rotation = turned
 
 
 # Shown in the defender's replay: the CIWS turning to shoot `missile` down

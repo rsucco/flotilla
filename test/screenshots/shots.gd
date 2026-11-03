@@ -17,6 +17,9 @@ func _initialize() -> void:
 	out = OS.get_cmdline_user_args()[0]
 	# Hand-offs autosave; keep that out of the player's own saves
 	SaveGame.dir = out.path_join("saves")
+	# Low-processor mode skips frames while nothing changes, and a shot waits
+	# for one to be drawn
+	OS.low_processor_usage_mode = false
 	run.call_deferred()
 
 
