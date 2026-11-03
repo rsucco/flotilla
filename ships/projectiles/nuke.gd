@@ -18,40 +18,11 @@ func explode(pos: Vector2) -> void:
 	position = pos
 	texture = null
 
-	var fire := CPUParticles2D.new()
-	fire.spread = 180.0
-	fire.gravity = Vector2.ZERO
-	fire.initial_velocity_min = 15.0
-	fire.initial_velocity_max = 15.0
-	fire.damping_min = 10.0
-	fire.damping_max = 10.0
-	fire.color = Color.CORAL
-	fire.scale_amount_min = 0.3
-	fire.scale_amount_max = 0.3
-	fire.texture = FIRE_TEXTURE
-	fire.amount = 200
-	fire.lifetime = 1.0
-	fire.one_shot = true
-	fire.explosiveness = 1.0
-	fire.position = pos
-	add_sibling(fire)
-
-	var smoke := CPUParticles2D.new()
-	smoke.spread = 180.0
-	smoke.gravity = Vector2.ZERO
-	smoke.initial_velocity_min = 40.0
-	smoke.initial_velocity_max = 40.0
-	smoke.damping_min = 20.0
-	smoke.damping_max = 20.0
-	smoke.scale_amount_min = 0.1
-	smoke.scale_amount_max = 0.1
-	smoke.texture = SMOKE_TEXTURE
-	smoke.amount = 300
-	smoke.lifetime = 1.5
-	smoke.one_shot = true
-	smoke.explosiveness = 1.0
-	smoke.position = pos
-	add_sibling(smoke)
+	# Out to the edge of the strike's area: two hexes' reach
+	var step := grid.get_hex_center(dest_hex).distance_to(
+		grid.get_hex_center(dest_hex + Vector2i(0, 1))
+	)
+	var lasts := Explosion.nuke(get_parent(), pos, step * 2.5)
 
 	var flash := ColorRect.new()
 	flash.color = Color.WHITE
@@ -69,9 +40,7 @@ func explode(pos: Vector2) -> void:
 	)
 	await tween.finished
 
-	await get_tree().create_timer(1.0, false).timeout
-	fire.queue_free()
-	smoke.queue_free()
+	await get_tree().create_timer(lasts - 0.5, false).timeout
 	flash.queue_free()
 	fading = true
 	if is_instance_valid(sound) and sound.playing:

@@ -62,6 +62,102 @@ static func blast(parent: Node, pos: Vector2, size: float = 1.0) -> float:
 	return smoke.lifetime
 
 
+# A Nuclear Strike: a shockwave racing out to `radius`, a huge fireball, and
+# a mushroom cloud (seen from above: a dark billowing cap, with a ring of
+# smoke rolling out around it) that lingers and drifts off. Returns how long
+# until the worst is over; the cloud outlasts it.
+static func nuke(parent: Node, pos: Vector2, radius: float) -> float:
+	var wave := Shockwave.new()
+	wave.position = pos
+	parent.add_child(wave)
+	var out := wave.create_tween().set_parallel()
+	out.tween_property(wave, "radius", radius, 0.7).set_ease(Tween.EASE_OUT).set_trans(
+		Tween.TRANS_CUBIC
+	)
+	out.tween_property(wave, "width", 2.0, 0.7)
+	out.tween_property(wave, "glow", 0.0, 0.9).from(0.45)
+	out.tween_property(wave, "modulate:a", 0.0, 0.4).set_delay(0.5)
+	out.chain().tween_callback(wave.queue_free)
+
+	blast(parent, pos, 3.0)
+
+	var cap := _burst(pos, SMOKE_TEXTURE, 60, 5.5)
+	cap.explosiveness = 0.6
+	cap.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
+	cap.emission_sphere_radius = radius * 0.15
+	cap.initial_velocity_min = 10.0
+	cap.initial_velocity_max = 30.0
+	cap.damping_min = 4.0
+	cap.damping_max = 8.0
+	cap.gravity = WIND
+	cap.scale_amount_min = 0.1
+	cap.scale_amount_max = 0.16
+	cap.scale_amount_curve = _curve(0.5, 1.6)
+	cap.angular_velocity_min = -20.0
+	cap.angular_velocity_max = 20.0
+	cap.color_ramp = _ramp(
+		[
+			Color(0.35, 0.22, 0.12, 0),
+			Color(0.2, 0.15, 0.12, 0.85),
+			Color(0.25, 0.24, 0.24, 0.6),
+			Color(0.4, 0.4, 0.4, 0)
+		]
+	)
+
+	var skirt := _burst(pos, SMOKE_TEXTURE, 70, 3.5)
+	skirt.emission_shape = CPUParticles2D.EMISSION_SHAPE_RING
+	skirt.emission_ring_radius = radius * 0.3
+	skirt.emission_ring_inner_radius = radius * 0.25
+	skirt.initial_velocity_min = radius * 0.5
+	skirt.initial_velocity_max = radius * 0.7
+	skirt.damping_min = radius * 0.2
+	skirt.damping_max = radius * 0.25
+	skirt.gravity = WIND
+	skirt.scale_amount_min = 0.05
+	skirt.scale_amount_max = 0.08
+	skirt.scale_amount_curve = _curve(0.6, 1.4)
+	skirt.color_ramp = _ramp(
+		[Color(0.5, 0.45, 0.4, 0), Color(0.45, 0.42, 0.4, 0.55), Color(0.5, 0.5, 0.5, 0)]
+	)
+
+	var embers := _burst(pos, FIRE_TEXTURE, 30, 2.5)
+	embers.explosiveness = 0.3
+	embers.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
+	embers.emission_sphere_radius = radius * 0.12
+	embers.initial_velocity_min = 2.0
+	embers.initial_velocity_max = 8.0
+	embers.scale_amount_min = 0.03
+	embers.scale_amount_max = 0.05
+	embers.color_ramp = _ramp(
+		[Color(1, 0.7, 0.3, 0.9), Color(0.9, 0.3, 0.1, 0.6), Color(0.4, 0.1, 0.05, 0)]
+	)
+
+	# The skirt rolls out under the cap; the embers glow through it
+	_play(parent, [skirt, cap, embers])
+	return 1.5
+
+
+# A ring of light racing outward, over a brief glow (for nuke())
+class Shockwave:
+	extends Node2D
+
+	var radius := 0.0:
+		set(value):
+			radius = value
+			queue_redraw()
+	var width := 7.0
+	# The flash's light lingering inside the ring (its alpha)
+	var glow := 0.0
+
+	func _draw() -> void:
+		if glow > 0.0:
+			draw_circle(Vector2.ZERO, radius, Color(1, 0.8, 0.5, glow * 0.5))
+		draw_arc(Vector2.ZERO, radius, 0, TAU, 96, Color(1, 0.97, 0.9, 0.85), width, true)
+		draw_arc(
+			Vector2.ZERO, radius * 0.93, 0, TAU, 96, Color(1, 0.8, 0.5, 0.35), width * 2.0, true
+		)
+
+
 # A miss at sea: spray thrown out and a ring of foam spreading. Returns how
 # long it lasts.
 static func splash(parent: Node, pos: Vector2) -> float:
