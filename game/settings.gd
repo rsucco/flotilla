@@ -16,9 +16,10 @@ static func load_settings() -> void:
 	config.load(path)
 	for bus in BUSES:
 		set_volume(bus, get_volume(bus))
-	# Browsers only allow fullscreen from a click, so Web starts windowed
+	# Fullscreen unless the player chose a window. Browsers only allow it from
+	# a click, so Web starts windowed.
 	if not OS.has_feature("web"):
-		set_fullscreen(config.get_value("display", "fullscreen", false))
+		set_fullscreen(config.get_value("display", "fullscreen", true))
 
 
 # Linear, 0 to 1

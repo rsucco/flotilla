@@ -88,6 +88,12 @@ func test_fullscreen_toggle_is_saved() -> void:
 	Settings.set_fullscreen(false)
 
 
+func test_fullscreen_by_default() -> void:
+	# after_each() left no settings file, as on a first run
+	assert_true(Settings.config.get_value("display", "fullscreen"), "until the player chooses")
+	Settings.set_fullscreen(false)
+
+
 func test_settings_open_from_the_title_screen() -> void:
 	var title: Node = add_child_autofree(TITLE_SCENE.instantiate())
 	title.get_node("TextureRect/PanelContainer/Buttons/Settings").pressed.emit()
