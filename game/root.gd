@@ -121,6 +121,11 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	# Stick motion never changes the board itself (HexCursor turns the left
+	# stick into mouse motion), and a Steam Deck's controls send hundreds of
+	# these a second even untouched: redrawing for each kept it drawing ~11 W
+	if event is InputEventJoypadMotion:
+		return
 	if event is InputEventMouse:
 		pointer = (event as InputEventMouse).position
 	queue_redraw()
