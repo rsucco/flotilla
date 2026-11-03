@@ -91,3 +91,11 @@ func test_a_host_that_stops_answering_is_forgotten() -> void:
 	finder.poll()
 	assert_eq(finder.games, {})
 	finder.close()
+
+
+func test_a_steam_deck_is_told_how_to_type_an_address() -> void:
+	assert_false(lobby().get_node("%KeyboardHint").visible, "not elsewhere")
+	OS.set_environment("SteamDeck", "1")
+	var on_deck := lobby()
+	OS.unset_environment("SteamDeck")
+	assert_true(on_deck.get_node("%KeyboardHint").visible, "on a Deck")

@@ -25,6 +25,9 @@ func _ready() -> void:
 	%Address.text_submitted.connect(func(_text: String) -> void: _on_join_pressed())
 	finder = Finder.new()
 	finder.changed.connect(_list_games)
+	# A Steam Deck has no keyboard, and Steam only opens its own by itself for
+	# games using Steamworks (Steam sets SteamDeck=1 in Game Mode)
+	%KeyboardHint.visible = OS.get_environment("SteamDeck") == "1"
 	Focus.first(self)
 
 
