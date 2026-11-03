@@ -27,9 +27,7 @@ signal dropped(left: bool)
 const PROTOCOL := 2
 const BEAT_MS := 1000
 
-var version: String = (
-	"%s/%d" % [ProjectSettings.get_setting("application/config/version"), PROTOCOL]
-)
+var version := build()
 var linked := false
 # Messages not yet read, oldest first
 var inbox: Array[Dictionary] = []
@@ -40,6 +38,11 @@ var is_quiet := false
 # When we last sent a heartbeat, and last heard anything (msec)
 var _beat_at := 0
 var _heard_at := 0
+
+
+# This build, as both ends must agree on it
+static func build() -> String:
+	return "%s/%d" % [ProjectSettings.get_setting("application/config/version"), PROTOCOL]
 
 
 func send(_message: Dictionary) -> void:
