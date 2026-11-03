@@ -12,6 +12,10 @@ const HITMISS_TEXTURE := preload("res://gui/sprites/hitmiss.png")
 const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")
 const VICTORY_SCENE := preload("res://gui/victory.tscn")
 const MUSIC_FADE := 2.0
+const SEA_SHADER := preload("res://game/sea.gdshader")
+# How often the water's light moves on: slow enough water looks the same
+# stepped, and each step costs a redraw (a handheld's battery)
+const SEA_STEP := 1.0 / 12.0
 
 # Set by the title screen before loading us
 static var mode := Mode.HOT_SEAT
@@ -38,6 +42,8 @@ var player_up := 0
 var effects: Node2D
 # Above the ships and effects: the hovered hex's coordinate, which they may cover
 var hover_label: Node2D
+# Foam where the water meets the islands, just above the board
+var shore: Node2D
 # Where the last mouse event was, from the mouse or the HexCursor standing in
 # for it
 var pointer := Vector2.ZERO
@@ -59,6 +65,8 @@ var game_id := 0
 var reveal_all := false
 # The banner as it was before we lost touch, to put back
 var _banner_before := ""
+# How far the water's light has moved on (seconds, paused with the game)
+var _sea_phase := 0.0
 
 @onready var gui: GUI = $GUI
 @onready var pause_menu: PauseMenu = $PauseMenu
@@ -111,7 +119,26 @@ func _ready() -> void:
 	hover_label = Node2D.new()
 	add_child(hover_label)
 	hover_label.draw.connect(_draw_hover_label)
+	shore = Node2D.new()
+	add_child(shore)
+	# Straight after the board, under everything else
+	move_child(shore, 0)
+	shore.draw.connect(_draw_shore)
 	pointer = get_viewport().get_mouse_position()
+	var sea := ShaderMaterial.new()
+	sea.shader = SEA_SHADER
+	material = sea
+	var waves := Timer.new()
+	waves.wait_time = SEA_STEP
+	waves.autostart = true
+	waves.timeout.connect(
+		func() -> void:
+			_sea_phase += SEA_STEP
+			sea.set_shader_parameter("phase", _sea_phase)
+			# The foam swells and ebbs (only its opacity, so it isn't redrawn)
+			shore.modulate.a = 0.75 + 0.25 * sin(_sea_phase * 1.3)
+	)
+	add_child(waves)
 	cursor = HexCursor.new()
 	add_child(cursor)
 	$TitleMusic.play(title_music_at)
@@ -137,6 +164,33 @@ func hover_text(hex: Vector2i) -> String:
 	if hex == Grid.OFF_GRID or swapping or choosing:
 		return ""
 	return ROW_LABELS[hex.y] + str(hex.x)
+
+
+# Foam along each island's coast, on the water side
+func _draw_shore() -> void:
+	for x in Grid.COLUMNS:
+		for y in Grid.ROWS:
+			var island := Vector2i(x, y)
+			if not grid.tile(island).island:
+				continue
+			var corners := grid.get_hex_points(island)
+			for n in grid.get_all_hex_neighbors(island):
+				if grid.tile(n).island:
+					continue
+				# The shared edge: the island's two corners nearest the water
+				var toward := grid.get_hex_center(n)
+				var sorted := Array(corners)
+				sorted.sort_custom(
+					func(a: Vector2, b: Vector2) -> bool:
+						return a.distance_to(toward) < b.distance_to(toward)
+				)
+				var edge: Array[Vector2] = [sorted[0], sorted[1]]
+				var out := grid.get_hex_center(island).direction_to(toward)
+				for band: Array in [[2.0, 7.0, 0.25], [1.5, 3.0, 0.6]]:
+					var shift: Vector2 = out * band[0]
+					shore.draw_line(
+						edge[0] + shift, edge[1] + shift, Color(1, 1, 1, band[2]), band[1], true
+					)
 
 
 # The coordinate on a dark tag, readable over markers and ships
@@ -194,6 +248,10 @@ func play_game() -> void:
 	grid = Grid.new()
 	for player in players:
 		player.grid = grid
+	# Where the current runs
+	var channel := grid.get_hex_points(Vector2i(Grid.NO_MANS_LAND, 0))
+	var xs: Array = Array(channel).map(func(point: Vector2) -> float: return point.x)
+	material.set_shader_parameter("channel", Vector2(xs.min(), xs.max()))
 	$TileHistory.grid = grid
 	cursor.grid = grid
 	turn_replay.grid = grid
@@ -206,6 +264,8 @@ func play_game() -> void:
 			return
 	else:
 		_restore(resume)
+	# The islands are settled now
+	shore.queue_redraw()
 	# A LAN game's replay would need the other player too
 	pause_menu.can_replay = mode != Mode.LAN
 	_update_fleets()
