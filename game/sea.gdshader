@@ -1,7 +1,8 @@
 shader_type canvas_item;
 // The sea for Root's board, flat-shaded in bands like the sprites: a swell
-// rolling in on one wind, with whitecaps on the highest crests, and down
-// no-man's-land (drawn with a UV of (1, 0)) a current. Only the water's fill
+// rolling in on one wind, with whitecaps on the highest crests, down
+// no-man's-land (drawn with a UV of (1, 0)) a current, and around the islands
+// (UV (0.5, how far out)) shallows with surf breaking on them. Only the water's fill
 // is touched, picked out by its blue vertex colour, so labels, markers and
 // islands stay as drawn. Root steps `phase` a few times a second rather than
 // the shader reading TIME, which would redraw the screen every frame.
@@ -17,6 +18,7 @@ varying vec2 world;
 // Where the wind blows from: the left, a little north of west
 const vec2 WIND = vec2(0.96, 0.28);
 const vec3 FOAM = vec3(0.85, 0.92, 0.97);
+const vec3 SHALLOW = vec3(0.13, 0.55, 0.62);
 
 
 void vertex() {
@@ -112,11 +114,39 @@ vec3 current(vec3 sea, vec2 p, float t) {
 }
 
 
+// Near an island, `far` from its coast (0) to the edge of the shallows (1):
+// lighter water over the sand, breakers rolling in and breaking, and surf
+// along the shore. The noise roughens the bands, so the coast isn't ruled,
+// but they stay short of where the strip ends.
+vec3 coast(vec3 col, vec2 p, float far, float t) {
+	float rough = fbm(p / 25.0);
+	float d = far + (rough - 0.5) * 0.35;
+	if (d < 0.45) {
+		col = mix(col, SHALLOW * 1.15, 0.75);
+	} else if (d < 0.75) {
+		col = mix(col, SHALLOW, 0.45);
+	}
+	// Lines of foam coming in toward the coast, ragged along their length
+	float roll = fract(d * 1.3 + t * 0.35 + rough * 0.8);
+	if (roll < 0.1 && d < 0.75) {
+		col = mix(col, FOAM, 0.75);
+	}
+	// The surf on the shore, running up and back
+	if (d < 0.12 + 0.08 * sin(t * 1.4 + rough * 9.0)) {
+		col = FOAM;
+	}
+	return col;
+}
+
+
 void fragment() {
 	// Blue well above red: the water and the hover/selection blues, never
 	// labels, outlines, red hits or orange islands
 	float water = smoothstep(0.2, 0.32, COLOR.b - COLOR.r);
 	vec2 p = (floor(world / pixel) + 0.5) * pixel;
-	vec3 col = UV.x > 0.5 ? current(COLOR.rgb, p, phase) : waves(COLOR.rgb, p, phase);
+	vec3 col = UV.x > 0.75 ? current(COLOR.rgb, p, phase) : waves(COLOR.rgb, p, phase);
+	if (UV.x > 0.25 && UV.x < 0.75) {
+		col = coast(col, p, UV.y, phase);
+	}
 	COLOR.rgb = mix(COLOR.rgb, col, water);
 }
