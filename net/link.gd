@@ -35,6 +35,8 @@ var inbox: Array[Dictionary] = []
 var quiet_after := 5.0
 var give_up_after := 60.0
 var is_quiet := false
+# Our end's closed: nothing more is sent or taken in
+var closed := false
 # When we last sent a heartbeat, and last heard anything (msec)
 var _beat_at := 0
 var _heard_at := 0
@@ -51,6 +53,8 @@ func send(_message: Dictionary) -> void:
 
 # Delivers what's arrived, and keeps the heartbeat going
 func poll() -> void:
+	if closed:
+		return
 	_pump()
 	if not linked:
 		return

@@ -219,6 +219,8 @@ func test_games_out_of_step_both_stop() -> void:
 	await drivers[0].act("carrier", "Forward")
 	for game in [host, guest]:
 		assert_string_contains(await victory_text(game), "stopped matching")
+		var link: Link = game.players[1 - game.seat].link
+		assert_true(link.closed, "and closed, so no more heartbeats")
 
 
 func test_leaving_during_setup() -> void:

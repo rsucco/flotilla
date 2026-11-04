@@ -8,7 +8,6 @@ var other: LoopbackLink
 var muted := false
 var _wire: Array[Dictionary] = []
 var _held: Array[Dictionary] = []
-var _closed := false
 var _greeted := false
 
 
@@ -21,7 +20,7 @@ static func pair() -> Array[LoopbackLink]:
 
 
 func send(message: Dictionary) -> void:
-	if not _closed:
+	if not closed:
 		# A copy, as if it had crossed the network
 		_held.append(message.duplicate(true))
 
@@ -36,7 +35,7 @@ func _pump() -> void:
 		_held.clear()
 	while not _wire.is_empty():
 		_deliver(_wire.pop_front())
-	if other._closed:
+	if other.closed:
 		_drop(true)
 
 
@@ -44,4 +43,4 @@ func close() -> void:
 	# What's held goes first, as EnetLink flushes
 	other._wire.append_array(_held)
 	_held.clear()
-	_closed = true
+	closed = true

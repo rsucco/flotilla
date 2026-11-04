@@ -41,6 +41,8 @@ func _listen() -> void:
 
 
 func send(message: Dictionary) -> void:
+	if closed:
+		return
 	_peer.set_target_peer(MultiplayerPeer.TARGET_PEER_BROADCAST)
 	_peer.put_packet(var_to_bytes(message))
 
@@ -64,3 +66,4 @@ func close() -> void:
 	if _peer.get_connection_status() != MultiplayerPeer.CONNECTION_DISCONNECTED:
 		_peer.host.flush()
 	_peer.close()
+	closed = true
