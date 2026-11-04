@@ -287,10 +287,7 @@ func test_ships_out_of_ap_are_tinted_and_pips_show_ap() -> void:
 	assert_eq(driver.ship_of(0, "battleship").modulate, Color.WHITE, "others untinted")
 	await driver.end_turn()
 	assert_false(pips.visible, "hidden once our turn ends")
-	await driver.swap()
-	await driver.end_turn()
-	await driver.swap()
-	assert_eq(battery.modulate, Color.WHITE, "untinted next turn")
+	assert_eq(battery.modulate, Color.WHITE, "untinted as soon as it ends")
 	get_node("/root/GutRunner/GutLayer").visible = true
 
 

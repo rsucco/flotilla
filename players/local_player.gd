@@ -410,6 +410,8 @@ func finish_turn() -> void:
 	pips.visible = false
 	for ship in ships:
 		ship.visible = not hot_seat
+		# Spent ships were dimmed for this turn only
+		ship.modulate = Color.WHITE
 	# Its history is about the opponent's fleet
 	tile_history.visible = false
 	buttons_changed.emit({"EndTurn": false})
