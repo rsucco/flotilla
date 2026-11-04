@@ -260,3 +260,9 @@ func test_damage_control_counts_afresh_after_unrep() -> void:
 	assert_true(tender.hit_hexes.has(true), "not healed early on the old count")
 	tender.new_turn()
 	assert_false(tender.hit_hexes.has(true))
+
+
+# README: Salvo has a 3-turn cooldown
+func test_salvo_cools_down_for_three_turns() -> void:
+	var battleship := spawn(p0, "battleship", Vector2i(5, 7))
+	assert_eq(battleship.special.cooldown_interval, 3)

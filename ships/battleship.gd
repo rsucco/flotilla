@@ -24,7 +24,7 @@ func _ready() -> void:
 	hit_hexes = [false, false, false, false]
 	ship_name = "Battleship"
 	weapon = "Big Gun"
-	special = SpecialAbility.new(2, "Salvo", SALVO_DESC, 1)
+	special = SpecialAbility.new(3, "Salvo", SALVO_DESC, 1)
 	passive = PassiveAbility.new("Armor", "Armor grants 25% chance of hits not counting")
 	move_sound = preload("res://audio/bigship.ogg")
 

@@ -72,7 +72,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Weapon: Big Guns
 - Size: 4
 - Points Cost: 4
-- Special Ability: (Salvo - 2 turns) Shoot one central hex and damage whatever it contains as well as all of its immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly
+- Special Ability: (Salvo - 3 turns) Shoot one central hex and damage whatever it contains as well as all of its immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly
 - Passive Ability: Armor grants 25% chance of any hit against it not counting
 - Drawbacks: None
 
