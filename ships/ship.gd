@@ -389,8 +389,11 @@ func _animate_move(property: String, target: Variant, duration: float) -> void:
 		movement_audio_player.stream = move_sound
 		movement_audio_player.play()
 	# Only where the viewer can see us: a wake would give away a cloaked ship
-	# (the AI's or the other LAN player's, mid-turn) or a hidden one
-	var trail: Wake = _make_wake() if visible and not cloaked and not ghost else null
+	# (the AI's or the other LAN player's, mid-turn) or a hidden one. Not while
+	# being placed, either: we aren't under way yet.
+	var trail: Wake = (
+		_make_wake() if visible and not cloaked and not ghost and not placing else null
+	)
 	if trail != null:
 		trail.moving = true
 	var tween := create_tween()

@@ -64,12 +64,9 @@ func _draw() -> void:
 		var fade := _fade(_age - float(b[3]))
 		if fade <= 0.0:
 			continue
-		var streak := PackedVector2Array()
-		for end: Array in [a, b]:
-			streak.append(_side(end, _churn(end), 1))
-		for end: Array in [b, a]:
-			streak.append(_side(end, _churn(end), -1))
-		draw_colored_polygon(streak, Color(FOAM, 0.5 * fade))
+		# A thick line rather than a polygon: turning on the spot, the track's
+		# two sides cross, and a crossed polygon can't be drawn
+		draw_line(a[0], b[0], Color(FOAM, 0.5 * fade), _churn(a) + _churn(b))
 		var fleck := _side(b, _churn(b) * absf(b[4]), signi(int(signf(b[4]))))
 		draw_rect(Rect2(fleck.snapped(Vector2(2, 2)), Vector2(2, 2)), Color(FOAM, fade))
 		# The arms are broken foam, not lines

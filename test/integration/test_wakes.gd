@@ -55,3 +55,12 @@ func test_none_for_a_hidden_or_cloaked_ship() -> void:
 	cloaked.cloaked = true
 	cloaked.forward()
 	assert_eq(wakes(cloaked), 0, "cloaked, mid-turn")
+
+
+func test_none_while_being_placed() -> void:
+	var ship := spawn(Vector2i(5, 7))
+	ship.visible = true
+	ship.placing = true
+	ship.turn_by(60)
+	assert_eq(wakes(ship), 0, "not under way yet")
+	ship.placing = false
