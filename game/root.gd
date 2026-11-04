@@ -670,16 +670,20 @@ func _draw() -> void:
 				uvs
 			)
 	# The shallows, over the water's fill but under the grid: in the colour of
-	# the hex beneath, and with a UV of (0.5, how far out) for the sea shader
-	var shore_uvs := PackedVector2Array(
-		[Vector2(0.5, 0), Vector2(0.5, 0), Vector2(0.5, 1), Vector2(0.5, 1)]
-	)
+	# the hex beneath, and with a UV of (0.5, how far out) for the sea shader,
+	# or (0.4, how far out) where the coast faces no-man's-land's deep water
 	for strip in _coast():
 		var under: Vector2i = strip[1]
 		var color := SEA
+		var kind := 0.5
 		if under != Grid.OFF_GRID:
 			color = hex_color(under, grid.tile(under), hover_hexes, selected_hexes, selected_center)
-		draw_colored_polygon(strip[0], color, shore_uvs)
+			if grid.tile(under).no_mans_land:
+				kind = 0.4
+		var uvs := PackedVector2Array(
+			[Vector2(kind, 0), Vector2(kind, 0), Vector2(kind, 1), Vector2(kind, 1)]
+		)
+		draw_colored_polygon(strip[0], color, uvs)
 
 	for x in Grid.COLUMNS:
 		# Column labels, highlighted under the mouse

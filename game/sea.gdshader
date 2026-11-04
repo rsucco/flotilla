@@ -2,9 +2,11 @@ shader_type canvas_item;
 // The sea for Root's board (the swell itself is in swell.gdshaderinc, shared
 // with the submarine's): the open sea; down no-man's-land (drawn with a UV of
 // (1, 0)) a current; and around the islands (UV (0.5, how far out)) shallows,
-// with a breaker coming in as each crest of the swell arrives. Only the
-// water's fill is touched, picked out by its blue vertex colour, so labels,
-// markers and islands stay as drawn. Root steps `sea_phase` rather than the
+// with a breaker coming in as each crest of the swell arrives, or (UV (0.4,
+// how far out)) where they face no-man's-land, a narrow shelf over the
+// current, dropping off into deep water. Only the water's fill is touched,
+// picked out by its blue vertex colour, so labels, markers and islands stay as
+// drawn. Root steps `sea_phase` rather than the
 // shader reading TIME, which would redraw the screen every frame.
 
 #include "res://game/swell.gdshaderinc"
@@ -15,7 +17,6 @@ uniform float pixel = 2.0;
 
 varying vec2 world;
 
-const vec3 SHALLOW = vec3(0.13, 0.55, 0.62);
 // How long a breaker takes to come in across the shallows, as a share of the
 // time between crests
 const float BREAKING = 0.3;
@@ -51,13 +52,25 @@ vec3 current(vec3 sea, vec2 p, float t) {
 // sweep past an island, so the surf comes round it, side by side. The noise
 // roughens the bands, so the coast isn't ruled, but they stay short of where
 // the strip ends.
-vec3 coast(vec3 col, vec2 p, float far, float t) {
+vec3 coast(vec3 col, vec2 p, float far, float t, bool deep) {
 	float rough = fbm(p / 25.0);
 	float d = far + (rough - 0.5) * 0.35;
+	// Lighter water over the sand, brightening the waves already drawn rather
+	// than covering them, so their bands carry on through
+	if (deep) {
+		// Only a narrow shelf before the drop-off, and surf against it
+		if (d < 0.3) {
+			col = col * 1.25 + vec3(0.02, 0.06, 0.08);
+		}
+		if (d < 0.1 + 0.06 * sin(t * 1.2 + rough * 9.0)) {
+			col = FOAM;
+		}
+		return col;
+	}
 	if (d < 0.45) {
-		col = mix(col, SHALLOW * 1.15, 0.75);
+		col = col * 1.3 + vec3(0.03, 0.08, 0.1);
 	} else if (d < 0.75) {
-		col = mix(col, SHALLOW, 0.45);
+		col = col * 1.12 + vec3(0.01, 0.03, 0.04);
 	}
 	float since = since_crest(bent(p, t), t);
 	// The breaker, from the edge of the shallows in to the shore
@@ -79,9 +92,11 @@ void fragment() {
 	// labels, outlines, red hits or orange islands
 	float water = smoothstep(0.2, 0.32, COLOR.b - COLOR.r);
 	vec2 p = (floor(world / pixel) + 0.5) * pixel;
-	vec3 col = UV.x > 0.75 ? current(COLOR.rgb, p, sea_phase) : waves(COLOR.rgb, p, sea_phase);
+	bool deep = UV.x > 0.25 && UV.x < 0.45;
+	bool flowing = UV.x > 0.75 || deep;
+	vec3 col = flowing ? current(COLOR.rgb, p, sea_phase) : waves(COLOR.rgb, p, sea_phase);
 	if (UV.x > 0.25 && UV.x < 0.75) {
-		col = coast(col, p, UV.y, sea_phase);
+		col = coast(col, p, UV.y, sea_phase, deep);
 	}
 	COLOR.rgb = mix(COLOR.rgb, col, water);
 }
