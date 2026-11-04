@@ -36,6 +36,13 @@ func _ready() -> void:
 	move_sound = preload("res://audio/sub_movement.ogg")
 
 
+# Underwater, so nothing goes up: air breaks the surface along the hull
+func _wreck(_tween: Tween) -> void:
+	var bow := effects.to_local(to_global(Vector2(0, get_rect().position.y)))
+	var stern := effects.to_local(to_global(Vector2(0, get_rect().end.y)))
+	Explosion.bubbles(effects, bow, stern)
+
+
 func hit(hit_hex: Vector2i, from_ship: Ship) -> void:
 	# Drawback - Crushing Depths: sinks when hit in the center hex, or in any
 	# hex by another sub (mines count as hits from the sub itself)

@@ -158,6 +158,17 @@ class Shockwave:
 		)
 
 
+# A submarine going down between `bow` and `stern`: a boil of white water,
+# then air breaking the surface along the hull, less and less. Returns how
+# long it lasts.
+static func bubbles(parent: Node, bow: Vector2, stern: Vector2) -> float:
+	var rising := Bubbles.new()
+	rising.bow = bow
+	rising.stern = stern
+	parent.add_child(rising)
+	return Bubbles.LASTS
+
+
 # A miss at sea: spray thrown out and a ring of foam spreading. Returns how
 # long it lasts.
 static func splash(parent: Node, pos: Vector2) -> float:
@@ -264,3 +275,54 @@ static func _curve(start: float, end: float) -> Curve:
 	curve.add_point(Vector2(0, start))
 	curve.add_point(Vector2(1, end))
 	return curve
+
+
+# Rings of air breaking the surface along a sunken hull (for bubbles()), in
+# flat foam like the sea's
+class Bubbles:
+	extends Node2D
+
+	const LASTS := 4.0
+	# How long one ring takes to spread and go
+	const POP := 0.7
+	const FOAM := Color(0.85, 0.92, 0.97)
+
+	var bow: Vector2
+	var stern: Vector2
+	var _age := 0.0
+	var _next := 0.0
+	# [where, born, how wide it spreads]
+	var _rings: Array[Array] = []
+	# The boil: patches of white water along the hull, [where, how big]
+	var _boil: Array[Array] = []
+
+	func _ready() -> void:
+		for i in 5:
+			var at := bow.lerp(stern, (i + randf()) / 5) + Vector2(randf_range(-3, 3), 0)
+			_boil.append([at, randf_range(4.0, 8.0)])
+
+	func _process(delta: float) -> void:
+		_age += delta
+		# Thick at first, thinning out (visual randomness: the global generator)
+		while _next <= _age and _age < LASTS - POP:
+			var at := bow.lerp(stern, randf()) + Vector2(randf_range(-4, 4), randf_range(-4, 4))
+			_rings.append([at, _next, randf_range(3.0, 7.0)])
+			_next += 0.03 + 0.25 * _age / LASTS
+		_rings = _rings.filter(func(ring: Array) -> bool: return _age - float(ring[1]) < POP)
+		if _age >= LASTS:
+			queue_free()
+		queue_redraw()
+
+	func _draw() -> void:
+		# The boil where it went down, spreading and settling in steps
+		var boil := 1.0 - _age / (LASTS * 0.5)
+		if boil > 0.0:
+			var color := Color(FOAM, 0.3 * ceilf(boil * 3.0) / 3.0)
+			for patch in _boil:
+				draw_circle(
+					patch[0], float(patch[1]) + 5.0 * (1.0 - boil), color, true, -1.0, false
+				)
+		for ring in _rings:
+			var t := (_age - float(ring[1])) / POP
+			var color := Color(FOAM, 0.9 if t < 0.5 else 0.5)
+			draw_arc(ring[0], 1.0 + float(ring[2]) * t, 0, TAU, 12, color, 1.5)

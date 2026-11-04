@@ -317,19 +317,18 @@ func copy_as_seen() -> Ship:
 	return copy
 
 
-# Goes up in a blast, with smaller ones along the hull, then settles and
-# fades into a spreading slick, with the sinking sound; returns when both are
-# done
+# Wrecked (see _wreck()), then settles and fades into a spreading slick, with
+# the sinking sound; returns when both are done
 func sink_effect() -> void:
 	var sound := Sfx.play(self, sink_sound)
 	sound.volume_db = sink_volume_db
 	# Make visible to the opponent while it sinks
 	visible = true
 	# (Tests sink ships that have no effects layer)
-	if effects != null:
-		Explosion.blast(effects, effects.to_local(global_position), 1.6)
-		_slick()
 	var tween := create_tween().set_parallel()
+	if effects != null:
+		_wreck(tween)
+		_slick()
 	(
 		tween
 		. tween_property(self, "modulate", Color(0.2, 0.25, 0.3, 0.0), 3.0)
@@ -338,16 +337,6 @@ func sink_effect() -> void:
 		. set_ease(Tween.EASE_IN)
 	)
 	tween.tween_property(self, "scale", scale * 0.85, 3.0)
-	# Secondary explosions along the hull, one after another (a visual
-	# shuffle: the global generator, not the rules' dice)
-	var along: Array[Vector2i] = []
-	if effects != null:
-		along = get_occupied_hexes()
-	along.shuffle()
-	for i in mini(along.size(), 3):
-		if along[i] != Grid.OFF_GRID:
-			var at := effects.to_local(grid.get_hex_center(along[i]))
-			tween.tween_callback(_secondary_blast.bind(at)).set_delay(0.35 + 0.4 * i)
 	await tween.finished
 	visible = false
 	if is_instance_valid(sound) and sound.playing:
@@ -387,6 +376,19 @@ func _animate_move(property: String, target: Variant, duration: float) -> void:
 		trail.moving = false
 	if moves_queued == 0:
 		movement_audio_player.stop()
+
+
+# Going up in a blast, with smaller ones along the hull, one after another on
+# the sinking's `tween`
+func _wreck(tween: Tween) -> void:
+	Explosion.blast(effects, effects.to_local(global_position), 1.6)
+	# A visual shuffle: the global generator, not the rules' dice
+	var along := get_occupied_hexes()
+	along.shuffle()
+	for i in mini(along.size(), 3):
+		if along[i] != Grid.OFF_GRID:
+			var at := effects.to_local(grid.get_hex_center(along[i]))
+			tween.tween_callback(_secondary_blast.bind(at)).set_delay(0.35 + 0.4 * i)
 
 
 # One of the smaller explosions along the hull as we go down
