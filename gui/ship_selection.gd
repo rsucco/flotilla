@@ -58,18 +58,45 @@ func _ready() -> void:
 		flag.toggle_mode = true
 		flag.button_group = flags
 		flag.disabled = key == taken
+		_style_flag(flag)
 		flag.toggled.connect(
 			func(on: bool) -> void:
 				if on:
 					navy = key
-					$VBoxContainer/NavyName.text = Navies.ALL[key].name
+					_name_navy(key)
 		)
+		# The name follows the mouse or the controller's focus, then goes back
+		# to the navy chosen
+		flag.mouse_entered.connect(_name_navy.bind(key))
+		flag.focus_entered.connect(_name_navy.bind(key))
+		flag.mouse_exited.connect(func() -> void: _name_navy(navy))
+		flag.focus_exited.connect(func() -> void: _name_navy(navy))
 		$VBoxContainer/Navies.add_child(flag)
 	# Start on any navy that's free
 	var free := Navies.ALL.keys().filter(func(key: String) -> bool: return key != taken)
 	var flag: Button = $VBoxContainer/Navies.get_node(free.pick_random())
 	flag.button_pressed = true
 	flag.grab_focus(true)
+
+
+func _name_navy(key: String) -> void:
+	var text: String = Navies.ALL[key].name if key != "" else ""
+	$VBoxContainer/NavyName.text = text + (" (taken)" if key == taken else "")
+
+
+# The chosen flag sits on a lit plate, at full colour; the others are dimmed
+# until the mouse or the focus is on them, which ring them as any button
+func _style_flag(flag: Button) -> void:
+	var chosen := StyleBoxFlat.new()
+	chosen.bg_color = Color(0.122, 0.714, 0.788, 0.45)
+	chosen.border_color = Color(0.749, 0.965, 0.984)
+	chosen.set_border_width_all(3)
+	chosen.set_content_margin_all(5)
+	for state in ["pressed", "hover_pressed"]:
+		flag.add_theme_stylebox_override(state, chosen)
+	flag.add_theme_color_override("icon_normal_color", Color(0.55, 0.55, 0.55))
+	for state in ["hover", "focus", "pressed", "hover_pressed"]:
+		flag.add_theme_color_override("icon_%s_color" % state, Color.WHITE)
 
 
 # The ship's size, weapon, abilities, passive and drawback

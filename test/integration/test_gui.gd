@@ -321,6 +321,24 @@ func test_the_opponents_navy_cant_be_chosen() -> void:
 		)
 
 
+# The name follows the mouse or a controller's focus before anything's chosen,
+# then goes back to the navy that is
+func test_navy_name_follows_the_focus() -> void:
+	var dialog: Control = SELECTION_SCENE.instantiate()
+	dialog.taken = "uk"
+	add_child_autofree(dialog)
+	var flags := dialog.get_node("VBoxContainer/Navies")
+	var name_label: Label = dialog.get_node("VBoxContainer/NavyName")
+	(flags.get_node("japan") as Button).button_pressed = true
+	(flags.get_node("italy") as Button).focus_entered.emit()
+	assert_eq(name_label.text, "Marina Militare", "the focused one")
+	assert_eq(dialog.navy, "japan", "still the one chosen")
+	(flags.get_node("italy") as Button).focus_exited.emit()
+	assert_eq(name_label.text, "Japan Maritime Self-Defense Force", "back to the chosen one")
+	(flags.get_node("uk") as Button).mouse_entered.emit()
+	assert_eq(name_label.text, "Royal Navy (taken)", "the opponent's, hovered")
+
+
 func test_fleet_panels_show_hits() -> void:
 	get_node("/root/GutRunner/GutLayer").visible = false
 	var game: Root = add_child_autofree(ROOT_SCENE.instantiate())
