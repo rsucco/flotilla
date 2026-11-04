@@ -9,7 +9,7 @@ extends SceneTree
 const SELECTION := preload("res://gui/ship_selection.gd")
 const SPEED := 20.0
 # A game still going after this many turns counts as a draw
-const MOST_TURNS := 80
+const MOST_TURNS := 40
 # A fleet down to this share of its points is in its endgame
 const ENDGAME := 0.25
 # Fleets by their AIPlayer.FLEETS index: classic, gun line, carrier group,
