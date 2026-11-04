@@ -104,7 +104,7 @@ func run() -> void:
 		await process_frame
 	var winner := -1
 	if _ended():
-		winner = 0 if game.players[1].ships.is_empty() else 1
+		winner = 0 if game.players[0].can_fight() else 1
 	# Sunk with no attack to blame: a mine
 	for entry in fleet:
 		if entry[1].sunk == 0 and _gone(entry[0]):
@@ -142,7 +142,7 @@ func run() -> void:
 
 
 func _ended() -> bool:
-	return game.players[0].ships.is_empty() or game.players[1].ships.is_empty()
+	return not game.players[0].can_fight() or not game.players[1].can_fight()
 
 
 func _share_left(side: int) -> float:

@@ -246,8 +246,8 @@ func play_game() -> void:
 	_start_battle_music()
 	# A resumed game starts at the swap screen of the turn it was saved in
 	var resuming := not resume.is_empty()
-	# Play until one player has no more ships
-	while not players[0].ships.is_empty() and not players[1].ships.is_empty():
+	# Play until one player has nothing left to fight with
+	while players[0].can_fight() and players[1].can_fight():
 		# Saved mid-turn: the replay holds this player's own attacks so far, to
 		# be shown with the rest of the turn at its end
 		var carrying_on: bool = resuming and resume.phase == "turn"
@@ -314,13 +314,13 @@ func play_game() -> void:
 			turn_replay.stop_watching()
 		if players[player_up].conceded:
 			break
-		# Go to the next player if they have any ships remaining
-		if not players[1 - player_up].ships.is_empty():
+		# Go to the next player if they can still fight
+		if players[1 - player_up].can_fight():
 			player_up = 1 - player_up
 
 	# Nothing left to carry on with, though its saves can still be loaded
 	SaveGame.mark_finished(game_id)
-	var winner := 0 if players[0].ships.size() > players[1].ships.size() else 1
+	var winner := 0 if players[0].can_fight() else 1
 	if players[player_up].conceded:
 		winner = 1 - player_up
 	var victory := _victory(winner)

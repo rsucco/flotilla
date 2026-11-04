@@ -57,9 +57,15 @@ func _exit_tree() -> void:
 			revealed.free()
 
 
+# Whether we've still a ship that can attack: a fleet of only supply tenders
+# (or none at all) has lost
+func can_fight() -> bool:
+	return ships.any(func(ship: Ship) -> bool: return ship.weapon != "None")
+
+
 func has_moves() -> bool:
 	# Don't make any more moves if the opponent is defeated
-	if conceded or opponent.ships.is_empty():
+	if conceded or not opponent.can_fight():
 		return false
 	return ships.any(func(s: Ship) -> bool: return s.ap > 0)
 

@@ -294,3 +294,16 @@ func test_unrep_restores_battery_hp() -> void:
 	battery.hp = 2
 	tender.use_special(battery.hex)
 	assert_eq(battery.hp, 5)
+
+# README: a fleet with no armed ships left (only supply tenders) has lost
+func test_a_fleet_of_only_tenders_has_lost() -> void:
+	var destroyer := spawn(p0, "destroyer", Vector2i(5, 7))
+	var tender := spawn(p1, "supply_tender", Vector2i(22, 7))
+	destroyer.ap = 4
+	assert_false(p1.can_fight(), "a tender has no weapon")
+	assert_true(p0.can_fight())
+	assert_false(p0.has_moves(), "nothing left to fight")
+	spawn(p1, "corvette", Vector2i(25, 3))
+	assert_true(p1.can_fight(), "a corvette can")
+	assert_true(p0.has_moves())
+	remove(tender)
