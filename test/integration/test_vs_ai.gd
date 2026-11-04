@@ -3,6 +3,7 @@ extends GutTest
 # view, and the AI's turn plays out live with its ships unseen
 
 const ROOT_SCENE := preload("res://game/root.tscn")
+const SELECTION := preload("res://gui/ship_selection.gd")
 const GameDriver := preload("res://test/game_driver.gd")
 
 var game: Root
@@ -37,7 +38,11 @@ func swap_screen() -> Node:
 func test_the_ai_sets_up_its_own_fleet_out_of_sight() -> void:
 	var ai := game.players[1]
 	assert_true(ai is AIPlayer)
-	assert_eq(ai.ships.size(), GameDriver.LAYOUT.size(), "one of each ship")
+	# One of its fleets, within the budget
+	var points := 0
+	for ship in ai.ships:
+		points += SELECTION.POINT_VALUES[ship.ship_type.to_pascal_case()]
+	assert_between(points, 1, SELECTION.POINTS_BUDGET, "a whole fleet")
 	for ship in ai.ships:
 		assert_eq(game.grid.side_of(ship.hex), 1, ship.ship_name + " on its side")
 		assert_true(ship.can_place(ship.hex, ship.direction), ship.ship_name + " placed legally")

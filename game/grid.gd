@@ -8,7 +8,7 @@ const NO_MANS_LAND := 15
 const OFF_GRID := Vector2i(-1, -1)
 const ISLAND_CHANCE := 0.02
 # Per side, so there's always somewhere for coastal batteries
-const MIN_ISLANDS := 3
+const MIN_ISLANDS := 5
 
 # Neighbor offsets for odd-q offset coordinates, indexed by column parity,
 # then by direction (0, 60, ..., 300 degrees)

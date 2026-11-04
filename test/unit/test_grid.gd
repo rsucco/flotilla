@@ -65,8 +65,8 @@ func test_last_event_ignores_non_hit_events() -> void:
 	assert_eq(tile.get_last_event(), [4, "Contact"], "like a sonar pulse's")
 
 
-func test_every_side_has_at_least_three_islands() -> void:
-	# A side rolls fewer than three about one time in six
+func test_every_side_has_at_least_five_islands() -> void:
+	# A side rolls fewer than five about half the time
 	seed(4)
 	for _i in 100:
 		var board := Grid.new()
