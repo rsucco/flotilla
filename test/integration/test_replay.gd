@@ -283,15 +283,21 @@ func test_battery_revealed_as_it_fires() -> void:
 	assert_almost_eq(copy.turret.rotation, aimed, 0.01, "turned to fire")
 
 
-func test_sub_revealed_by_its_sonar_pulse() -> void:
+# Its rough position only: a patch on the board, not the submarine itself
+func test_sonar_pulse_gives_away_only_a_patch() -> void:
+	var sub := driver.ship_of(0, "submarine")
 	await driver.act("submarine", "Secondary", Vector2i(20, 10))
 	await driver.end_turn()
 	await driver.swap(true)
-	await wait_process_frames(2)
-	assert_true(game.turn_replay.playing, "replay started")
-	assert_true(revealed_shown("submarine"), "shown as the pulse plays")
 	await driver.wait_until(replay_done, 20, "the replay")
-	assert_true(revealed_shown("submarine"), "still shown for the turn")
+	assert_false(revealed_shown("submarine"), "no copy of it")
+	var patch := sub.get_occupied_hexes().filter(
+		func(h: Vector2i) -> bool:
+			return game.grid.tile(h).history.any(
+				func(e: Array) -> bool: return e[1] == "Submarine used Sonar Pulse"
+			)
+	)
+	assert_false(patch.is_empty(), "a contact on one of its hexes")
 
 
 func test_replay_shows_the_defenders_side_without_spoilers() -> void:

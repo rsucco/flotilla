@@ -57,8 +57,8 @@ class Action:
 	var hp_changes: Array[Array] = []
 	var sunk: Array[Ship] = []
 	var sounds: Array[Array] = []
-	# Copies of the attacker's ship that the attack gave away (battery fire,
-	# Sonar Pulse), shown from the start of its replay
+	# Copies of the attacker's ship that the attack gave away (battery fire),
+	# shown from the start of its replay
 	var revealed_before := 0
 	var revealed: Array[Ship] = []
 

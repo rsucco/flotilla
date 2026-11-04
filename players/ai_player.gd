@@ -178,7 +178,7 @@ func _danger(ship: Ship, hexes: Array[Vector2i]) -> float:
 					continue
 				var text: String = event[1]
 				var seen := text.begins_with("Hit") or text.contains(" revealed by ")
-				if seen or text == "Contact":
+				if seen or text in ["Contact", "Submarine used Sonar Pulse"]:
 					danger += spotted if near == hex and ship.get_occupied_hexes().has(hex) else 0.0
 				if text.begins_with("Miss") or text.begins_with("Hit"):
 					danger += shelled

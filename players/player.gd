@@ -352,11 +352,9 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 			grid.log_event(hex, "Mine laid")
 
 		"Sonar Pulse":
-			# Reveals ships around the hex, and also reveals the submarine
-			var revealed_sub := from_ship.copy_as_seen()
-			temp_revealed_ships.append(revealed_sub)
-			from_ship.revealed_buddy = revealed_sub
-			for h in from_ship.get_occupied_hexes():
+			# Reveals ships around the hex, and gives away the submarine's rough
+			# position: a patch around it, not the submarine itself
+			for h in grid.contact(from_ship.get_occupied_hexes(), 1):
 				grid.log_event(h, "Submarine used Sonar Pulse")
 			var searched := grid.get_all_hex_neighbors(hex, ability.aoe)
 			searched.append(hex)

@@ -86,10 +86,12 @@ func _read_history(hex: Vector2i) -> void:
 			_sightings.append(["Battleship", hex, age])
 		elif text == "Miss (CIWS intercepted hit)":
 			_sightings.append(["", hex, age])
-		elif text in ["Submarine used Sonar Pulse", "Miss (Silent Service)"]:
+		elif text == "Miss (Silent Service)":
 			_sightings.append(["Submarine", hex, age])
 		# Patches around a ship, not the ship itself: they make it likelier to
 		# be near, but don't pin it there
+		elif text == "Submarine used Sonar Pulse":
+			_sightings.append(["Submarine", hex, age, true])
 		elif text == "Contact":
 			_sightings.append(["", hex, age, true])
 		elif text.begins_with("Hit, "):

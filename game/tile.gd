@@ -26,6 +26,6 @@ func get_last_event() -> Array:
 	if hit_or_miss in ["Hit", "Miss", "Sunk"] or hit_or_miss.begins_with("Miss ("):
 		return [last[0], hit_or_miss]
 	# A ship giving away roughly where it is
-	if hit_or_miss == "Contact":
+	if hit_or_miss in ["Contact", "Submarine used Sonar Pulse"]:
 		return [last[0], "Contact"]
 	return []

@@ -61,6 +61,8 @@ func test_last_event_ignores_non_hit_events() -> void:
 	assert_eq(tile.get_last_event(), [])
 	tile.history.append([3, "Contact"])
 	assert_eq(tile.get_last_event(), [3, "Contact"], "a contact is marked")
+	tile.history.append([4, "Submarine used Sonar Pulse"])
+	assert_eq(tile.get_last_event(), [4, "Contact"], "like a sonar pulse's")
 
 
 func test_every_side_has_at_least_three_islands() -> void:
