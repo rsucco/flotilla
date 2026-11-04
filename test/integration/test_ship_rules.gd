@@ -288,3 +288,27 @@ func test_a_carrier_can_move_after_attacking_twice() -> void:
 	carrier.ap -= 4
 	carrier.fire_remaining = 0
 	assert_true(carrier.can_move(), "two attacks' AP spent, one hex still left")
+
+
+# README: UNREP heals one of our ships within two hexes, not itself
+func test_unrep_reaches_ships_within_two_hexes_not_itself() -> void:
+	var tender: SupplyTender = spawn(p0, "supply_tender", Vector2i(5, 7))
+	tender.ap = 4
+	tender.special.cooldown_current = 0
+	var near := spawn(p0, "destroyer", Vector2i(7, 7))
+	spawn(p0, "destroyer", Vector2i(10, 7))
+	assert_eq(tender.ships_within(SupplyTender.UNREP_REACH), [near] as Array[Ship])
+	assert_true(tender.ships_within(1).is_empty(), "two hexes off isn't touching")
+	assert_true(p0.can_perform(tender, "special", near.hex))
+
+
+# README: ships next to the tender count their cooldowns down an extra turn
+func test_ships_next_to_a_tender_are_resupplied() -> void:
+	spawn(p0, "supply_tender", Vector2i(5, 7))
+	var beside := spawn(p0, "destroyer", Vector2i(6, 7))
+	var away := spawn(p0, "destroyer", Vector2i(10, 7))
+	for ship: Ship in [beside, away]:
+		ship.special.cooldown_current = 3
+	p0.new_turn()
+	assert_eq(beside.special.cooldown_current, 1, "two turns' worth")
+	assert_eq(away.special.cooldown_current, 2, "one")

@@ -316,14 +316,7 @@ func click(player: LocalPlayer, hex: Vector2i) -> void:
 	player._unhandled_input(event)
 
 
-func test_unrep_targets_only_adjacent_ships_not_itself() -> void:
-	var tender := ready_tender()
-	var adjacent := spawn(p0, "destroyer", Vector2i(6, 7))
-	spawn(p0, "destroyer", Vector2i(10, 7))
-	assert_eq(tender.adjacent_ships(), [adjacent] as Array[Ship])
-
-
-func test_unrep_unavailable_with_nothing_adjacent() -> void:
+func test_unrep_unavailable_with_nothing_in_reach() -> void:
 	var tender := ready_tender()
 	spawn(p0, "destroyer", Vector2i(10, 7))
 	assert_false(tender.can_special())

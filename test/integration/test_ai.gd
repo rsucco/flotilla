@@ -170,15 +170,16 @@ func test_the_tender_heads_for_a_damaged_ship() -> void:
 	add_child_autofree(ai)
 	var hurt := spawn(ai, "cruiser", Vector2i(20, 7))
 	hurt.hit_hexes[0] = true
-	var tender := spawn(ai, "supply_tender", Vector2i(22, 6))
+	# Just out of UNREP's reach
+	var tender := spawn(ai, "supply_tender", Vector2i(23, 6))
 	tender.special.cooldown_current = 0
 	var move: Array = ai._best_move()
 	assert_eq(move.slice(0, 1), [tender])
-	var alongside := false
+	var in_reach := false
 	for h in ai._hexes_after(tender, move[1]):
 		for o in hurt.get_occupied_hexes():
-			alongside = alongside or Grid.distance(h, o) == 1
-	assert_true(alongside, "alongside it")
+			in_reach = in_reach or Grid.distance(h, o) <= SupplyTender.UNREP_REACH
+	assert_true(in_reach, "into reach of it")
 
 
 func test_a_cloaked_battery_shows_itself_as_it_fires() -> void:
