@@ -266,3 +266,14 @@ func test_damage_control_counts_afresh_after_unrep() -> void:
 func test_salvo_cools_down_for_three_turns() -> void:
 	var battleship := spawn(p0, "battleship", Vector2i(5, 7))
 	assert_eq(battleship.special.cooldown_interval, 3)
+
+
+# README: the carrier has 6 AP, so it can still move after both its attacks
+func test_a_carrier_can_move_after_attacking_twice() -> void:
+	var carrier := spawn(p0, "carrier", Vector2i(7, 7))
+	carrier.new_turn()
+	assert_eq(carrier.ap, 6)
+	assert_eq(carrier.fire_remaining, 2)
+	carrier.ap -= 4
+	carrier.fire_remaining = 0
+	assert_true(carrier.can_move(), "two attacks' AP spent, one hex still left")

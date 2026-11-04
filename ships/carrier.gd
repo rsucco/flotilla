@@ -10,6 +10,8 @@ func _ready() -> void:
 	len_fore = 2
 	len_aft = 2
 	ship_type = "carrier"
+	# Enough to move after both its attacks (Flight Ops)
+	default_ap = 6
 	hit_hexes = [false, false, false, false, false]
 	ship_name = "Aircraft Carrier"
 	weapon = "F-35 Strike"
@@ -17,7 +19,7 @@ func _ready() -> void:
 		2, "Recon Flight", "Reveals one row of hexes on opponent's board, except for submarines"
 	)
 	passive = PassiveAbility.new(
-		"Flight Ops", "Can take two attack moves in one turn instead of moving"
+		"Flight Ops", "Can take two attack moves in one turn, with AP to spare for moving"
 	)
 	drawback = Drawback.new(
 		"Degraded Runway", "If two or more hexes are damaged, can only take one attack move"
