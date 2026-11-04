@@ -224,9 +224,10 @@ func area(values: Dictionary, hex: Vector2i, radius: int) -> float:
 	return total
 
 
-# Sum of heat along the row through `hex`
+# Sum of heat along the rows a Recon Flight at `hex` reveals
 func row(hex: Vector2i) -> float:
 	var total := 0.0
-	for x: int in _grid.columns_of(_side):
-		total += heat[Vector2i(x, hex.y)]
+	for y in Grid.recon_rows(hex.y):
+		for x: int in _grid.columns_of(_side):
+			total += heat[Vector2i(x, y)]
 	return total

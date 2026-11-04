@@ -445,13 +445,14 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 					grid.log_event(h, "Miss (Salvo)")
 
 		"Recon Flight":
-			# Reveals everything but submarines in the target row
+			# Reveals everything but submarines in the target rows
 			var revealed: Array[Ship] = []
-			for x: int in grid.columns_of(player_num):
-				var ship := get_ship_at_hex(Vector2i(x, hex.y))
-				if ship != null and ship.ship_type != "submarine" and not revealed.has(ship):
-					reveal(ship, " revealed by Recon Flight")
-					revealed.append(ship)
+			for y in Grid.recon_rows(hex.y):
+				for x: int in grid.columns_of(player_num):
+					var ship := get_ship_at_hex(Vector2i(x, y))
+					if ship != null and ship.ship_type != "submarine" and not revealed.has(ship):
+						reveal(ship, " revealed by Recon Flight")
+						revealed.append(ship)
 
 
 func reveal(ship: Ship, event: String) -> void:

@@ -65,6 +65,15 @@ func test_last_event_ignores_non_hit_events() -> void:
 	assert_eq(tile.get_last_event(), [4, "Contact"], "like a sonar pulse's")
 
 
+func test_recon_flight_takes_the_row_and_the_next() -> void:
+	assert_eq(Grid.recon_rows(7), [7, 8] as Array[int])
+	assert_eq(
+		Grid.recon_rows(Grid.ROWS - 1),
+		[Grid.ROWS - 2, Grid.ROWS - 1] as Array[int],
+		"or the one before"
+	)
+
+
 func test_every_side_has_at_least_five_islands() -> void:
 	# A side rolls fewer than five about half the time
 	seed(4)

@@ -195,7 +195,7 @@ func test_armor_never_blocks_a_hit_on_a_damaged_hex() -> void:
 # Aircraft Carrier: Flight Ops, Degraded Runway and Recon Flight
 
 
-func test_carrier_attacks_twice_until_two_hexes_are_damaged() -> void:
+func test_carrier_attacks_twice_until_three_hexes_are_damaged() -> void:
 	var carrier := spawn(p0, "carrier", Vector2i(5, 7))
 	carrier.new_turn()
 	assert_eq(carrier.fire_remaining, 2)
@@ -204,15 +204,23 @@ func test_carrier_attacks_twice_until_two_hexes_are_damaged() -> void:
 	assert_eq(carrier.fire_remaining, 2, "one damaged hex")
 	carrier.hit_hexes = [true, true, false, false, false]
 	carrier.new_turn()
-	assert_eq(carrier.fire_remaining, 1, "two damaged hexes")
+	assert_eq(carrier.fire_remaining, 2, "two damaged hexes")
+	carrier.hit_hexes = [true, true, true, false, false]
+	carrier.new_turn()
+	assert_eq(carrier.fire_remaining, 1, "three damaged hexes")
 
 
-func test_recon_flight_reveals_ships_in_the_row() -> void:
+# README: Recon Flight reveals two rows, the one chosen and the next
+func test_recon_flight_reveals_ships_in_two_rows() -> void:
 	var carrier := spawn(p0, "carrier", Vector2i(5, 7))
 	var in_row := spawn(p1, "destroyer", Vector2i(20, 7))
+	# Rows 8 to 10: in the next row only
+	var next_row := spawn(p1, "destroyer", Vector2i(26, 9))
 	var other_row := spawn(p1, "destroyer", Vector2i(20, 2))
 	p1.receive_special(Vector2i(27, 7), carrier)
 	assert_string_contains(game.grid.tile(in_row.hex).history[-1][1], "revealed by Recon Flight")
+	var seen: Array = game.grid.tile(next_row.hex).history
+	assert_string_contains(seen[-1][1], "revealed by Recon Flight", "the next row too")
 	assert_true(game.grid.tile(other_row.hex).history.is_empty(), "other rows untouched")
 
 

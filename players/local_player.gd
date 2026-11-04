@@ -290,12 +290,13 @@ func get_hover_hexes(hex: Vector2i) -> Array[Vector2i]:
 	# No-man's-land or off the board
 	if side == -1 or targeting_hex_range == -1:
 		return []
-	# Recon Flight covers the entire row
+	# Recon Flight covers two whole rows
 	if aiming["recon"]:
-		var row: Array[Vector2i] = []
-		for x: int in grid.columns_of(side):
-			row.append(Vector2i(x, hex.y))
-		return row
+		var rows: Array[Vector2i] = []
+		for y in Grid.recon_rows(hex.y):
+			for x: int in grid.columns_of(side):
+				rows.append(Vector2i(x, y))
+		return rows
 	var hexes := grid.get_all_hex_neighbors(hex, targeting_hex_range)
 	hexes.append(hex)
 	return hexes

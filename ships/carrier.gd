@@ -15,22 +15,27 @@ func _ready() -> void:
 	hit_hexes = [false, false, false, false, false]
 	ship_name = "Aircraft Carrier"
 	weapon = "F-35 Strike"
-	special = SpecialAbility.new(
-		2, "Recon Flight", "Reveals one row of hexes on opponent's board, except for submarines"
-	)
+	special = (SpecialAbility.new(
+		2,
+		"Recon Flight",
+		(
+			"Reveals two rows of hexes on opponent's board (the one chosen and the next),"
+			+ " except for submarines"
+		)
+	))
 	passive = PassiveAbility.new(
 		"Flight Ops", "Can take two attack moves in one turn, with AP to spare for moving"
 	)
 	drawback = Drawback.new(
-		"Degraded Runway", "If two or more hexes are damaged, can only take one attack move"
+		"Degraded Runway", "If three or more hexes are damaged, can only take one attack move"
 	)
 	move_sound = preload("res://audio/bigship.ogg")
 
 
 func new_turn() -> void:
 	super()
-	# Drawback - Degraded Runway: loses Flight Ops with two or more damaged hexes
-	if hit_hexes.count(true) < 2:
+	# Drawback - Degraded Runway: loses Flight Ops with three or more damaged hexes
+	if hit_hexes.count(true) < 3:
 		# Passive - Flight Ops: two fire actions per turn
 		fire_remaining = 2
 		print("passive - flight ops")

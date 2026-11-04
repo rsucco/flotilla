@@ -80,9 +80,9 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Weapon: F-35
 - Size: 5
 - Points Cost: 5
-- Special Ability: (Recon Flight - 2 turns) Reveals one row of hexes on opponent's board, except for submarines
+- Special Ability: (Recon Flight - 2 turns) Reveals two rows of hexes on opponent's board (the one chosen and the next), except for submarines
 - Passive Ability: Can use two attacks in one turn, and has 6 AP rather than 4, so it can still move after them
-- Drawbacks: If at least two hexes are damaged, can only use one attack move per turn
+- Drawbacks: If at least three hexes are damaged, can only use one attack move per turn
 
 ##### Credits
 

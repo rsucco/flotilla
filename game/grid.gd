@@ -141,6 +141,12 @@ func contact(hexes: Array[Vector2i], reach: int) -> Array[Vector2i]:
 	return patch
 
 
+# The rows a Recon Flight at row `y` reveals: that one and the next, or the
+# one before on the last row
+static func recon_rows(y: int) -> Array[int]:
+	return [y, y + 1] if y < ROWS - 1 else [y - 1, y]
+
+
 # Steps between two hexes, ignoring what's in the way (no-man's-land included)
 static func distance(a: Vector2i, b: Vector2i) -> int:
 	# Odd-q offset to axial coordinates
