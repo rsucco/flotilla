@@ -338,6 +338,9 @@ func copy_as_seen() -> Ship:
 	copy.title = title
 	copy.self_modulate = Color.WHITE
 	for child in _cloaked_children:
+		# Smoke freed since (repaired) has nothing to show
+		if not is_instance_valid(child):
+			continue
 		# Children added at runtime (smoke, say) aren't duplicated
 		var copied := copy.get_node_or_null(get_path_to(child))
 		if copied != null:

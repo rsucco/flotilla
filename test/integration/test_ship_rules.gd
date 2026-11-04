@@ -320,3 +320,16 @@ func test_ships_next_to_a_tender_are_resupplied() -> void:
 	p0.new_turn()
 	assert_eq(beside.special.cooldown_current, 1, "two turns' worth")
 	assert_eq(away.special.cooldown_current, 2, "one")
+
+
+# A cloaked ship (the AI's) repaired after a hit, then giving itself away,
+# once crashed on the smoke the repair had freed
+func test_a_repaired_cloaked_ship_can_still_be_copied() -> void:
+	var battery := spawn_battery(p1, Vector2i(22, 7))
+	battery.cloaked = true
+	battery.hit(battery.hex, battery)
+	battery.heal()
+	await wait_process_frames(1)
+	var copy := battery.copy_as_seen()
+	assert_not_null(copy)
+	copy.free()
