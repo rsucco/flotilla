@@ -20,6 +20,9 @@ var link: Link
 var hosting := false
 # Where each of our ships goes, as sent from the other end
 var _placements: Array = []
+# The game as it was when we last sent our checksum of it, to log if they
+# find it doesn't match theirs
+var _sent: Array = []
 
 
 func _init(num: int, with: Link, host: bool) -> void:
@@ -35,6 +38,10 @@ func _ready() -> void:
 		func() -> void:
 			var last: Dictionary = link.inbox.back()
 			if last.get("type") == "stop":
+				print("LAN game stopped by them: ", last.get("why"))
+				_log_state("as we last sent it", _sent)
+				if hash(_sent) != checksum():
+					_log_state("now", state())
 				out_of_step.emit(str(last.get("why")))
 	)
 	# Every frame, even under the Esc menu (which pauses the tree), or the
@@ -106,7 +113,7 @@ func relay(ship: Ship, action: String, target: Vector2i) -> void:
 		"ship": opponent.ships.find(ship),
 		"action": action,
 		"target": target,
-		"sum": checksum(),
+		"sum": _sign(),
 	}
 	if hosting:
 		move.seed = randi()
@@ -121,7 +128,7 @@ func relay(ship: Ship, action: String, target: Vector2i) -> void:
 
 # Our player ends their turn ("end"), or gives up ("concede")
 func tell(type: String) -> void:
-	link.send({"type": type, "sum": checksum()})
+	link.send({"type": type, "sum": _sign()})
 
 
 func get_move() -> void:
@@ -166,6 +173,12 @@ func _take(types: Array[String]) -> Dictionary:
 
 # The game as both sides should have it: fleets, the board's history and mines
 func checksum() -> int:
+	return hash(state())
+
+
+# What checksum() is of: each ship's state (both fleets, the host's first),
+# then each tile's history and whether it's mined
+func state() -> Array:
 	var state := []
 	var both: Array[Player] = [self, opponent]
 	if player_num == 1:
@@ -181,10 +194,27 @@ func checksum() -> int:
 		for y in Grid.ROWS:
 			var tile := grid.tile(Vector2i(x, y))
 			state.append([tile.history, tile.is_mined])
-	return hash(state)
+	return state
 
 
-# The games no longer agree: tells the other end, which stops too
+# Our checksum for a message, keeping the state it's of
+func _sign() -> int:
+	_sent = state()
+	return hash(_sent)
+
+
+# The games no longer agree: tells the other end, which stops too. Both log
+# the game as they had it, to tell what drifted apart.
 func _stop(why: String) -> void:
+	print("LAN game stopped: ", why)
+	_log_state("now", state())
 	link.send({"type": "stop", "why": why})
 	out_of_step.emit(why)
+
+
+# The game a line at a time (ships, then tiles by column), so the two ends'
+# logs can be diffed
+static func _log_state(label: String, game: Array) -> void:
+	print("LAN game state, ", label, ":")
+	for i in game.size():
+		print("  %d %s" % [i, game[i]])
