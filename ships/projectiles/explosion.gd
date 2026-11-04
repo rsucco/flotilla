@@ -169,6 +169,23 @@ static func bubbles(parent: Node, bow: Vector2, stern: Vector2) -> float:
 	return Bubbles.LASTS
 
 
+# A missile's launch: a cloud of smoke and steam from the silo. Returns how
+# long it lasts.
+static func puff(parent: Node, pos: Vector2) -> float:
+	var smoke := _burst(pos, SMOKE_TEXTURE, 14, 1.4)
+	smoke.initial_velocity_min = 6.0
+	smoke.initial_velocity_max = 16.0
+	smoke.damping_min = 8.0
+	smoke.damping_max = 12.0
+	smoke.gravity = WIND
+	smoke.scale_amount_min = 0.025
+	smoke.scale_amount_max = 0.04
+	smoke.scale_amount_curve = grow(0.6, 1.5)
+	smoke.color_ramp = fade(Color(0.92, 0.92, 0.9, 0.7))
+	_play(parent, [smoke])
+	return smoke.lifetime
+
+
 # A miss at sea: spray thrown out and a ring of foam spreading. Returns how
 # long it lasts.
 static func splash(parent: Node, pos: Vector2) -> float:
@@ -257,6 +274,17 @@ static func _play(parent: Node, bursts: Array[CPUParticles2D]) -> void:
 	for burst in bursts:
 		parent.add_child(burst)
 		burst.create_tween().tween_callback(burst.queue_free).set_delay(burst.lifetime + 0.1)
+
+
+# Particles growing from `start` to `end` times their size (for other effects
+# too: a missile's smoke trail)
+static func grow(start: float, end: float) -> Curve:
+	return _curve(start, end)
+
+
+# Particles in `color`, fading out
+static func fade(color: Color) -> Gradient:
+	return _ramp([color, Color(color, 0.0)])
 
 
 static func _ramp(colors: Array[Color]) -> Gradient:

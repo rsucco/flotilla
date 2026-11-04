@@ -85,16 +85,25 @@ func test_turret_takes_shortest_way_around() -> void:
 	assert_lt(await sweep(ship, ship.turret, Vector2i(3, 8)), 30.0)
 
 
+# It flies an arc: straight for the target over the ground, climbing then
+# diving on screen, nose first
 func test_missile_turns_to_face_target() -> void:
 	for shot: Array in [[Vector2i(5, 7), Vector2i(25, 2)], [Vector2i(25, 7), Vector2i(3, 12)]]:
 		var missile: Missile = MISSILE_SCENE.instantiate()
 		missile.grid = game.grid
 		game.add_child(missile)
-		missile.launch(game.grid.get_hex_center(shot[0]), shot[1])
+		var from := game.grid.get_hex_center(shot[0])
+		missile.launch(from, shot[1])
 		await wait_until(func() -> bool: return missile.enroute, 3)
-		var dir := missile.global_position.direction_to(missile.dest)
+		await wait_process_frames(3)
+		var seen := missile.seen_at()
+		await wait_process_frames(2)
+		var ground := from.direction_to(missile.global_position)
+		assert_almost_eq(ground, from.direction_to(missile.dest), Vector2.ONE * 0.01, "on track")
+		assert_lt(missile.seen_at().y - missile.global_position.y, 0.0, str("up in the air"))
 		# The missile sprite points left
-		assert_lt(off_by(missile, Vector2.LEFT, dir), 1.0, str("missile to ", shot[1]))
+		var going := seen.direction_to(missile.seen_at())
+		assert_lt(off_by(missile, Vector2.LEFT, going), 3.0, str("nose first, to ", shot[1]))
 		missile.queue_free()
 
 

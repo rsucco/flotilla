@@ -93,7 +93,8 @@ func test_intercepted_missile_shot_down_over_no_mans_land() -> void:
 	assert_not_null(missile.tracers, "CIWS fired")
 	var edge_x := missile.tracers.position.x
 	assert_between(edge_x, missile.position.x, game.grid.get_hex_center(Vector2i(16, 0)).x)
-	var bearing := game.effects.to_local(cruiser.global_position).direction_to(missile.kill_at)
+	# At the missile up in the air, where it's seen
+	var bearing := game.effects.to_local(cruiser.global_position).direction_to(missile.kill_seen)
 	assert_almost_eq(missile.tracers.direction, bearing, Vector2.ONE * 0.01, "from the cruiser")
 	await wait_seconds(2.5)
 
@@ -180,9 +181,7 @@ func test_ciws_mount_tracks_the_missile_then_returns_to_the_bow() -> void:
 	cruiser.track(missile)
 	await wait_for_signal(missile.done, 5)
 	await wait_process_frames(2)
-	var off := angle_difference(
-		cruiser.ciws.global_rotation, _aim(cruiser, missile.global_position)
-	)
+	var off := angle_difference(cruiser.ciws.global_rotation, _aim(cruiser, missile.seen_at()))
 	assert_almost_eq(off, 0.0, 0.05, "on the missile at the kill")
 	await wait_until(func() -> bool: return missile.fading, 5)
 	await wait_seconds(0.6)

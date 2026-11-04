@@ -5,6 +5,9 @@ const NUKE_SOUND := preload("res://audio/nuke.wav")
 
 func _ready() -> void:
 	rotate_sound = preload("res://audio/torpedo.wav")
+	# A ballistic missile, lobbed high
+	apex_ratio = 0.3
+	apex_most = 150.0
 
 
 func explode(pos: Vector2) -> void:
