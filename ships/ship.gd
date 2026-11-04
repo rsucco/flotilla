@@ -46,6 +46,8 @@ var passive := PassiveAbility.new()
 var drawback := Drawback.new()
 var placing := false
 var moves_queued := 0
+# The water we've left behind us, while it's still there
+var wake: Wake
 var revealed_buddy: Ship
 var sunk := false
 # How sinking is logged in tile history
@@ -371,17 +373,18 @@ func _animate_move(property: String, target: Variant, duration: float) -> void:
 		movement_audio_player.play()
 	# Only where the viewer can see us: a wake would give away a cloaked ship
 	# (the AI's or the other LAN player's, mid-turn) or a hidden one
-	var wake: CPUParticles2D = _make_wake() if visible and not cloaked and not ghost else null
+	var trail: Wake = _make_wake() if visible and not cloaked and not ghost else null
+	if trail != null:
+		trail.moving = true
 	var tween := create_tween()
 	tween.tween_property(self, property, target, duration).set_trans(Tween.TRANS_SINE).set_ease(
 		Tween.EASE_IN_OUT
 	)
 	await tween.finished
-	if wake != null:
-		# The foam already in the water fades out first
-		wake.emitting = false
-		wake.create_tween().tween_callback(wake.queue_free).set_delay(wake.lifetime)
 	moves_queued -= 1
+	if trail != null and moves_queued == 0:
+		# What's already in the water fades out on its own
+		trail.moving = false
 	if moves_queued == 0:
 		movement_audio_player.stop()
 
@@ -407,35 +410,15 @@ func _slick() -> void:
 	spread.chain().tween_callback(slick.queue_free)
 
 
-# Foam from the stern, left in the water behind us as we move or turn
-func _make_wake() -> CPUParticles2D:
-	var wake := CPUParticles2D.new()
-	wake.texture = Projectile.SMOKE_TEXTURE
+# Our wake, carried on from move to move until it's faded
+func _make_wake() -> Wake:
+	if is_instance_valid(wake):
+		return wake
+	wake = Wake.new()
 	wake.show_behind_parent = true
 	# The sprite points up (-y), so its stern is the bottom of its rect
-	wake.position = Vector2(0, get_rect().end.y - 6)
-	wake.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	wake.emission_rect_extents = Vector2(5, 2)
-	# Astern and spreading out to the sides
-	wake.direction = Vector2.DOWN
-	wake.spread = 30.0
-	wake.gravity = Vector2.ZERO
-	wake.initial_velocity_min = 10.0
-	wake.initial_velocity_max = 20.0
-	wake.damping_min = 4.0
-	wake.damping_max = 6.0
-	wake.amount = 48
-	wake.lifetime = 2.4
-	wake.scale_amount_min = 0.035
-	wake.scale_amount_max = 0.055
-	var grow := Curve.new()
-	grow.add_point(Vector2(0, 0.6))
-	grow.add_point(Vector2(1, 1.5))
-	wake.scale_amount_curve = grow
-	var fade := Gradient.new()
-	fade.set_color(0, Color(1, 1, 1, 0.8))
-	fade.set_color(1, Color(1, 1, 1, 0))
-	wake.color_ramp = fade
+	wake.stern = Vector2(0, get_rect().end.y - 6)
+	wake.beam = get_rect().size.x * global_scale.x / 2
 	add_child(wake)
 	return wake
 

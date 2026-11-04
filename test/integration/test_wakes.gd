@@ -26,7 +26,7 @@ func spawn(hex: Vector2i) -> Ship:
 
 
 func wakes(ship: Ship) -> int:
-	return ship.get_children().filter(func(n: Node) -> bool: return n is CPUParticles2D).size()
+	return ship.get_children().filter(func(n: Node) -> bool: return n is Wake).size()
 
 
 func test_a_ship_in_view_leaves_a_wake() -> void:
@@ -34,7 +34,7 @@ func test_a_ship_in_view_leaves_a_wake() -> void:
 	ship.visible = true
 	ship.forward()
 	assert_eq(wakes(ship), 1, "while it moves")
-	await wait_seconds(4.5)
+	await wait_seconds(5.0)
 	assert_eq(wakes(ship), 0, "gone once it's faded")
 
 
