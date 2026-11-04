@@ -21,7 +21,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 ##### Coastal Battery
 - Weapon: Big Guns
 - Size: 1
-- Points Cost: 2
+- Points Cost: 1
 - Special Ability: None
 - Passive Ability: Must be hit five times to destroy
 - Drawbacks: Can only be placed on island tiles, reveals itself when it fires, cannot move

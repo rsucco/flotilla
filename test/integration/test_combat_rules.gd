@@ -126,7 +126,7 @@ func test_salvo_on_undamaged_battery_is_normal_hit() -> void:
 	var battery := spawn_battery(p1, Vector2i(22, 7))
 	p1.receive_special(Vector2i(22, 7), spawn(p0, "battleship", Vector2i(5, 7)))
 	assert_false(battery.sunk)
-	assert_eq(battery.hp, 4)
+	assert_eq(battery.hp, CoastalBattery.MAX_HP - 1)
 
 
 func test_salvo_miss_splashes_every_shell() -> void:
@@ -256,9 +256,17 @@ func test_battery_hp_bar_reads_level_and_its_copy_shows_damage() -> void:
 	battery.fire(Vector2i(22, 7))
 	var copy: Ship = p1.temp_revealed_ships[0]
 	battery.hit(battery.hex, null)
-	assert_eq((copy.get_node("HPBar") as ProgressBar).value, 4.0, "the copy shows the hit")
+	assert_eq(
+		(copy.get_node("HPBar") as ProgressBar).value,
+		CoastalBattery.MAX_HP - 1.0,
+		"the copy shows the hit"
+	)
 	var saved := SaveGame.restore_revealed(SaveGame.revealed_state(copy))
-	assert_eq((saved.get_node("HPBar") as ProgressBar).value, 4.0, "and keeps it when saved")
+	assert_eq(
+		(saved.get_node("HPBar") as ProgressBar).value,
+		CoastalBattery.MAX_HP - 1.0,
+		"and keeps it when saved"
+	)
 	saved.free()
 	p1.finish_turn()
 	await wait_process_frames(1)
@@ -344,7 +352,8 @@ func test_unrep_restores_battery_hp() -> void:
 	var battery := spawn_battery(p0, Vector2i(6, 7))
 	battery.hp = 2
 	tender.use_special(battery.hex)
-	assert_eq(battery.hp, 5)
+	assert_eq(battery.hp, CoastalBattery.MAX_HP)
+
 
 # README: a fleet with no armed ships left (only supply tenders) has lost
 func test_a_fleet_of_only_tenders_has_lost() -> void:

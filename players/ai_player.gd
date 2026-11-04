@@ -83,7 +83,7 @@ func take_persona(persona: Dictionary) -> void:
 
 
 # Any navy but the opponent's, and one of the fleets, with any batteries we've
-# no islands for swapped for corvettes (the same points)
+# no islands for swapped for corvettes (a point more each, still in budget)
 func get_ship_selection() -> Dictionary:
 	navy = (
 		Navies

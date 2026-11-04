@@ -61,7 +61,7 @@ func _make_custom_tooltip(for_text: String) -> Object:
 		row.add_child(called)
 		if ship is CoastalBattery and show_damage:
 			var hp := Label.new()
-			hp.text = str((ship as CoastalBattery).hp) + "/5 HP"
+			hp.text = "%d/%d HP" % [(ship as CoastalBattery).hp, CoastalBattery.MAX_HP]
 			row.add_child(hp)
 		list.add_child(row)
 	return list

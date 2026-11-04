@@ -3,8 +3,10 @@ extends Ship
 
 const PROJECTILE_SCENE := preload("res://ships/projectiles/battleship_projectile.tscn")
 const TURRET_SOUND := preload("res://audio/artillery_rotate.wav")
+# Passive - Fortified: hits it takes to be destroyed
+const MAX_HP := 5
 
-var hp := 5
+var hp := MAX_HP
 
 @onready var turret: Sprite2D = $Turret
 @onready var hp_bar: ProgressBar = $HPBar
@@ -41,7 +43,7 @@ func _level_hp_bar() -> void:
 
 # Batteries track HP instead of hexes, so any lost HP counts as damage
 func is_hex_hit(_h: Vector2i) -> bool:
-	return hp < 5
+	return hp < MAX_HP
 
 
 # Drawback - Stationary
@@ -83,11 +85,11 @@ func fire(target: Vector2i) -> void:
 # UNREP restores full HP
 func heal() -> void:
 	super()
-	hp = 5
+	hp = MAX_HP
 	hp_bar.value = hp
 
 
-# Passive - Fortified: 5 HP rather than a set number of hexes to be hit
+# Passive - Fortified: MAX_HP rather than a set number of hexes to be hit
 func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 	Sfx.play(self, hit_sound)
 	hp -= 1
