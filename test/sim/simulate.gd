@@ -7,6 +7,7 @@ extends SceneTree
 # test/sim/run.sh plays many in parallel.
 
 const SELECTION := preload("res://gui/ship_selection.gd")
+const EXTERNAL := preload("res://test/sim/external_player.gd")
 const SPEED := 20.0
 # A game still going after this many turns counts as a draw
 const MOST_TURNS := 40
@@ -57,14 +58,21 @@ func run() -> void:
 	Engine.time_scale = SPEED
 	SaveGame.dir = "user://sim_saves"
 	Root.mode = Root.Mode.SIMULATION
-	Root.personas.clear()
-	for persona_name: String in names:
+	Root.seats.clear()
+	for seat in 2:
+		var persona_name: String = names[seat]
+		# "agent:<dir>": played from outside, through files in <dir> (external_player.gd)
+		if persona_name.begins_with("agent:"):
+			Root.seats.append(EXTERNAL.new(seat, persona_name.trim_prefix("agent:")))
+			continue
 		var persona: Dictionary = PERSONAS[persona_name].duplicate(true)
 		if persona.has("fleets"):
 			persona.fleets = persona.fleets.map(
 				func(i: int) -> Dictionary: return AIPlayer.FLEETS[i]
 			)
-		Root.personas.append(persona)
+		var ai := AIPlayer.new(seat)
+		ai.take_persona(persona)
+		Root.seats.append(ai)
 	game = load("res://game/root.tscn").instantiate()
 	root.add_child(game)
 	for player in game.players:
@@ -105,6 +113,9 @@ func run() -> void:
 	var winner := -1
 	if _ended():
 		winner = 0 if game.players[0].can_fight() else 1
+	for player in game.players:
+		if player.has_method("tell_over"):
+			player.call("tell_over", winner)
 	# Sunk with no attack to blame: a mine
 	for entry in fleet:
 		if entry[1].sunk == 0 and _gone(entry[0]):

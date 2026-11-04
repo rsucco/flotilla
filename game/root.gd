@@ -27,9 +27,9 @@ static var replay := {}
 static var title_music_at := 0.0
 # A saved game to carry on with, set by the title screen before loading us
 static var loaded := {}
-# Each AI's persona in a simulation (see AIPlayer.take_persona()), set by the
-# simulator before loading us
-static var personas: Array[Dictionary] = []
+# The two players of a simulation (AIs with personas, or ones played from
+# outside), made by the simulator (test/sim) before loading us
+static var seats: Array[Player] = []
 # A LAN game's connection to the other game, and whether we're its host (who
 # sits as Player 1), set by the lobby before loading us
 static var link: Link
@@ -96,9 +96,7 @@ func _ready() -> void:
 		Mode.VS_AI:
 			players = [LocalPlayer.new(0), AIPlayer.new(1)]
 		Mode.SIMULATION:
-			players = [AIPlayer.new(0), AIPlayer.new(1)]
-			for i in personas.size():
-				(players[i] as AIPlayer).take_persona(personas[i])
+			players.assign(seats)
 		Mode.LAN:
 			seat = 0 if hosting else 1
 			var theirs := RemotePlayer.new(1 - seat, link, hosting)
