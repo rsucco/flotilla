@@ -61,6 +61,26 @@ const UNREP_VALUE := 0.4
 const SHELLED := 0.2
 const SPOTTED := 1.0
 
+# Its persona: the above, unless a balance simulation gives it another
+var fleets: Array[Dictionary] = FLEETS
+var values: Dictionary = VALUES
+var unrep_value := UNREP_VALUE
+var shelled := SHELLED
+var spotted := SPOTTED
+
+
+# Takes on a persona for a simulation: any of "fleets", "values" (merged over
+# VALUES), "unrep_value", "shelled" and "spotted"
+func take_persona(persona: Dictionary) -> void:
+	if persona.has("fleets"):
+		# A new array: this one is FLEETS itself, which can't be changed
+		fleets = []
+		fleets.assign(persona.fleets)
+	values = VALUES.merged(persona.get("values", {}), true)
+	unrep_value = persona.get("unrep_value", UNREP_VALUE)
+	shelled = persona.get("shelled", SHELLED)
+	spotted = persona.get("spotted", SPOTTED)
+
 
 # Any navy but the opponent's, and one of the fleets, with any batteries we've
 # no islands for swapped for corvettes (the same points)
@@ -72,7 +92,7 @@ func get_ship_selection() -> Dictionary:
 		. filter(func(key: String) -> bool: return key != opponent.navy)
 		. pick_random()
 	)
-	var fleet: Dictionary = FLEETS.pick_random().duplicate()
+	var fleet: Dictionary = fleets.pick_random().duplicate()
 	var spare: int = fleet.get("CoastalBattery", 0) - grid.get_num_island_tiles(player_num)
 	if spare > 0:
 		fleet.CoastalBattery -= spare
@@ -158,16 +178,16 @@ func _danger(ship: Ship, hexes: Array[Vector2i]) -> float:
 					continue
 				var text: String = event[1]
 				if text.begins_with("Hit") or text.contains(" revealed by "):
-					danger += SPOTTED if near == hex and ship.get_occupied_hexes().has(hex) else 0.0
+					danger += spotted if near == hex and ship.get_occupied_hexes().has(hex) else 0.0
 				if text.begins_with("Miss") or text.begins_with("Hit"):
-					danger += SHELLED
+					danger += shelled
 	if ship is SupplyTender and ship.special.cooldown_current <= 1:
 		for other in ships:
 			if other != ship and other.hit_hexes.has(true):
 				for hex in hexes:
 					for h in other.get_occupied_hexes():
 						if Grid.distance(hex, h) == 1:
-							return danger - UNREP_VALUE * other.hit_hexes.count(true)
+							return danger - unrep_value * other.hit_hexes.count(true)
 	return danger
 
 
@@ -182,7 +202,7 @@ func _best_attack() -> Array:
 		for kind in ATTACKS:
 			if kind == "special" and ship is SupplyTender:
 				for near in (ship as SupplyTender).adjacent_ships():
-					var score := near.hit_hexes.count(true) * UNREP_VALUE
+					var score := near.hit_hexes.count(true) * unrep_value
 					if score > maxf(best_score, 0.0) and can_perform(ship, kind, near.hex):
 						best = [ship, kind, near.hex]
 						best_score = score
@@ -200,7 +220,7 @@ func _score(map: HeatMap, ship: Ship, kind: String, hex: Vector2i) -> float:
 	if kind == "fire":
 		return 0.0 if hex in map.fresh_hits else map.heat[hex]
 	var ability := ship.special if kind == "special" else ship.secondary
-	var worth: float = VALUES.get(ability.name, 0.5)
+	var worth: float = values.get(ability.name, 0.5)
 	match ability.name:
 		"Salvo":
 			# Dead-on a damaged hex sinks the ship
