@@ -192,8 +192,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	# The water's light moves on in steps, on the Ambient beat
 	if Ambient.beat() != _sea_beat:
+		_sea_phase += Ambient.since(_sea_beat)
 		_sea_beat = Ambient.beat()
-		_sea_phase += Ambient.STEP
 		(material as ShaderMaterial).set_shader_parameter("phase", _sea_phase)
 	# Counting down to giving up on them
 	if mode == Mode.LAN and players[1 - seat].link.is_quiet and not over:

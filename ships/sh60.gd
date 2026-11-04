@@ -44,8 +44,8 @@ func _process(delta: float) -> void:
 		# Idling on deck: turned on the Ambient beat, which looks the same at
 		# this speed and lets a still board skip frames
 		if Ambient.beat() != _idle_beat:
+			rotor.rotation += rotor_speed * Ambient.since(_idle_beat)
 			_idle_beat = Ambient.beat()
-			rotor.rotation += rotor_speed * Ambient.STEP
 	if not flying:
 		# Spin down, then stop the sound once the rotors are idle
 		if rotor_speed > IDLE_ROTOR_SPEED:
