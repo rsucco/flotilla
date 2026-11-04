@@ -179,6 +179,45 @@ func test_sonar_pulse_reveals_ship_on_center_hex() -> void:
 	await wait_process_frames(1)
 
 
+# README: a fleet down to its last two ships gives each away at the start of
+# each of its opponent's turns: seven hexes, nineteen for a submarine
+func test_the_last_two_ships_give_themselves_away() -> void:
+	game.grid.dice.reseed(1)
+	var destroyer := spawn(p1, "destroyer", Vector2i(22, 7))
+	var sub := spawn(p1, "submarine", Vector2i(26, 3))
+	var corvette := spawn(p1, "corvette", Vector2i(20, 12))
+	p1.give_away()
+	assert_true(_logged("Contact").is_empty(), "three ships can still hide")
+	remove(corvette)
+	p1.give_away()
+	var contacts := _logged("Contact")
+	for ship: Ship in [destroyer, sub]:
+		assert_true(ship.get_occupied_hexes().any(func(h: Vector2i) -> bool: return h in contacts))
+	# The two patches, which may overlap: 7 and up to 19 hexes
+	assert_between(contacts.size(), 19, 26)
+	game.grid.dice.reseed(1)
+	var first := contacts.duplicate()
+	_clear_history()
+	p1.give_away()
+	assert_eq(_logged("Contact"), first, "rolled on the dice, as a rule")
+
+
+func _logged(event: String) -> Array[Vector2i]:
+	var hexes: Array[Vector2i] = []
+	for x in Grid.COLUMNS:
+		for y in Grid.ROWS:
+			for entry: Array in game.grid.tile(Vector2i(x, y)).history:
+				if entry[1] == event and not hexes.has(Vector2i(x, y)):
+					hexes.append(Vector2i(x, y))
+	return hexes
+
+
+func _clear_history() -> void:
+	for column: Array in game.grid.tiles:
+		for tile: Tile in column:
+			tile.history.clear()
+
+
 # Coastal Battery: Stationary drawback
 
 

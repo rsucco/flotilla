@@ -14,6 +14,8 @@ signal mine_blast(hex: Vector2i)
 
 # Abilities that can damage ships, which count toward the hit rate
 const DAMAGING_ABILITIES: Array[String] = ["Salvo", "Nuclear Strike", "ASW Strike"]
+# How few ships a fleet is down to before it can't hide (see give_away())
+const LAST_FEW := 2
 # Ships without a name from our navy are numbered by type (up to five of each)
 const NUMERALS: Array[String] = ["I", "II", "III", "IV", "V"]
 
@@ -55,6 +57,17 @@ func _exit_tree() -> void:
 	for revealed in temp_revealed_ships:
 		if is_instance_valid(revealed) and not revealed.is_inside_tree():
 			revealed.free()
+
+
+# Down to its last few ships, a fleet can't hide: as each of the opponent's
+# turns starts, each of its ships gives away a contact on a patch of hexes
+# around it (a submarine's wider)
+func give_away() -> void:
+	if ships.size() > LAST_FEW:
+		return
+	for ship in ships:
+		for hex in grid.contact(ship.get_occupied_hexes(), 2 if ship is Submarine else 1):
+			grid.log_event(hex, "Contact")
 
 
 # Whether we've still a ship that can attack: a fleet of only supply tenders

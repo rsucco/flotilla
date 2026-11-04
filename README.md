@@ -15,6 +15,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Some ships have a second special ability to really mix things up.
 - Some ships have drawbacks that reduce their effectiveness under specific conditions.
 - A fleet with no armed ships left (only supply tenders) has lost.
+- A fleet down to its last two ships can no longer hide: at the start of each of its opponent's turns, each of its ships gives away its rough position, as a contact on a patch of seven hexes that includes one of its own (nineteen for a submarine).
 
 ### Ship Classes
 ##### Coastal Battery

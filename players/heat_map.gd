@@ -35,7 +35,8 @@ var _turn: int
 # Hex -> what's left of the evidence that it's empty (0 = just missed)
 var _empty := {}
 var _no_sub := {}
-# [who, hex, turns ago], newest first once read. Who is the ship's own name
+# [who, hex, turns ago], newest first once read, with a fourth entry (true)
+# when it's only near the ship (a contact's patch). Who is the ship's own name
 # (title) when the history names it, else its type (ship_name), or "" if unknown.
 var _sightings: Array[Array] = []
 # Ship title -> hexes hit, to tell which can no longer move
@@ -87,6 +88,10 @@ func _read_history(hex: Vector2i) -> void:
 			_sightings.append(["", hex, age])
 		elif text in ["Submarine used Sonar Pulse", "Miss (Silent Service)"]:
 			_sightings.append(["Submarine", hex, age])
+		# Patches around a ship, not the ship itself: they make it likelier to
+		# be near, but don't pin it there
+		elif text == "Contact":
+			_sightings.append(["", hex, age, true])
 		elif text.begins_with("Hit, "):
 			var title := text.trim_prefix("Hit, ").get_slice(" (", 0)
 			_sightings.append([title, hex, age])
@@ -176,9 +181,13 @@ func _weigh(hexes: Array[Vector2i], ship: Ship, fixed: bool, sightings: bool) ->
 	# Its latest sighting, and any of ships unknown or maybe it
 	var seen := false
 	for sighting in _sightings:
+		var loose: bool = sighting.size() > 3
 		var named: bool = (
-			sighting[0] == ship.title
-			or (sighting[0] == ship.ship_name and _alike[ship.ship_name] == 1)
+			not loose
+			and (
+				sighting[0] == ship.title
+				or (sighting[0] == ship.ship_name and _alike[ship.ship_name] == 1)
+			)
 		)
 		var maybe: bool = sighting[0] == "" or sighting[0] == ship.ship_name
 		if seen or not (named or maybe):

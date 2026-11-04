@@ -59,6 +59,8 @@ func test_last_event_ignores_non_hit_events() -> void:
 	assert_eq(tile.get_last_event(), [1, "Hit"])
 	tile.history.append([2, "Mine laid"])
 	assert_eq(tile.get_last_event(), [])
+	tile.history.append([3, "Contact"])
+	assert_eq(tile.get_last_event(), [3, "Contact"], "a contact is marked")
 
 
 func test_every_side_has_at_least_three_islands() -> void:

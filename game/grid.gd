@@ -120,6 +120,27 @@ func get_all_hex_neighbors(hex: Vector2i, distance: int = 1) -> Array[Vector2i]:
 	return neighbors
 
 
+# A ship's rough position, as `hexes` (its own) give it away: a patch of every
+# hex within `reach` of a centre picked within `reach` of one of them, so it
+# includes that one but needn't be centred on the ship. Only hexes on the
+# ship's side; rolled on the dice, as a rule.
+func contact(hexes: Array[Vector2i], reach: int) -> Array[Vector2i]:
+	var side := side_of(hexes[0])
+	var on: Vector2i = dice.pick(hexes)
+	var centres: Array[Vector2i] = []
+	var patch: Array[Vector2i] = []
+	for x: int in columns_of(side):
+		for y in ROWS:
+			if distance(on, Vector2i(x, y)) <= reach:
+				centres.append(Vector2i(x, y))
+	var centre: Vector2i = dice.pick(centres)
+	for x: int in columns_of(side):
+		for y in ROWS:
+			if distance(centre, Vector2i(x, y)) <= reach:
+				patch.append(Vector2i(x, y))
+	return patch
+
+
 # Steps between two hexes, ignoring what's in the way (no-man's-land included)
 static func distance(a: Vector2i, b: Vector2i) -> int:
 	# Odd-q offset to axial coordinates

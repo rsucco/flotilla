@@ -295,6 +295,8 @@ func play_game() -> void:
 			# Carry on with the AP and fire actions it was saved with
 			players[player_up].resume_turn()
 		else:
+			# A fleet down to its last few ships gives them away to this player
+			players[1 - player_up].give_away()
 			# Reset AP counts, decrement ability timers, etc.
 			players[player_up].new_turn()
 		resuming = false
@@ -808,7 +810,7 @@ func draw_markers(hex: Vector2i, tile: Tile) -> void:
 		var event: String = last_event[1]
 		# Shapes as well as colours, for colour-blind players: an outlined red dot
 		# with a cross for a hit, a ring around the label for a miss, an outlined
-		# black dot when sunk
+		# black dot when sunk, an amber diamond for a contact
 		if event == "Hit":
 			draw_circle(center, 11, Color(0.0, 0.0, 0.0, alpha))
 			draw_circle(center, 10, Color(1.0, 0.0, 0.0, alpha))
@@ -820,6 +822,12 @@ func draw_markers(hex: Vector2i, tile: Tile) -> void:
 		elif event == "Sunk":
 			draw_circle(center, 12, Color(1.0, 1.0, 1.0, alpha))
 			draw_circle(center, 10, Color(0.0, 0.0, 0.0, alpha))
+		elif event == "Contact":
+			var corners := PackedVector2Array()
+			for corner: Vector2 in [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]:
+				corners.append(center + corner * 13)
+			corners.append(corners[0])
+			draw_polyline(corners, Color(1.0, 0.75, 0.2, alpha), 2.5)
 		elif event.begins_with("Miss ("):
 			# Mixed marker when a potential hit was blocked by an ability
 			draw_texture(
