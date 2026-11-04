@@ -194,7 +194,8 @@ func _process(_delta: float) -> void:
 	if Ambient.beat() != _sea_beat:
 		_sea_phase += Ambient.since(_sea_beat)
 		_sea_beat = Ambient.beat()
-		(material as ShaderMaterial).set_shader_parameter("phase", _sea_phase)
+		# A global, so every shader showing the sea keeps to the same swell
+		RenderingServer.global_shader_parameter_set("sea_phase", _sea_phase)
 	# Counting down to giving up on them
 	if mode == Mode.LAN and players[1 - seat].link.is_quiet and not over:
 		var link: Link = players[1 - seat].link

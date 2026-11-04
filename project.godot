@@ -175,6 +175,13 @@ cursor_down={
 
 common/enable_pause_aware_picking=true
 
+[shader_globals]
+
+sea_phase={
+"type": "float",
+"value": 0.0
+}
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
