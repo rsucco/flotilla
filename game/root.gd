@@ -13,6 +13,8 @@ const TURN_SWAP_SCENE := preload("res://gui/local_turn_swap.tscn")
 const VICTORY_SCENE := preload("res://gui/victory.tscn")
 const MUSIC_FADE := 2.0
 const SEA_SHADER := preload("res://game/sea.gdshader")
+const SEA := Color(0.04, 0.3, 0.52)
+const CHANNEL := Color(0.02, 0.19, 0.35)
 
 # Set by the title screen before loading us
 static var mode := Mode.HOT_SEAT
@@ -60,6 +62,8 @@ var game_id := 0
 # Testing cheats (debug builds): V shows both fleets, C readies every ability
 # of the player whose turn it is
 var reveal_all := false
+# No-man's-land's left and right edges (x), for the current past the board
+var channel := Vector2.ZERO
 # The banner as it was before we lost touch, to put back
 var _banner_before := ""
 # How far the water's light has moved on (seconds, paused with the game), and
@@ -242,10 +246,10 @@ func play_game() -> void:
 	grid = Grid.new()
 	for player in players:
 		player.grid = grid
-	# Where the current runs
-	var channel := grid.get_hex_points(Vector2i(Grid.NO_MANS_LAND, 0))
-	var xs: Array = Array(channel).map(func(point: Vector2) -> float: return point.x)
-	material.set_shader_parameter("channel", Vector2(xs.min(), xs.max()))
+	# Where the current runs on past the board
+	var points := grid.get_hex_points(Vector2i(Grid.NO_MANS_LAND, 0))
+	var xs: Array = Array(points).map(func(point: Vector2) -> float: return point.x)
+	channel = Vector2(xs.min(), xs.max())
 	$TileHistory.grid = grid
 	cursor.grid = grid
 	turn_replay.grid = grid
@@ -663,6 +667,15 @@ func _draw() -> void:
 		selected_hexes = selected.get_occupied_hexes()
 		selected_center = selected_hexes[selected.len_aft]
 	var row_step := grid.hex_size / sqrt(3)
+	# Open sea all around the board, so the waves run on past its edge, and
+	# the current with them. A UV of (1, 0) is how the sea shader knows the
+	# current; draw_rect() would give it UVs of its own.
+	var view := get_viewport_rect()
+	var still := PackedVector2Array([Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO])
+	var flowing := PackedVector2Array([Vector2.RIGHT, Vector2.RIGHT, Vector2.RIGHT, Vector2.RIGHT])
+	draw_colored_polygon(_corners(view), SEA, still)
+	var strip := Rect2(channel.x, view.position.y, channel.y - channel.x, view.size.y)
+	draw_colored_polygon(_corners(strip), CHANNEL, flowing)
 
 	for x in Grid.COLUMNS:
 		# Column labels, highlighted under the mouse
@@ -705,15 +718,19 @@ func _draw() -> void:
 				)
 
 			var points := grid.get_hex_points(hex)
+			var uvs := PackedVector2Array()
+			uvs.resize(points.size())
+			uvs.fill(Vector2.RIGHT if tile.no_mans_land else Vector2.ZERO)
 			draw_polygon(
 				points,
 				PackedColorArray(
 					[hex_color(hex, tile, hover_hexes, selected_hexes, selected_center)]
-				)
+				),
+				uvs
 			)
-			# Border
+			# Border, faint over the water so the waves run on across it
 			points.append(points[0])
-			draw_polyline(points, Color.BLACK)
+			draw_polyline(points, Color(0.0, 0.08, 0.16, 0.45))
 
 			draw_string(
 				FONT,
@@ -722,13 +739,24 @@ func _draw() -> void:
 				HORIZONTAL_ALIGNMENT_CENTER,
 				grid.hex_size,
 				FONT_SIZE,
-				Color.BLACK
+				Color.BLACK if tile.island else Color(0.85, 0.92, 1.0, 0.55)
 			)
 
 			# Hit/miss markers on the opponent's grid, fading out over turns. Over
 			# the label, which a miss's ring goes around.
 			if grid.side_of(hex) == 1 - viewer():
 				draw_markers(hex, tile)
+
+
+func _corners(rect: Rect2) -> PackedVector2Array:
+	return PackedVector2Array(
+		[
+			rect.position,
+			Vector2(rect.end.x, rect.position.y),
+			rect.end,
+			Vector2(rect.position.x, rect.end.y)
+		]
+	)
 
 
 func hex_color(
@@ -742,14 +770,14 @@ func hex_color(
 		# Darker on the opponent's grid
 		if grid.side_of(hex) == viewer():
 			return Color(0.8, 0.5, 0.25) if tile.island else Color(0.0, 0.3, 0.9)
-		return Color(0.47, 0.27, 0.14) if tile.island else Color(0.0, 0.26, 0.5)
+		return Color(0.47, 0.27, 0.14) if tile.island else Color(0.0, 0.13, 0.3)
 	if hex == selected_center and not swapping:
 		return Color(0.7, 0.42, 0.2) if tile.island else Color(0.0, 0.3, 0.9)
 	if selected_hexes.has(hex) and not swapping:
 		return Color(0.0, 0.4, 0.9)
 	if tile.island:
 		return Color(1.0, 0.67, 0.5)
-	return Color(0.0, 0.3, 0.65) if tile.no_mans_land else Color(0.0, 0.5, 1.0)
+	return CHANNEL if tile.no_mans_land else SEA
 
 
 func draw_markers(hex: Vector2i, tile: Tile) -> void:
