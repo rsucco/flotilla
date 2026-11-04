@@ -26,6 +26,8 @@ const CIWS_VOLUME_DB := -8.0
 # (this much per px of it, as if nearer), over a shadow on the water. It
 # climbs this high off the deck before pitching over onto its arc.
 const CLIMB := 12.0
+# How long it takes to rise out of its silo, nose first, before it fires
+const RISE := 0.6
 const GROW := 1.0 / 200.0
 const SHADOW := Color(0, 0, 0, 0.3)
 
@@ -35,6 +37,8 @@ var apex_ratio := 0.1
 var apex_most := 60.0
 # How high it is now (px)
 var height := 0.0
+# How much of it is out of its silo, nose first (0 to 1)
+var risen := 1.0
 var shadow: Sprite2D
 var trail: CPUParticles2D
 var enroute := false
@@ -68,8 +72,9 @@ func _process(delta: float) -> void:
 	super(delta)
 	if enroute and speed < MAX_SPEED:
 		speed += 500 * delta
-	# Until it's arrived or been shot down
-	if is_instance_valid(exhaust) and is_instance_valid(shadow):
+	# Until it's arrived or been shot down (the exhaust and shadow are freed a
+	# frame after the texture's cleared)
+	if texture != null and is_instance_valid(exhaust) and is_instance_valid(shadow):
 		_fly()
 	if intercepted and moving:
 		_follow_muzzle()
@@ -149,6 +154,15 @@ func launch(
 		global_rotation = heading
 		speed = MAX_SPEED
 	else:
+		# Out of the silo, nose first, its engine not yet lit
+		region_enabled = true
+		shadow.region_enabled = true
+		exhaust.emitting = false
+		risen = 0.0
+		var rise := create_tween()
+		rise.tween_property(self, "risen", 1.0, RISE).set_trans(Tween.TRANS_SINE)
+		await rise.finished
+		exhaust.emitting = true
 		sound.stream = rotate_sound
 		sound.play()
 		Explosion.puff(get_parent(), position)
@@ -300,7 +314,14 @@ func _fly() -> void:
 	var near := 1.0 + height * GROW
 	scale = _scale * near
 	var lift := (Vector2.UP * height).rotated(-global_rotation) / scale.x
-	offset = _offset + lift
+	# What's still in the silo isn't drawn: the sprite points left, so its nose
+	# is the texture's left edge, which stays put as the rest comes out
+	var out := texture.get_size() * Vector2(risen, 1.0)
+	region_rect = Rect2(Vector2.ZERO, out)
+	shadow.region_rect = region_rect
+	var below := Vector2((texture.get_width() - out.x) / 2.0, 0.0)
+	offset = _offset + lift - below
+	shadow.offset = _offset - below
 	exhaust.position = Vector2(1.5, 0) + lift
 	trail.position = exhaust.position
 	shadow.scale = Vector2.ONE / near
