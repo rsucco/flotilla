@@ -5,6 +5,7 @@ const TORPEDO_SCENE := preload("res://ships/projectiles/torpedo.tscn")
 const NUKE_SCENE := preload("res://ships/projectiles/nuke.tscn")
 const PULSE_SCENE := preload("res://ships/projectiles/sonar_pulse.tscn")
 const SONAR_SOUND := preload("res://audio/sonar.wav")
+const SUBMERGED := preload("res://ships/submerged.gdshader")
 const NUCLEAR_STRIKE_DESC := (
 	"Select a hex on opponent's board; instantly sinks any unit it hits directly and "
 	+ "damages all hexes within two hexes of central hex"
@@ -33,6 +34,9 @@ func _ready() -> void:
 	passive = PassiveAbility.new("Silent Service", "Can only be hit by surface units on center hex")
 	drawback = Drawback.new("Crushing Depths", CRUSHING_DEPTHS_DESC)
 	sink_sound = preload("res://audio/sub_destroyed.wav")
+	# Under the waves, which pass over it
+	material = ShaderMaterial.new()
+	(material as ShaderMaterial).shader = SUBMERGED
 	move_sound = preload("res://audio/sub_movement.ogg")
 
 
