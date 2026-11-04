@@ -26,8 +26,10 @@ const CIWS_VOLUME_DB := -8.0
 # (this much per px of it, as if nearer), over a shadow on the water. It
 # climbs this high off the deck before pitching over onto its arc.
 const CLIMB := 12.0
-# How long it takes to rise out of its silo, nose first, before it fires
+# How long it takes to rise out of its silo, standing on end, before it
+# pitches over, and how much of its length shows from above while it stands
 const RISE := 0.6
+const UPRIGHT := 0.25
 const GROW := 1.0 / 200.0
 const SHADOW := Color(0, 0, 0, 0.3)
 
@@ -37,8 +39,8 @@ var apex_ratio := 0.1
 var apex_most := 60.0
 # How high it is now (px)
 var height := 0.0
-# How much of it is out of its silo, nose first (0 to 1)
-var risen := 1.0
+# How upright it is: 1 standing on end, 0 level
+var pitch := 0.0
 var shadow: Sprite2D
 var trail: CPUParticles2D
 var enroute := false
@@ -154,36 +156,27 @@ func launch(
 		global_rotation = heading
 		speed = MAX_SPEED
 	else:
-		# Out of the silo, nose first, its engine not yet lit
-		region_enabled = true
-		shadow.region_enabled = true
-		exhaust.emitting = false
-		risen = 0.0
-		var rise := create_tween()
-		rise.tween_property(self, "risen", 1.0, RISE).set_trans(Tween.TRANS_SINE)
-		await rise.finished
-		exhaust.emitting = true
+		# Straight up out of its silo in a puff of smoke, standing on end
+		pitch = 1.0
 		sound.stream = rotate_sound
 		sound.play()
 		Explosion.puff(get_parent(), position)
-		var climb := create_tween()
-		climb.tween_property(self, "height", CLIMB, 0.5).set_ease(Tween.EASE_OUT).set_trans(
+		var rise := create_tween()
+		rise.tween_property(self, "height", CLIMB, RISE).set_ease(Tween.EASE_OUT).set_trans(
 			Tween.TRANS_QUAD
 		)
-		await climb.finished
-		var tween := create_tween()
-		(
-			tween
-			. tween_property(
-				self,
-				"global_rotation",
-				global_rotation + wrapf(heading - global_rotation, -PI, PI),
-				0.5
-			)
-			. set_trans(Tween.TRANS_SINE)
-			. set_ease(Tween.EASE_IN_OUT)
+		await rise.finished
+		# Then over onto its heading, coming to its full length as it levels
+		var over := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+		over.set_ease(Tween.EASE_IN_OUT)
+		over.tween_property(
+			self,
+			"global_rotation",
+			global_rotation + wrapf(heading - global_rotation, -PI, PI),
+			0.5
 		)
-		await tween.finished
+		over.tween_property(self, "pitch", 0.0, 0.5)
+		await over.finished
 	sound.stream = FIRE_SOUND
 	sound.play()
 	enroute = true
@@ -312,16 +305,11 @@ func _fly() -> void:
 		height = _height_at(along)
 		global_rotation = (-_course(along)).angle()
 	var near := 1.0 + height * GROW
-	scale = _scale * near
-	var lift := (Vector2.UP * height).rotated(-global_rotation) / scale.x
-	# What's still in the silo isn't drawn: the sprite points left, so its nose
-	# is the texture's left edge, which stays put as the rest comes out
-	var out := texture.get_size() * Vector2(risen, 1.0)
-	region_rect = Rect2(Vector2.ZERO, out)
-	shadow.region_rect = region_rect
-	var below := Vector2((texture.get_width() - out.x) / 2.0, 0.0)
-	offset = _offset + lift - below
-	shadow.offset = _offset - below
+	# Standing on end, it's seen nose-on from above: shortened along its length
+	# (the sprite's x)
+	scale = _scale * near * Vector2(lerpf(1.0, UPRIGHT, pitch), 1.0)
+	var lift := (Vector2.UP * height).rotated(-global_rotation) / scale
+	offset = _offset + lift
 	exhaust.position = Vector2(1.5, 0) + lift
 	trail.position = exhaust.position
 	shadow.scale = Vector2.ONE / near
