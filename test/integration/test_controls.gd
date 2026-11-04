@@ -234,6 +234,43 @@ func test_placing_with_the_cursor_and_buttons() -> void:
 		assert_false(ship.placing, "A places it")
 
 
+func wheel(button: MouseButton) -> void:
+	var event := InputEventMouseButton.new()
+	event.button_index = button
+	event.pressed = true
+	game.get_viewport().push_input(event)
+
+
+func pan(by: float) -> void:
+	var event := InputEventPanGesture.new()
+	event.delta = Vector2(0, by)
+	game.get_viewport().push_input(event)
+
+
+# A wheel's notch or a trackpad's swipe turns a ship being placed once, even
+# when a swipe arrives as many small events
+func test_each_scroll_turns_a_ship_being_placed_once() -> void:
+	var ship: Ship = load("res://ships/destroyer.tscn").instantiate()
+	player.adopt(ship)
+	ship.set_grid_position(Vector2i(7, 12), 0)
+	ship.placing = true
+	for i in 4:
+		wheel(MOUSE_BUTTON_WHEEL_DOWN)
+	assert_eq(ship.direction, 60, "a burst of wheel events: one scroll")
+	await wait_seconds(0.25)
+	wheel(MOUSE_BUTTON_WHEEL_UP)
+	assert_eq(ship.direction, 0, "the next scroll, back again")
+	await wait_seconds(0.25)
+	for i in 4:
+		pan(0.1)
+	assert_eq(ship.direction, 0, "a trackpad swipe that's only just started")
+	for i in 20:
+		pan(0.1)
+	assert_eq(ship.direction, 60, "then once, however long it goes on")
+	ship.placing = false
+	ship.queue_free()
+
+
 func test_button_hints_only_after_a_controller_or_hotkey() -> void:
 	var fire: Button = game.gui.find_child("Fire")
 	var own := fire.icon

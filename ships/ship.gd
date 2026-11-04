@@ -19,6 +19,13 @@ const SHIP_TYPES: Array[String] = [
 const UNPLACED := Vector2i(-10, -10)
 # Two taps on a hex this close together are a double tap (Android's timeout)
 const DOUBLE_TAP_MS := 300
+# Placing, each scroll turns us once: a wheel's notch, or a trackpad's whole
+# swipe, momentum and all. A swipe comes as a stream of small wheel events
+# (Windows) or pan gestures (macOS, which sends a trackpad no wheel events),
+# so a scroll ends after this long without any (ms). A pan must go this far
+# first, so a resting finger doesn't turn us.
+const SCROLL_PAUSE_MS := 150
+const PAN_TURN := 0.5
 
 var hit_sound: AudioStream = preload("res://audio/water_hit1.wav")
 var sink_sound: AudioStream = preload("res://audio/ship_destroyed.wav")
@@ -92,6 +99,11 @@ var _cloaked_children: Array[CanvasItem] = []
 var _tapped_at := -DOUBLE_TAP_MS
 var _tapped_hex := UNPLACED
 var _tap_turn := 0
+# The scroll under way: when it was last moved, how far it's gone, and
+# whether it's turned us yet
+var _scrolled_at := -SCROLL_PAUSE_MS
+var _scrolled := 0.0
+var _scroll_turned := false
 
 
 # Subclasses must call super() first
@@ -110,6 +122,8 @@ func _input(event: InputEvent) -> void:
 		if can_place(mouse_hex, direction):
 			set_grid_position(mouse_hex, direction)
 			visible = true
+	elif event is InputEventPanGesture:
+		_scroll((event as InputEventPanGesture).delta.y, PAN_TURN)
 	elif HexCursor.presses(event, "action_port"):
 		turn_by(-60)
 	elif HexCursor.presses(event, "action_starboard"):
@@ -125,13 +139,27 @@ func _input(event: InputEvent) -> void:
 			return
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
-				turn_by(-60)
+				_scroll(-1.0, 0.0)
 			MOUSE_BUTTON_WHEEL_DOWN:
-				turn_by(60)
+				_scroll(1.0, 0.0)
 			MOUSE_BUTTON_LEFT:
 				if hex != UNPLACED:
 					placing = false
 					placed.emit()
+
+
+# Scrolled `by` (up negative) while placing: the first time this scroll has
+# gone `far` enough, we turn that way
+func _scroll(by: float, far: float) -> void:
+	var now := Time.get_ticks_msec()
+	if now - _scrolled_at > SCROLL_PAUSE_MS:
+		_scrolled = 0.0
+		_scroll_turned = false
+	_scrolled_at = now
+	_scrolled += by
+	if not _scroll_turned and absf(_scrolled) > far:
+		_scroll_turned = true
+		turn_by(60 if _scrolled > 0.0 else -60)
 
 
 # Placing by touch, which has no hover or wheel: a tap moves us there, a tap
