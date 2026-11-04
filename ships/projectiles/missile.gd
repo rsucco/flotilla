@@ -32,6 +32,9 @@ var intercepted := false
 # show its fire all the way (to the defender, watching live or in the replay)
 var ciws_at := Vector2.INF
 var ciws_shown := false
+# Set by the cruiser shooting it down, when it's seen doing it: the tip of its
+# CIWS barrel, which the tracers come from as it turns
+var muzzle: Node2D
 var launched_from: Vector2
 var kill_at: Vector2
 var gun_at: Vector2
@@ -44,6 +47,7 @@ func _process(delta: float) -> void:
 	if enroute and speed < MAX_SPEED:
 		speed += 500 * delta
 	if intercepted and moving:
+		_follow_muzzle()
 		var to_go := launched_from.distance_to(kill_at) - launched_from.distance_to(position)
 		# Early enough for the first tracers to reach the missile, too
 		var lead := FIRE_LEAD + gun_at.distance_to(kill_at) / TRACER_SPEED
@@ -135,6 +139,17 @@ func _plan_shootdown() -> void:
 		gun_at = cruiser
 
 
+# Fires from the barrel, along it, while the cruiser is shown and still there
+func _follow_muzzle() -> void:
+	if not ciws_shown or not is_instance_valid(muzzle):
+		return
+	gun_at = get_parent().to_local(muzzle.global_position)
+	if tracers != null:
+		tracers.position = gun_at
+		# The mount's sprite points up (-y)
+		tracers.direction = Vector2.UP.rotated(muzzle.global_rotation)
+
+
 func _open_fire() -> void:
 	tracers = CPUParticles2D.new()
 	tracers.position = gun_at
@@ -150,6 +165,7 @@ func _open_fire() -> void:
 	tracers.scale_amount_min = 2.0
 	tracers.scale_amount_max = 2.0
 	add_sibling(tracers)
+	_follow_muzzle()
 
 
 func _shoot_down() -> void:

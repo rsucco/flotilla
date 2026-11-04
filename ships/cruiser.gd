@@ -20,6 +20,8 @@ const CIWS_SLEW := TAU * 4
 var fore_silo := true
 # The missile the CIWS is shooting at, if any
 var tracking: Missile
+# The tip of the CIWS barrel, which the tracers come out of
+var muzzle: Marker2D
 
 @onready var ciws: Sprite2D = $CIWS
 
@@ -35,6 +37,10 @@ func _ready() -> void:
 	special = SpecialAbility.new(3, "EW Strike", EW_STRIKE_DESC, 2)
 	passive = PassiveAbility.new("Missile Defense", MISSILE_DEFENSE_DESC)
 	move_sound = preload("res://audio/smallship.ogg")
+	# The barrel is the top of the mount's sprite, which points up
+	muzzle = Marker2D.new()
+	muzzle.position = Vector2(0, -ciws.texture.get_height() / 2.0)
+	ciws.add_child(muzzle)
 
 
 # Follows the missile until it's been shot down, then turns back to the bow
@@ -50,9 +56,11 @@ func _process(delta: float) -> void:
 		ciws.rotation = turned
 
 
-# Shown in the defender's replay: the CIWS turning to shoot `missile` down
+# Shown in the defender's replay: the CIWS turning to shoot `missile` down,
+# its tracers coming from the barrel
 func track(missile: Missile) -> void:
 	tracking = missile
+	missile.muzzle = muzzle
 
 
 func fire(target: Vector2i) -> void:

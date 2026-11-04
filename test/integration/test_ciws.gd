@@ -155,6 +155,22 @@ func test_ciws_mount_turns_any_way_round_before_the_tracers_show() -> void:
 	assert_lt(PI / Cruiser.CIWS_SLEW, Missile.SOUND_LEAD * 0.5, "with time to spare")
 
 
+func test_seen_ciws_fires_from_the_tip_of_its_barrel() -> void:
+	var cruiser: Cruiser = spawn(p1, "cruiser", Vector2i(24, 7), 1)
+	var missile := _intercepted_missile()
+	missile.ciws_at = cruiser.global_position
+	missile.ciws_shown = true
+	missile.launch(game.grid.get_hex_center(Vector2i(5, 7)), Vector2i(24, 9), 0.0, true)
+	cruiser.track(missile)
+	await wait_until(func() -> bool: return missile.tracers != null, 5)
+	await wait_process_frames(1)
+	var tip := cruiser.ciws.to_global(Vector2(0, -cruiser.ciws.texture.get_height() / 2.0))
+	assert_almost_eq(missile.tracers.global_position, tip, Vector2(0.5, 0.5), "the barrel's tip")
+	var along := Vector2.UP.rotated(cruiser.ciws.global_rotation)
+	assert_almost_eq(missile.tracers.direction, along, Vector2(0.01, 0.01), "along the barrel")
+	await wait_for_signal(missile.done, 5)
+
+
 func test_ciws_mount_tracks_the_missile_then_returns_to_the_bow() -> void:
 	var cruiser: Cruiser = spawn(p1, "cruiser", Vector2i(24, 7), 1)
 	var missile := _intercepted_missile()
