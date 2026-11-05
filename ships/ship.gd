@@ -377,7 +377,7 @@ func sink_effect() -> void:
 # Rotates by a multiple of 60 degrees if the new position is clear
 func turn_by(offset: int) -> void:
 	var hexes := hexes_at(hex, direction + offset)
-	if hexes.has(Grid.OFF_GRID) or not _is_clear(hexes):
+	if hexes.has(Grid.OFF_GRID) or not Helm.is_clear(self, hexes):
 		return
 	direction += offset
 	await _animate_move("rotation_degrees", direction, 1.0)
@@ -459,16 +459,6 @@ func _make_wake() -> Wake:
 	return wake
 
 
-# True if none of the hexes are land or occupied by another ship
-func _is_clear(hexes: Array[Vector2i]) -> bool:
-	for h in hexes:
-		# The opponent's ships are never on our side
-		var other := player.get_ship_at_hex(h)
-		if grid.tile(h).island or (other != null and other != self):
-			return false
-	return true
-
-
 # True if moving one hex forward (or back) is in bounds, clear, affordable,
 # and the ship isn't too damaged
 func can_move(reverse: bool = false) -> bool:
@@ -478,14 +468,14 @@ func can_move(reverse: bool = false) -> bool:
 		return false
 	var new_hex := grid.get_hex_neighbor(hex, direction + (180 if reverse else 0))
 	var hexes := hexes_at(new_hex, direction)
-	return not hexes.has(Grid.OFF_GRID) and _is_clear(hexes)
+	return not hexes.has(Grid.OFF_GRID) and Helm.is_clear(self, hexes)
 
 
 func can_rotate(offset: int) -> bool:
 	if is_immobilized() or ap < 2:
 		return false
 	var hexes := hexes_at(hex, direction + offset)
-	return not hexes.has(Grid.OFF_GRID) and _is_clear(hexes)
+	return not hexes.has(Grid.OFF_GRID) and Helm.is_clear(self, hexes)
 
 
 # 2 AP and 1 fire action required to fire

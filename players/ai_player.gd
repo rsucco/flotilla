@@ -107,7 +107,8 @@ func get_ship_selection() -> Dictionary:
 	return fleet
 
 
-# Anywhere it fits, hidden from the opponent
+# Anywhere it fits, hidden from the opponent, and with room to turn and get
+# under way if there's any such place
 func _place(ship: Ship) -> void:
 	var spots: Array[Array] = []
 	for x: int in grid.columns_of(player_num):
@@ -115,7 +116,8 @@ func _place(ship: Ship) -> void:
 			for dir in DIRECTIONS:
 				if ship.can_place(Vector2i(x, y), dir):
 					spots.append([Vector2i(x, y), dir])
-	var spot: Array = spots.pick_random()
+	var roomy := spots.filter(func(s: Array) -> bool: return Helm.has_room(ship, s[0], s[1]))
+	var spot: Array = (roomy if not roomy.is_empty() else spots).pick_random()
 	ship.set_grid_position(spot[0], spot[1])
 	ship.visible = false
 

@@ -207,6 +207,8 @@ func update_ship_info(ship: Ship) -> void:
 		ap_label.text = "AP:     "
 		update_ability(special_button, special_info, "Special", null)
 		update_ability(secondary_button, secondary_info, "Secondary", null)
+		for move in Helm.MOVES:
+			(find_child(move.capitalize()) as Button).tooltip_text = ""
 		return
 	update_ability(special_button, special_info, "Special", ship.special)
 	update_ability(secondary_button, secondary_info, "Secondary", ship.secondary)
@@ -222,6 +224,13 @@ func update_ship_info(ship: Ship) -> void:
 		ship_name.text += " (Jammed)"
 		ship_name.tooltip_text += "\nJammed by EW Strike: can't fire this turn"
 		$GUIGrid/Actions/Fire.tooltip_text = "Jammed by EW Strike: can't fire this turn"
+	# Tooltips for the mouse; a controller or a touch screen has only the name
+	for move in Helm.MOVES:
+		(find_child(move.capitalize()) as Button).tooltip_text = Helm.refusal(ship, move)
+	if ship.is_immobilized():
+		ship_name.text += " (Immobilized)"
+	elif Helm.is_boxed_in(ship):
+		ship_name.text += " (Boxed In)"
 	ship_icon.texture = ship_icons[ship.ship_type]
 	ship_icon.modulate = Color.WHITE
 	ap_label.text = "AP: " + str(ship.ap) + "/" + str(ship.default_ap)
