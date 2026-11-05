@@ -116,7 +116,7 @@ func test_the_ai_fires_where_a_ship_was_just_seen() -> void:
 	assert_lte(Grid.distance(move[2], Vector2i(7, 7)), 2, "at the carrier")
 
 
-func test_every_fleet_is_within_the_rules() -> void:
+func test_every_fleet_spends_the_budget_within_the_rules() -> void:
 	var selection := AIPlayer.SELECTION
 	for fleet: Dictionary in AIPlayer.FLEETS:
 		var points := 0
@@ -124,7 +124,7 @@ func test_every_fleet_is_within_the_rules() -> void:
 			assert_true(selection.POINT_VALUES.has(ship_type), ship_type + " is a ship")
 			assert_lte(fleet[ship_type], selection.MAX_PER_TYPE, ship_type)
 			points += fleet[ship_type] * selection.POINT_VALUES[ship_type]
-		assert_lte(points, selection.POINTS_BUDGET, str(fleet))
+		assert_eq(points, selection.POINTS_BUDGET, str(fleet))
 
 
 func test_batteries_only_with_islands_to_put_them_on() -> void:
