@@ -307,21 +307,32 @@ func test_unrep_reaches_ships_within_two_hexes_not_itself() -> void:
 	tender.special.cooldown_current = 0
 	var near := spawn(p0, "destroyer", Vector2i(7, 7))
 	spawn(p0, "destroyer", Vector2i(10, 7))
-	assert_eq(tender.ships_within(SupplyTender.UNREP_REACH), [near] as Array[Ship])
-	assert_true(tender.ships_within(1).is_empty(), "two hexes off isn't touching")
+	assert_eq(tender.ships_in_reach(), [near] as Array[Ship])
 	assert_true(p0.can_perform(tender, "special", near.hex))
 
 
-# README: ships next to the tender count their cooldowns down an extra turn
-func test_ships_next_to_a_tender_are_resupplied() -> void:
+# README: ships within two hexes of a tender count their cooldowns down an
+# extra turn
+func test_ships_within_two_hexes_of_a_tender_are_resupplied() -> void:
 	spawn(p0, "supply_tender", Vector2i(5, 7))
-	var beside := spawn(p0, "destroyer", Vector2i(6, 7))
+	var near := spawn(p0, "destroyer", Vector2i(7, 7))
 	var away := spawn(p0, "destroyer", Vector2i(10, 7))
-	for ship: Ship in [beside, away]:
+	for ship: Ship in [near, away]:
 		ship.special.cooldown_current = 3
 	p0.new_turn()
-	assert_eq(beside.special.cooldown_current, 1, "two turns' worth")
+	assert_eq(near.special.cooldown_current, 1, "two turns' worth")
 	assert_eq(away.special.cooldown_current, 2, "one")
+
+
+# README: only once, however many tenders are in reach
+func test_two_tenders_dont_stack() -> void:
+	spawn(p0, "supply_tender", Vector2i(5, 3))
+	spawn(p0, "supply_tender", Vector2i(5, 11))
+	var between := spawn(p0, "destroyer", Vector2i(5, 7))
+	between.special.cooldown_current = 3
+	assert_eq(p0.ships.filter(func(s: Ship) -> bool: return s is SupplyTender).size(), 2)
+	p0.new_turn()
+	assert_eq(between.special.cooldown_current, 1, "one tender's worth")
 
 
 # A cloaked ship (the AI's) repaired after a hit, then giving itself away,

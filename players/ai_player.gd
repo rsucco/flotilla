@@ -187,7 +187,7 @@ func _danger(ship: Ship, hexes: Array[Vector2i]) -> float:
 			if other != ship and other.hit_hexes.has(true):
 				for hex in hexes:
 					for h in other.get_occupied_hexes():
-						if Grid.distance(hex, h) <= SupplyTender.UNREP_REACH:
+						if Grid.distance(hex, h) <= SupplyTender.REACH:
 							return danger - unrep_value * other.hit_hexes.count(true)
 	return danger
 
@@ -202,7 +202,7 @@ func _best_attack() -> Array:
 	for ship in ships:
 		for kind in ATTACKS:
 			if kind == "special" and ship is SupplyTender:
-				for near in (ship as SupplyTender).ships_within(SupplyTender.UNREP_REACH):
+				for near in (ship as SupplyTender).ships_in_reach():
 					var score := near.hit_hexes.count(true) * unrep_value
 					if score > maxf(best_score, 0.0) and can_perform(ship, kind, near.hex):
 						best = [ship, kind, near.hex]

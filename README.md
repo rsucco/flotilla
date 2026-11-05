@@ -65,7 +65,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Size: 3
 - Points Cost: 3
 - Special Ability: (UNREP - 3 turns) Completely heal one of our ships within two hexes (not itself); restores a Coastal Battery's HP
-- Passive Ability: Ships next to it at the start of their turn count their ability cooldowns down an extra turn; if damaged, heals one hex every ten turns
+- Passive Ability: Ships within two hexes of it at the start of their turn count their ability cooldowns down an extra turn (only once, however many tenders are in reach); if damaged, heals one hex every ten turns
 - Drawbacks: Loses 50% move speed when damaged
 
 ##### Battleship

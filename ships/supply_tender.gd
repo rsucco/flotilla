@@ -2,8 +2,8 @@ class_name SupplyTender
 extends Ship
 
 const REPAIR_SOUND := preload("res://audio/repair.wav")
-# How far away a ship UNREP can heal can be
-const UNREP_REACH := 2
+# How far UNREP and Resupply reach
+const REACH := 2
 
 # Turns until Damage Control next heals a hex, or -1 while undamaged
 var dc_timer := -1
@@ -18,13 +18,16 @@ func _ready() -> void:
 	ship_name = "Supply Tender"
 	weapon = "None"
 	special = SpecialAbility.new(
-		3, "UNREP", "Completely heals one of our ships within %d hexes" % UNREP_REACH
+		3, "UNREP", "Completely heals one of our ships within %d hexes" % REACH
 	)
 	passive = (PassiveAbility.new(
 		"Resupply",
 		(
-			"Ships next to it count their cooldowns down an extra turn; heals one hex"
-			+ " every 10 turns if damaged"
+			(
+				"Ships within %d hexes count their cooldowns down an extra turn, once however"
+				+ " many tenders reach them; heals one hex every 10 turns if damaged"
+			)
+			% REACH
 		)
 	))
 	drawback = Drawback.new("Flammable Cargo", "Lose 2 AP per turn if damaged")
@@ -58,16 +61,15 @@ func new_turn() -> void:
 		ap = 2
 
 
-# Our other ships with a hex within `reach` of one of the tender's (1: those
-# touching it)
-func ships_within(reach: int) -> Array[Ship]:
+# Our other ships with a hex within REACH of one of the tender's
+func ships_in_reach() -> Array[Ship]:
 	var found: Array[Ship] = []
 	for ship in player.ships:
 		if ship == self:
 			continue
 		for h in get_occupied_hexes():
 			if ship.get_occupied_hexes().any(
-				func(o: Vector2i) -> bool: return Grid.distance(h, o) <= reach
+				func(o: Vector2i) -> bool: return Grid.distance(h, o) <= REACH
 			):
 				found.append(ship)
 				break
@@ -76,7 +78,7 @@ func ships_within(reach: int) -> Array[Ship]:
 
 # UNREP needs something to heal
 func can_special() -> bool:
-	return super() and not ships_within(UNREP_REACH).is_empty()
+	return super() and not ships_in_reach().is_empty()
 
 
 # Heals the ship at `target`, within reach

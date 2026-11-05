@@ -178,7 +178,7 @@ func test_the_tender_heads_for_a_damaged_ship() -> void:
 	var in_reach := false
 	for h in ai._hexes_after(tender, move[1]):
 		for o in hurt.get_occupied_hexes():
-			in_reach = in_reach or Grid.distance(h, o) <= SupplyTender.UNREP_REACH
+			in_reach = in_reach or Grid.distance(h, o) <= SupplyTender.REACH
 	assert_true(in_reach, "into reach of it")
 
 

@@ -95,11 +95,12 @@ func new_turn() -> void:
 		if ship.jammed:
 			ship.fire_remaining = 0
 			ship.jammed = false
-	# Passive - Resupply: ships next to a tender count down an extra turn
+	# Passive - Resupply: ships in a tender's reach count down an extra turn,
+	# once however many tenders reach them
 	var resupplied: Array[Ship] = []
 	for tender in ships:
 		if tender is SupplyTender:
-			for ship in (tender as SupplyTender).ships_within(1):
+			for ship in (tender as SupplyTender).ships_in_reach():
 				if not resupplied.has(ship):
 					resupplied.append(ship)
 					for ability in [ship.special, ship.secondary]:
@@ -172,13 +173,10 @@ func can_perform(ship: Ship, action: String, target: Vector2i = Grid.OFF_GRID) -
 		"fire":
 			legal = at_opponent and ship.can_fire(target)
 		"special":
-			# UNREP heals one of our ships next to the tender
+			# UNREP heals one of our ships in the tender's reach
 			if ship is SupplyTender:
 				var tender := ship as SupplyTender
-				legal = (
-					tender.can_special()
-					and get_ship_at_hex(target) in tender.ships_within(SupplyTender.UNREP_REACH)
-				)
+				legal = tender.can_special() and get_ship_at_hex(target) in tender.ships_in_reach()
 			else:
 				legal = at_opponent and ship.can_special()
 		"secondary":
