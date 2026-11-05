@@ -14,8 +14,11 @@ signal mine_blast(hex: Vector2i)
 
 # Abilities that can damage ships, which count toward the hit rate
 const DAMAGING_ABILITIES: Array[String] = ["Salvo", "Nuclear Strike", "ASW Strike"]
-# How few ships a fleet is down to before it can't hide (see give_away())
+# How few armed ships a fleet is down to before it can't hide (see give_away())
 const LAST_FEW := 2
+# How far a contact's patch reaches from its centre: nineteen hexes, so one
+# area attack at the centre can't be a sure thing
+const CONTACT_REACH := 2
 # Ships without a name from our navy are numbered by type (up to five of each)
 const NUMERALS: Array[String] = ["I", "II", "III", "IV", "V"]
 
@@ -59,14 +62,15 @@ func _exit_tree() -> void:
 			revealed.free()
 
 
-# Down to its last few ships, a fleet can't hide: as each of the opponent's
-# turns starts, each of its ships gives away a contact on a patch of hexes
-# around it (a submarine's wider)
+# Down to its last few armed ships, a fleet can't hide: as each of the
+# opponent's turns starts, each of them gives away a contact on a patch of
+# hexes around it
 func give_away() -> void:
-	if ships.size() > LAST_FEW:
+	var armed := ships.filter(func(ship: Ship) -> bool: return ship.weapon != "None")
+	if armed.size() > LAST_FEW:
 		return
-	for ship in ships:
-		for hex in grid.contact(ship.get_occupied_hexes(), 2 if ship is Submarine else 1):
+	for ship: Ship in armed:
+		for hex in grid.contact(ship.get_occupied_hexes(), CONTACT_REACH):
 			grid.log_event(hex, "Contact")
 
 
@@ -366,7 +370,7 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 		"Sonar Pulse":
 			# Reveals ships around the hex, and gives away the submarine's rough
 			# position: a patch around it, not the submarine itself
-			for h in grid.contact(from_ship.get_occupied_hexes(), 1):
+			for h in grid.contact(from_ship.get_occupied_hexes(), CONTACT_REACH):
 				grid.log_event(h, "Submarine used Sonar Pulse")
 			var searched := grid.get_all_hex_neighbors(hex, ability.aoe)
 			searched.append(hex)

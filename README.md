@@ -15,7 +15,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Some ships have a second special ability to really mix things up.
 - Some ships have drawbacks that reduce their effectiveness under specific conditions.
 - A fleet with no armed ships left (only supply tenders) has lost.
-- A fleet down to its last two ships can no longer hide: at the start of each of its opponent's turns, each of its ships gives away its rough position, as a contact on a patch of seven hexes that includes one of its own (nineteen for a submarine).
+- A fleet down to its last two armed ships can no longer hide: at the start of each of its opponent's turns, each of those ships gives away its rough position, as a contact on a patch of nineteen hexes that includes one of its own. Supply tenders don't count, and don't give themselves away.
 
 ### Ship Classes
 ##### Coastal Battery
@@ -48,7 +48,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Size: 3
 - Points Cost: 3
 - Special Ability: (Nuclear Strike - 6 turns) Select a hex on opponent's board; instantly sinks any unit it hits directly and damages all hexes within two hexes of central hex
-- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines (but not coastal batteries) on that hex and its direct neighbors, and gives away the submarine's rough position (a patch of seven hexes that includes one of its own)
+- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines (but not coastal batteries) on that hex and its direct neighbors, and gives away the submarine's rough position (a patch of nineteen hexes that includes one of its own)
 - Passive Ability: Can only be hit by surface units on center hex
 - Drawbacks: Sinks when any hex is hit by a mine, ASW strike, or another sub, sinks instantly when hit in center hex by surface unit, cannot shoot at island tiles except with Nuclear Strike
 

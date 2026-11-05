@@ -103,6 +103,19 @@ func test_strikes_log_a_ship_they_sink_as_sunk_on_every_hex() -> void:
 		remove(from)
 
 
+# README: tenders don't count toward the last two, or give themselves away
+func test_tenders_neither_count_nor_give_themselves_away() -> void:
+	var destroyer := spawn(p1, "destroyer", Vector2i(17, 2))
+	var tender := spawn(p1, "supply_tender", Vector2i(28, 12))
+	var other := spawn(p1, "supply_tender", Vector2i(28, 8))
+	p1.give_away()
+	var contacts := _logged("Contact")
+	assert_true(destroyer.get_occupied_hexes().any(func(h: Vector2i) -> bool: return h in contacts))
+	for ship: Ship in [tender, other]:
+		for h in ship.get_occupied_hexes():
+			assert_false(h in contacts, "no contact on a tender")
+
+
 # Battleship: Salvo
 
 
@@ -182,19 +195,19 @@ func test_sonar_pulse_reveals_ship_on_center_hex() -> void:
 
 
 # README: Sonar Pulse gives away the submarine's rough position, a patch of
-# seven hexes that includes one of its own, but not the submarine itself
+# nineteen hexes that includes one of its own, but not the submarine itself
 func test_sonar_pulse_gives_away_a_patch_around_the_submarine() -> void:
 	game.grid.dice.reseed(1)
 	var sub := spawn(p0, "submarine", Vector2i(6, 7))
 	p1.receive_special(Vector2i(22, 7), sub, true)
 	var patch := _logged("Submarine used Sonar Pulse")
-	assert_between(patch.size(), 4, 7, "a patch of seven, less any off the board")
+	assert_eq(patch.size(), 19)
 	assert_true(sub.get_occupied_hexes().any(func(h: Vector2i) -> bool: return h in patch))
 	assert_true(p1.temp_revealed_ships.is_empty(), "no copy of it shown")
 
 
-# README: a fleet down to its last two ships gives each away at the start of
-# each of its opponent's turns: seven hexes, nineteen for a submarine
+# README: a fleet down to its last two armed ships gives each away at the start
+# of each of its opponent's turns, on a patch of nineteen hexes
 func test_the_last_two_ships_give_themselves_away() -> void:
 	game.grid.dice.reseed(1)
 	var destroyer := spawn(p1, "destroyer", Vector2i(22, 7))
@@ -207,8 +220,8 @@ func test_the_last_two_ships_give_themselves_away() -> void:
 	var contacts := _logged("Contact")
 	for ship: Ship in [destroyer, sub]:
 		assert_true(ship.get_occupied_hexes().any(func(h: Vector2i) -> bool: return h in contacts))
-	# The two patches, which may overlap: 7 and up to 19 hexes
-	assert_between(contacts.size(), 19, 26)
+	# The two patches, which may overlap
+	assert_between(contacts.size(), 19, 38)
 	game.grid.dice.reseed(1)
 	var first := contacts.duplicate()
 	_clear_history()
