@@ -19,8 +19,8 @@ func _ready() -> void:
 		2,
 		"Recon Flight",
 		(
-			"Reveals two rows of hexes on opponent's board (the one chosen and the next),"
-			+ " except for submarines"
+			"Reveals the whole of any ship with a hex in two rows of opponent's board (the"
+			+ " one chosen and the next), except for submarines"
 		)
 	))
 	passive = PassiveAbility.new(
