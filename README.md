@@ -48,7 +48,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Size: 3
 - Points Cost: 3
 - Special Ability: (Nuclear Strike - 6 turns) Select a hex on opponent's board; instantly sinks any unit it hits directly and damages all hexes within two hexes of central hex
-- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals ships and submarines (but not coastal batteries) on that hex and its direct neighbors, and gives away the submarine's rough position (a patch of nineteen hexes that includes one of its own)
+- Secondary Ability: (Sonar Pulse - 1 turn) Select a hex on opponent's board; reveals the whole of any ship or submarine (but not coastal batteries) with a hex on that hex or its direct neighbors, and gives away the submarine's rough position (a patch of nineteen hexes that includes one of its own)
 - Passive Ability: Can only be hit by surface units on center hex
 - Drawbacks: Sinks when any hex is hit by a mine, ASW strike, or another sub, sinks instantly when hit in center hex by surface unit, cannot shoot at island tiles except with Nuclear Strike
 
@@ -80,7 +80,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Weapon: F-35
 - Size: 5
 - Points Cost: 5
-- Special Ability: (Recon Flight - 2 turns) Reveals two rows of hexes on opponent's board (the one chosen and the next), except for submarines
+- Special Ability: (Recon Flight - 2 turns) Reveals the whole of any ship with a hex in two rows of the opponent's board (the one chosen and the next), except for submarines
 - Passive Ability: Can use two attacks in one turn, and has 6 AP rather than 4, so it can still move after them
 - Drawbacks: If at least three hexes are damaged, can only use one attack move per turn
 
