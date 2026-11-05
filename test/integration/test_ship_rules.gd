@@ -278,13 +278,15 @@ func test_salvo_cools_down_for_three_turns() -> void:
 	assert_eq(battleship.special.cooldown_interval, 3)
 
 
-# README: a coastal battery costs 1 point, and must be hit five times
-func test_a_battery_is_cheap_and_takes_five_hits() -> void:
-	assert_eq(preload("res://gui/ship_selection.gd").POINT_VALUES.CoastalBattery, 1)
+# README: a coastal battery costs 2 points, and must be hit eight times
+func test_a_battery_costs_two_points_and_takes_eight_hits() -> void:
+	assert_eq(preload("res://gui/ship_selection.gd").POINT_VALUES.CoastalBattery, 2)
 	var battery := spawn_battery(p1, Vector2i(22, 7))
-	for i in 4:
+	assert_eq(p1.damage_taken(), 0, "an undamaged battery counts as undamaged")
+	for i in 7:
 		battery.hit(battery.hex, battery)
-	assert_false(battery.sunk, "four isn't enough")
+	assert_eq(p1.damage_taken(), 7)
+	assert_false(battery.sunk, "seven isn't enough")
 	battery.hit(battery.hex, battery)
 	assert_true(battery.sunk)
 

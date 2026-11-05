@@ -8,17 +8,13 @@ func slider(dialog: Node, ship_type: String) -> HSlider:
 	return dialog.get_node("VBoxContainer/Body/SelectionGrid/" + ship_type + "/CountSlider")
 
 
-# One of each costs 24 of the 25 points, so the last goes on a battery if
-# there's an island for one
-func test_classic_fleet_spends_the_spare_point_on_a_battery() -> void:
+# One of each costs all 25 points
+func test_classic_fleet_is_one_of_each_for_the_whole_budget() -> void:
 	var dialog: Node = add_child_autofree(SELECTION_SCENE.instantiate())
 	dialog.set_island_tiles(2)
 	dialog.get_node("VBoxContainer/Buttons/Classic").pressed.emit()
-	assert_eq(slider(dialog, "CoastalBattery").value, 2.0, "two islands, two batteries")
+	assert_eq(slider(dialog, "CoastalBattery").value, 1.0)
 	assert_eq(dialog.used_points, dialog.POINTS_BUDGET)
-	dialog.set_island_tiles(1)
-	dialog.get_node("VBoxContainer/Buttons/Classic").pressed.emit()
-	assert_eq(slider(dialog, "CoastalBattery").value, 1.0, "one island, one")
 	assert_false(dialog.can_add_ship(), "so nothing to ask about")
 
 

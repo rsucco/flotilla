@@ -265,7 +265,7 @@ func damage_taken() -> int:
 	for ship in ships:
 		total += ship.hit_hexes.count(true)
 		if ship is CoastalBattery:
-			total += 5 - (ship as CoastalBattery).hp
+			total += CoastalBattery.MAX_HP - (ship as CoastalBattery).hp
 	return total
 
 

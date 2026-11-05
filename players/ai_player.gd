@@ -11,9 +11,9 @@ const SELECTION := preload("res://gui/ship_selection.gd")
 # Fleets to pick from, each within the points budget. Rough starting points
 # for balance passes, not a final word.
 const FLEETS: Array[Dictionary] = [
-	# Classic: one of everything, and a second battery with the spare point
+	# Classic: one of everything
 	{
-		"CoastalBattery": 2,
+		"CoastalBattery": 1,
 		"Corvette": 1,
 		"Destroyer": 1,
 		"Cruiser": 1,
@@ -23,16 +23,14 @@ const FLEETS: Array[Dictionary] = [
 		"Carrier": 1,
 	},
 	# Gun line
-	{"Battleship": 2, "Cruiser": 2, "Destroyer": 2, "Corvette": 2, "CoastalBattery": 1},
+	{"Battleship": 2, "Cruiser": 2, "Destroyer": 3, "Corvette": 1},
 	# Carrier group
 	{
 		"Carrier": 2,
 		"Cruiser": 1,
-		"Destroyer": 1,
+		"Destroyer": 2,
 		"SupplyTender": 1,
 		"Submarine": 1,
-		"Corvette": 1,
-		"CoastalBattery": 1,
 	},
 	# Wolfpack
 	{"Submarine": 3, "Destroyer": 2, "Battleship": 1, "Corvette": 3},
@@ -44,7 +42,7 @@ const FLEETS: Array[Dictionary] = [
 		"SupplyTender": 1,
 		"Destroyer": 1,
 		"Submarine": 1,
-		"Corvette": 2,
+		"Corvette": 1,
 	},
 ]
 const DIRECTIONS: Array[int] = [0, 60, 120, 180, 240, 300]

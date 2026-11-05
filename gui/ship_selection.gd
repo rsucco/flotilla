@@ -8,7 +8,7 @@ const MAX_PER_TYPE := 5
 
 # Keyed by node name under SelectionGrid
 const POINT_VALUES := {
-	"CoastalBattery": 1,
+	"CoastalBattery": 2,
 	"Corvette": 2,
 	"Destroyer": 3,
 	"Cruiser": 3,
@@ -247,6 +247,3 @@ func _on_Classic_pressed() -> void:
 		slider(ship_type).value = 0
 	for ship_type: String in POINT_VALUES:
 		slider(ship_type).value = 1
-	# One of each leaves a point, which goes on another battery if there's an
-	# island for it (the slider's limit counts both)
-	slider("CoastalBattery").value = slider("CoastalBattery").max_value

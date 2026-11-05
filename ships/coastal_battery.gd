@@ -4,7 +4,7 @@ extends Ship
 const PROJECTILE_SCENE := preload("res://ships/projectiles/battleship_projectile.tscn")
 const TURRET_SOUND := preload("res://audio/artillery_rotate.wav")
 # Passive - Fortified: hits it takes to be destroyed
-const MAX_HP := 5
+const MAX_HP := 8
 
 var hp := MAX_HP
 
@@ -22,7 +22,7 @@ func _ready() -> void:
 	ship_name = "Coastal Battery"
 	sunk_event = "Destroyed"
 	weapon = "Big Gun"
-	passive = PassiveAbility.new("Fortified", "Must be hit five times to destroy")
+	passive = PassiveAbility.new("Fortified", "Must be hit %d times to destroy" % MAX_HP)
 	drawback = Drawback.new("Stationary", "Cannot move, reveals itself when firing")
 	hit_sound = preload("res://audio/land_hit.wav")
 	sink_sound = preload("res://audio/battery_destroyed.wav")
