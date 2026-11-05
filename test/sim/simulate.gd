@@ -43,7 +43,10 @@ var fleet: Array[Array] = []
 # The attack under way: who made it, and the other side's ships and hits
 # before it landed
 var attacker: Ship
+var attack_name := ""
 var before := {}
+# Ability or weapon name -> how often it was used, and what it hit and sank
+var abilities := {}
 
 
 func _initialize() -> void:
@@ -130,6 +133,7 @@ func run() -> void:
 		"turns": game.current_turn,
 		"left": left,
 		"endgame": _endgame(left, winner),
+		"abilities": abilities,
 		"ships": fleet.map(func(entry: Array) -> Dictionary: return entry[1]),
 	}
 	var file := FileAccess.open(out, FileAccess.READ_WRITE)
@@ -187,8 +191,14 @@ func _endgame(left: Array, winner: int) -> Dictionary:
 	return {"from": shares.size(), "lasted": 0}
 
 
-func _on_attack_started(ship: Ship, _kind: String, _target: Vector2i) -> void:
+func _on_attack_started(ship: Ship, kind: String, _target: Vector2i) -> void:
 	attacker = ship
+	attack_name = ship.weapon
+	if kind != "fire":
+		attack_name = (ship.special if kind == "special" else ship.secondary).name
+	if not abilities.has(attack_name):
+		abilities[attack_name] = {"uses": 0, "hits": 0, "kills": 0}
+	abilities[attack_name].uses += 1
 	before.clear()
 	for entry in fleet:
 		if entry[1].side != ship.player.player_num and entry[1].sunk == 0:
@@ -197,15 +207,20 @@ func _on_attack_started(ship: Ship, _kind: String, _target: Vector2i) -> void:
 
 func _on_attack_resolved() -> void:
 	var by: Dictionary = _record(attacker)
+	var tally: Dictionary = abilities[attack_name]
 	for entry in fleet:
 		if not before.has(entry[0]):
 			continue
 		if not _gone(entry[0]):
-			by.hits += (entry[0] as Ship).hit_hexes.count(true) - int(before[entry[0]])
+			var hits: int = (entry[0] as Ship).hit_hexes.count(true) - int(before[entry[0]])
+			by.hits += hits
+			tally.hits += hits
 		elif entry[1].sunk == 0:
 			entry[1].sunk = game.current_turn
 			entry[1].by = attacker.ship_type
+			entry[1].with = attack_name
 			by.kills += 1
+			tally.kills += 1
 	# Sinkings outside an attack (mines) are noticed as the turn goes on
 	for entry in fleet:
 		if entry[1].sunk == 0 and _gone(entry[0]):

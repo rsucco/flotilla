@@ -21,7 +21,7 @@ for a in "${personas[@]}"; do
         done
     done
 done | xargs -P "$jobs" -L 1 sh -c '
-    godot --headless --path . -s res://test/sim/simulate.gd -- \
+    timeout 900 godot --headless --path . -s res://test/sim/simulate.gd -- \
         "$0/$1-$2-$3.jsonl" "$3" "$1" "$2" 2>/dev/null | grep -E " won| draw" || true
 ' "$parts"
 
