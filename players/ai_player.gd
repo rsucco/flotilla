@@ -73,6 +73,8 @@ var values: Dictionary = VALUES
 var unrep_value := UNREP_VALUE
 var shelled := SHELLED
 var spotted := SPOTTED
+# Submarines that pulsed this turn, and now run from the patch they gave away
+var _fleeing: Array[Ship] = []
 
 
 # Takes on a persona for a simulation: any of "fleets", "values" (merged over
@@ -120,15 +122,24 @@ func _place(ship: Ship) -> void:
 	ship.visible = false
 
 
+func new_turn() -> void:
+	super()
+	_fleeing.clear()
+
+
 func get_move() -> void:
 	# Deferred: Root only starts waiting for made_move once this returns
 	_move.call_deferred()
 
 
 func _move() -> void:
-	var move := _best_attack()
+	var move := _flee()
+	if move.is_empty():
+		move = _best_attack()
 	if move.is_empty():
 		move = _best_move()
+	if not move.is_empty() and move[0] is Submarine and move[1] == "secondary":
+		_fleeing.append(move[0])
 	await (
 		get_tree()
 		. create_timer(MOVE_PAUSE if move.is_empty() or move[1] in MOVES else ATTACK_PAUSE, false)
@@ -140,6 +151,31 @@ func _move() -> void:
 	else:
 		await perform(move[0], move[1], move[2])
 	made_move.emit()
+
+
+# [ship, action, no target] taking a submarine that pulsed this turn out of the
+# patch it gave away, or as near as it can get; [] if none can move
+func _flee() -> Array:
+	for ship in _fleeing:
+		if not ships.has(ship):
+			continue
+		var best := []
+		var fewest := INF
+		for action in MOVES:
+			if can_perform(ship, action):
+				var in_patch := _hexes_after(ship, action).filter(_given_away).size()
+				if in_patch < fewest:
+					best = [ship, action, Grid.OFF_GRID]
+					fewest = in_patch
+		if not best.is_empty():
+			return best
+	return []
+
+
+func _given_away(hex: Vector2i) -> bool:
+	return grid.tile(hex).history.any(
+		func(e: Array) -> bool: return e[0] == grid.turn and e[1] == "Submarine used Sonar Pulse"
+	)
 
 
 # [ship, action, no target] for the move that most improves a ship's lot, or
@@ -207,7 +243,13 @@ func _best_attack() -> Array:
 	var best := []
 	var best_score := -1.0
 	for ship in ships:
+		if _fleeing.has(ship):
+			continue
 		for kind in ATTACKS:
+			# A pulse gives the submarine away, so it comes first, with all its
+			# AP left to run with, or not at all
+			if ship is Submarine and kind == "secondary" and ship.ap < ship.default_ap:
+				continue
 			if kind == "special" and ship is SupplyTender:
 				for near in (ship as SupplyTender).ships_in_reach():
 					var score := near.hit_hexes.count(true) * unrep_value

@@ -116,6 +116,40 @@ func test_the_ai_fires_where_a_ship_was_just_seen() -> void:
 	assert_lte(Grid.distance(move[2], Vector2i(7, 7)), 2, "at the carrier")
 
 
+# Pulsing gives the sub away, so it doesn't stay to shoot: it runs
+func test_a_submarine_that_pulsed_runs_rather_than_fires() -> void:
+	var ai := AIPlayer.new(0)
+	ai.grid = grid
+	ai.opponent = p1
+	add_child_autofree(ai)
+	var sub := spawn(ai, "submarine", Vector2i(7, 7))
+	grid.log_event(sub.hex, "Submarine used Sonar Pulse")
+	ai._fleeing.append(sub)
+	var move: Array = ai._flee()
+	assert_eq(move[0], sub)
+	assert_true(move[1] in AIPlayer.MOVES)
+	assert_true(ai._best_attack().is_empty(), "no shots from the fleeing sub")
+	sub.ap = 0
+	assert_true(ai._flee().is_empty(), "nothing left to run with")
+	ai.new_turn()
+	assert_true(ai._fleeing.is_empty(), "next turn it fights again")
+
+
+func test_a_submarine_only_pulses_before_anything_else() -> void:
+	var ai := AIPlayer.new(0)
+	ai.grid = grid
+	ai.opponent = p1
+	add_child_autofree(ai)
+	# Enough value that it would rather pulse than fire
+	ai.values = AIPlayer.VALUES.merged({"Sonar Pulse": 5.0}, true)
+	spawn(p1, "destroyer", Vector2i(22, 7))
+	var sub := spawn(ai, "submarine", Vector2i(7, 7))
+	sub.secondary.cooldown_current = 0
+	assert_eq(ai._best_attack().slice(0, 2), [sub, "secondary"], "with all its AP")
+	sub.ap = 2
+	assert_ne(ai._best_attack().slice(0, 2), [sub, "secondary"], "not once it's acted")
+
+
 func test_every_fleet_spends_the_budget_within_the_rules() -> void:
 	var selection := AIPlayer.SELECTION
 	for fleet: Dictionary in AIPlayer.FLEETS:
