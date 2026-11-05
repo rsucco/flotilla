@@ -8,7 +8,7 @@ const ARMOR_SOUND := preload("res://audio/plink.wav")
 const SALVO_VOLUME_DB := -6.0
 const SALVO_DESC := (
 	"Shoot one central hex and damage whatever it contains as well as all of its "
-	+ "immediate neighbors; if central hex is a damaged hex, sink the enemy ship instantly"
+	+ "immediate neighbors"
 )
 
 var next_turret := 0

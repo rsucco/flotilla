@@ -58,7 +58,7 @@ func test_full_game() -> void:
 	await driver.act("supply_tender", "Forward")
 	await driver.act("battleship", "Fire", Vector2i(19, 10))
 	await driver.act("battleship", "Special", enemy("coastal_battery"))
-	assert_null(driver.ship_of(1, "coastal_battery"), "Salvo sank the damaged battery")
+	assert_lt(driver.ship_of(1, "coastal_battery").hp, CoastalBattery.MAX_HP, "Salvo hit it")
 	await driver.act("carrier", "Fire", Vector2i(21, 12))
 	await driver.act("carrier", "Special", enemy("battleship"))
 	assert_true(driver.ship_of(1, "battleship").visible, "Recon Flight revealed the battleship")

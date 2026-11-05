@@ -419,18 +419,8 @@ func receive_special(hex: Vector2i, from_ship: Ship, use_secondary: bool = false
 				struck.append(ship)
 
 		"Salvo":
-			# Sinks anything when it hits a damaged hex dead-on; otherwise hits
-			# normally in the area of effect
-			var dead_center := get_ship_at_hex(hex)
 			var search := grid.get_all_hex_neighbors(hex, ability.aoe)
-			if dead_center == null:
-				grid.log_event(hex, "Miss (Salvo)")
-			elif dead_center.is_hex_hit(hex):
-				for h in dead_center.get_occupied_hexes():
-					search.erase(h)
-				dead_center.sink()
-			else:
-				dead_center.hit(hex, from_ship)
+			search.push_front(hex)
 			var sunk_hexes: Array[Vector2i] = []
 			for h in search:
 				if sunk_hexes.has(h):

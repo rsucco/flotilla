@@ -159,11 +159,13 @@ func test_ew_strike_adds_five_to_cooldowns_or_resets_whichever_is_less() -> void
 # Battleship: Salvo on ships, and Armor
 
 
-func test_salvo_sinks_a_ship_hit_on_a_damaged_hex() -> void:
-	var destroyer := spawn(p1, "destroyer", Vector2i(22, 7))
-	destroyer.hit_hexes = [false, true, false]
-	p1.receive_special(destroyer.hex, spawn(p0, "battleship", Vector2i(5, 7)))
-	assert_true(destroyer.sunk)
+# README: Salvo has no instant sink: a hit on a damaged hex just splashes on
+func test_salvo_on_a_damaged_hex_hits_like_any_other() -> void:
+	var battleship := spawn(p1, "battleship", Vector2i(22, 7))
+	battleship.hit_hexes = [false, true, false, false]
+	game.grid.dice.reseed(1)
+	p1.receive_special(battleship.hex, spawn(p0, "battleship", Vector2i(5, 7)))
+	assert_false(battleship.sunk)
 
 
 func test_battleship_armor_blocks_about_a_quarter_of_hits() -> void:

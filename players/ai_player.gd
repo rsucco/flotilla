@@ -223,10 +223,6 @@ func _score(map: HeatMap, ship: Ship, kind: String, hex: Vector2i) -> float:
 	var ability := ship.special if kind == "special" else ship.secondary
 	var worth: float = values.get(ability.name, 0.5)
 	match ability.name:
-		"Salvo":
-			# Dead-on a damaged hex sinks the ship
-			var sinks := 2.0 if hex in map.fresh_hits else 0.0
-			return worth * map.area(map.heat, hex, ability.aoe) + sinks
 		"Nuclear Strike":
 			# Dead-on sinks whatever it hits
 			return worth * (map.area(map.heat, hex, ability.aoe) + map.heat[hex])

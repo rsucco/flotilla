@@ -106,11 +106,13 @@ func test_strikes_log_a_ship_they_sink_as_sunk_on_every_hex() -> void:
 # Battleship: Salvo
 
 
-func test_salvo_sinks_damaged_battery() -> void:
+# README: Salvo damages what it hits, and nothing more
+func test_salvo_on_damaged_battery_is_normal_hit() -> void:
 	var battery := spawn_battery(p1, Vector2i(22, 7))
 	battery.hp = 4
 	p1.receive_special(Vector2i(22, 7), spawn(p0, "battleship", Vector2i(5, 7)))
-	assert_true(battery.sunk)
+	assert_false(battery.sunk)
+	assert_eq(battery.hp, 3)
 
 
 func test_destroyed_battery_logged_as_destroyed() -> void:
