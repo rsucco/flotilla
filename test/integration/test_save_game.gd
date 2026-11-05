@@ -99,6 +99,21 @@ func test_turn_counter_reads_as_before_the_save() -> void:
 	assert_eq(game.gui.get_node(label).text, live)
 
 
+func test_player_2s_long_cooldowns_start_a_turn_shorter_once() -> void:
+	await start()
+	var salvo := driver.ship_of(1, "battleship").special
+	var mine := driver.ship_of(1, "destroyer").secondary
+	var nuke := driver.ship_of(1, "submarine").special
+	assert_eq(salvo.cooldown_current, salvo.cooldown_interval - 1, "three turns")
+	assert_eq(mine.cooldown_current, mine.cooldown_interval - 1, "also on a secondary")
+	assert_eq(nuke.cooldown_current, nuke.cooldown_interval - 1, "six turns")
+	var asw := driver.ship_of(1, "destroyer").special
+	assert_eq(asw.cooldown_current, asw.cooldown_interval, "two turns is too short")
+	await reload(game.save_state("swap"))
+	salvo = driver.ship_of(1, "battleship").special
+	assert_eq(salvo.cooldown_current, salvo.cooldown_interval - 1, "not again on loading")
+
+
 func test_mid_turn_save_carries_on_where_it_left_off() -> void:
 	await start()
 	await driver.act("battleship", "Fire", GameDriver.spot(1, "destroyer"))

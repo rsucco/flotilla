@@ -53,7 +53,7 @@ Players take turns on the same device; hand it over when the swap screen appears
 Each ship gets 4 action points (AP) a turn: forward 1, rotate 60° 2, reverse 4, and fire, special or secondary 2 each. A ship fires once a turn (the carrier twice). The dots above a ship are its AP left; ships with none turn grey. Next Ship picks the next ship that can still act, and End Turn ends your turn for the whole fleet.
 
 [b]Abilities[/b]
-Specials and secondaries have a cooldown in turns, shown on their button. They start the game cooling down and count down at the start of each of your turns. Passives (and drawbacks) always apply.
+Specials and secondaries have a cooldown in turns, shown on their button. They start the game cooling down and count down at the start of each of your turns. Player 2 moves second, so their cooldowns of three turns or more start one turn shorter. Passives (and drawbacks) always apply.
 
 [b]Damage[/b]
 Board markers: red is a hit, white a miss, black a ship sunk or destroyed, and half and half a hit that was stopped (armor, or a cruiser shooting it down). Hover over a hex for its history. Ships more than half damaged can't move. Hover over or tap an entry in the fleet panels to see each ship's damage.

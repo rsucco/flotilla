@@ -95,6 +95,9 @@ func test_both_set_up_on_the_hosts_board() -> void:
 		var titles := func(game: Root) -> Array:
 			return game.players[seat].ships.map(func(s: Ship) -> String: return s.title)
 		assert_eq(titles.call(guest), titles.call(host), "the same names")
+	for game: Root in [host, guest]:
+		var salvo: SpecialAbility = drivers[game.seat].ship_of(1, "battleship").special
+		assert_eq(salvo.cooldown_current, salvo.cooldown_interval - 1, "Player 2's head start")
 	assert_true(in_step())
 	assert_false(
 		host.players[1].ships.any(func(s: Ship) -> bool: return s.visible), "theirs unseen"

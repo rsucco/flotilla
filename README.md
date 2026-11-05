@@ -11,6 +11,7 @@ Basic gameplay is similar to Battleship, with some exceptions:
 - Every ship is allowed to fire at least once per turn.
 - Every ship is allowed to move at least one tile or rotate at least 60° per turn, unless more than 50% damaged.
 - Most ships have a special ability that can be used after a cooldown period.
+- Player 2 moves second, so any of their cooldowns of three turns or more starts the game one turn shorter.
 - Most ships have a passive ability that improves their effectiveness.
 - Some ships have a second special ability to really mix things up.
 - Some ships have drawbacks that reduce their effectiveness under specific conditions.

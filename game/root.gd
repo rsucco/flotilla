@@ -18,6 +18,8 @@ const SEA := Color(0.04, 0.3, 0.52)
 const CHANNEL := Color(0.02, 0.19, 0.35)
 # How far the shallows reach out from an island's coast (px)
 const SHALLOWS := 15.0
+# Player 2 starts with cooldowns this long or longer a turn shorter
+const HEAD_START_COOLDOWN := 3
 
 # Set by the title screen before loading us
 static var mode := Mode.HOT_SEAT
@@ -238,6 +240,7 @@ func play_game() -> void:
 		await _set_up()
 		if over:
 			return
+		_give_head_start()
 	else:
 		_restore(resume)
 	# A LAN game's replay would need the other player too
@@ -420,6 +423,14 @@ func _set_up() -> void:
 	setup = {"islands": grid.get_islands(), "selections": selections, "navies": navies}
 	# Random, and unaffected by seed()
 	game_id = ResourceUID.create_id()
+
+
+# Making up for moving second: Player 2's long cooldowns start a turn shorter
+func _give_head_start() -> void:
+	for ship: Ship in players[1].ships:
+		for ability: SpecialAbility in [ship.special, ship.secondary]:
+			if ability.cooldown_interval >= HEAD_START_COOLDOWN:
+				ability.cooldown_current -= 1
 
 
 # Both players choose and place their fleets at once, each on their own
