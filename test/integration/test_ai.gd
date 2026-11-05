@@ -87,7 +87,7 @@ func test_a_named_sighting_pins_down_that_ship_alone() -> void:
 func test_a_crippled_ship_is_still_where_it_was_hit() -> void:
 	spawn(p0, "corvette", Vector2i(5, 5))
 	grid.log_event(Vector2i(5, 5), "Hit, Corvette I")
-	grid.log_event(Vector2i(5, 6), "Hit, Corvette I (Immobilized)")
+	grid.log_event(Vector2i(5, 6), "Hit, Corvette I (Corvette)")
 	grid.turn += 3
 	assert_gt(map().heat[Vector2i(5, 5)], 0.5, "over half damaged, so it can't move")
 

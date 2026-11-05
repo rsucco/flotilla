@@ -54,6 +54,15 @@ func test_placed_on_our_own_water_clear_of_our_ships() -> void:
 	assert_false(destroyer.can_place(Vector2i(5, 8), 0), "nor overlapping it")
 
 
+func test_the_log_does_not_say_a_ship_is_immobilized() -> void:
+	var ship := spawn(p0, "destroyer", Vector2i(5, 5))
+	var hexes := ship.get_occupied_hexes()
+	ship.hit(hexes[0], null)
+	ship.hit(hexes[1], null)
+	assert_true(ship.is_immobilized())
+	assert_eq(game.grid.tile(hexes[1]).history[-1][1], "Hit, Destroyer I")
+
+
 func test_ships_named_in_turn_and_logged_by_name() -> void:
 	var first := spawn(p0, "cruiser", Vector2i(3, 3))
 	var second := spawn(p0, "cruiser", Vector2i(8, 8))

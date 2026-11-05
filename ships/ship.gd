@@ -288,10 +288,7 @@ func hit(hit_hex: Vector2i, _from_ship: Ship) -> void:
 		grid.log_event(hit_hex, "Hit, " + called("No effect"))
 		return
 	hit_hexes[index] = true
-	if is_immobilized():
-		grid.log_event(hit_hex, "Hit, " + called("Immobilized"))
-	else:
-		grid.log_event(hit_hex, "Hit, " + called())
+	grid.log_event(hit_hex, "Hit, " + called())
 	_add_smoke(index)
 	if not hit_hexes.has(false):
 		sink()
