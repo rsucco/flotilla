@@ -102,6 +102,19 @@ func test_both_set_up_on_the_hosts_board() -> void:
 	assert_true(guest.players[1].ships.all(func(s: Ship) -> bool: return s.visible), "ours in view")
 
 
+# The C cheat would change only this game's cooldowns, and desync the two
+func test_the_ability_cheat_is_off_in_a_lan_game() -> void:
+	await start()
+	await drivers[0].wait_until(func() -> bool: return host.players[0].active, 5, "our turn")
+	var ship: Ship = host.players[0].ships[-1]
+	ship.special.cooldown_current = 2
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_C
+	key.pressed = true
+	host._unhandled_input(key)
+	assert_eq(ship.special.cooldown_current, 2)
+
+
 func test_a_navy_chosen_by_both_stays_the_hosts() -> void:
 	await choose(host, "uk")
 	await choose(guest, "uk")

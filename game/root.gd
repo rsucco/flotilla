@@ -184,7 +184,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not key.pressed or key.echo:
 		return
 	var up := players[player_up]
-	if key.physical_keycode == KEY_C and up is LocalPlayer and up.active:
+	# Not in a LAN game: only this game's cooldowns would change, and the two
+	# would no longer match
+	if key.physical_keycode == KEY_C and up is LocalPlayer and up.active and mode != Mode.LAN:
 		(up as LocalPlayer).ready_abilities()
 	elif key.physical_keycode == KEY_V:
 		reveal_all = not reveal_all
